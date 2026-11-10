@@ -1,0 +1,332 @@
+/* =========================================================================
+   MUNDO VIRTUAL · Integrante 3
+   Saturado, onírico, seductor. Y, a medida que el visitante se queda,
+   cada vez más hueco: los estados [data-grieta="1|2|3"] lo degradan.
+   Prefijo obligatorio: .vir-
+   NOTA: .vir::after está reservado para efectos.css (líneas de escaneo).
+   ========================================================================= */
+
+.vir {
+  min-height: calc(var(--alto-pantalla) * 1.6);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--vir-1);
+  color: var(--vir-texto);
+}
+
+/* ---------- Cielo (fondo animado) ---------- */
+.vir-cielo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, var(--vir-1) 0%, #2b0d63 22%, #4a1690 52%, #34107a 78%, var(--vir-1) 100%);
+  transition: filter 2.5s ease;
+}
+
+.vir-particulas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Orbes de luz: degradados radiales (más livianos que filter: blur) */
+.vir-orbe {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  animation: vir-respirar 12s ease-in-out infinite alternate;
+}
+
+.vir-orbe--1 {
+  top: 2%;
+  left: -12%;
+  width: 55vmax;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(255, 79, 184, .55), transparent 65%);
+}
+
+.vir-orbe--2 {
+  top: 35%;
+  right: -18%;
+  width: 50vmax;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(62, 240, 224, .38), transparent 65%);
+  animation-delay: -4s;
+}
+
+.vir-orbe--3 {
+  bottom: -8%;
+  left: 25%;
+  width: 40vmax;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(255, 213, 107, .3), transparent 65%);
+  animation-delay: -8s;
+}
+
+@keyframes vir-respirar {
+  from { transform: scale(1);    opacity: .75; }
+  to   { transform: scale(1.18); opacity: 1; }
+}
+
+/* Islas flotantes: roca (::before) + cristal luminoso (::after) */
+.vir-isla {
+  position: absolute;
+  width: calc(15rem * var(--tam, 1));
+  aspect-ratio: 2 / 1.3;
+  animation: vir-flotar 9s ease-in-out infinite alternate;
+}
+
+.vir-isla::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #ffb3e0 0 9%, #8a3fd1 10%, #3a1275 55%, #1a0638 100%);
+  clip-path: polygon(0 12%, 10% 6%, 30% 10%, 55% 4%, 80% 9%, 100% 12%, 88% 38%, 72% 62%, 56% 100%, 40% 70%, 22% 46%);
+  filter: drop-shadow(0 0 24px rgba(255, 79, 184, .45));
+}
+
+.vir-isla::after {
+  content: "";
+  position: absolute;
+  left: 46%;
+  bottom: 92%;
+  width: 14%;
+  aspect-ratio: 1 / 1.8;
+  background: linear-gradient(160deg, #fff, var(--vir-4) 45%, var(--vir-2));
+  clip-path: polygon(50% 0, 100% 40%, 50% 100%, 0 40%);
+  filter: drop-shadow(0 0 14px var(--vir-4));
+  animation: vir-cristal 4s ease-in-out infinite alternate;
+}
+
+.vir-isla--1 { --tam: 1;   top: 12%; left: 4%; }
+.vir-isla--2 { --tam: .7;  top: 46%; right: 6%; animation-delay: -3s; }
+.vir-isla--3 { --tam: .5;  top: 78%; left: 14%; animation-delay: -6s; }
+
+@keyframes vir-flotar {
+  from { transform: translateY(-14px) rotate(-1.5deg); }
+  to   { transform: translateY(14px)  rotate(1.5deg); }
+}
+
+@keyframes vir-cristal {
+  from { transform: translateY(0);    opacity: .8; }
+  to   { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ---------- Contenido ---------- */
+.vir-contenido {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 1.8rem;
+  padding-block: 24vh 22vh;
+  text-align: center;
+}
+
+.vir-etiqueta {
+  color: var(--vir-4);
+  font-family: var(--fuente-mono);
+  font-size: .75rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+
+.vir-titulo {
+  font-family: var(--fuente-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(3.2rem, 11vw, 9rem);
+  line-height: .95;
+  letter-spacing: -.03em;
+  background: linear-gradient(90deg, #fff, var(--vir-5), var(--vir-3), var(--vir-4), #fff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: vir-brillo 9s linear infinite;
+  text-shadow: none;
+}
+
+@keyframes vir-brillo {
+  to { background-position: -300% 0; }
+}
+
+.vir-texto {
+  max-width: 34ch;
+  font-family: var(--fuente-serif);
+  font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+  line-height: 1.6;
+  opacity: .9;
+}
+
+/* ---------- Fragmentos (cada clic divide) ---------- */
+.vir-fragmentos {
+  display: flex;
+  width: min(100%, 46rem);
+  aspect-ratio: 16 / 10;
+  margin-top: 2rem;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, .06);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .25),
+    0 40px 90px -30px rgba(255, 79, 184, .6);
+}
+
+.vir-division {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.vir-division--columna { flex-direction: column; }
+
+.vir-fragmento {
+  --profundidad: 0;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: .4rem;
+  border: 0;
+  background: var(--fondo-frag, linear-gradient(135deg, var(--vir-3), var(--vir-2)));
+  color: #fff;
+  font-family: var(--fuente-serif);
+  font-style: italic;
+  font-size: calc(clamp(1.1rem, 3.4vw, 2.4rem) * (1 - var(--profundidad) * .16));
+  line-height: 1.1;
+  text-shadow: 0 2px 12px rgba(26, 6, 56, .5);
+  overflow-wrap: anywhere;
+  transition: filter var(--dur-rapida), transform var(--dur-rapida);
+}
+
+.vir-fragmento:hover { filter: brightness(1.2) saturate(1.15); }
+.vir-fragmento:active { transform: scale(.97); }
+
+.vir-fragmento--nace { animation: vir-nacer .6s var(--curva-suave) both; }
+
+@keyframes vir-nacer {
+  from { opacity: 0; filter: brightness(2.5) blur(6px); }
+}
+
+.vir-pista {
+  color: var(--vir-4);
+  font-family: var(--fuente-mono);
+  font-size: .7rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  opacity: .75;
+}
+
+/* ---------- Despertar (nivel 3) ---------- */
+.vir-despertar {
+  display: grid;
+  justify-items: center;
+  gap: 1.4rem;
+  margin-top: 4rem;
+  animation: vir-nacer 1.4s ease both;
+}
+
+.vir-despertar__texto {
+  font-family: var(--fuente-mono);
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  letter-spacing: -.02em;
+}
+
+.vir-despertar__boton {
+  padding: 1rem 2rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: var(--fuente-mono);
+  font-size: .8rem;
+  letter-spacing: .25em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color var(--dur-rapida), color var(--dur-rapida);
+}
+
+.vir-despertar__boton:hover {
+  background: var(--vir-texto);
+  color: var(--vir-1);
+}
+
+/* ---------- Intrusiones del mundo real ---------- */
+.vir-intrusiones {
+  position: fixed;
+  left: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 40;
+  display: grid;
+  gap: .5rem;
+  width: min(19rem, calc(100% - 4rem));
+  transition: opacity var(--dur-media), visibility var(--dur-media);
+}
+
+/* Solo visibles mientras el visitante está en el mundo virtual */
+body:not([data-mundo="virtual"]) .vir-intrusiones {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.vir-intrusion {
+  padding: .7rem .9rem;
+  border-radius: .5rem;
+  background: var(--cot-fondo);
+  color: var(--cot-tinta);
+  font-family: var(--fuente-mono);
+  font-size: .75rem;
+  line-height: 1.4;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .6);
+  rotate: var(--giro, 0deg);
+  animation: vir-intrusion-entra .5s var(--curva-suave) both;
+}
+
+.vir-intrusion b {
+  display: block;
+  color: var(--cot-tenue);
+  font-weight: 500;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+@keyframes vir-intrusion-entra {
+  from { opacity: 0; transform: translateX(-2rem); }
+}
+
+/* =========================================================================
+   ESTADOS DE LA GRIETA (el mundo virtual se vacía)
+   ========================================================================= */
+.vir[data-grieta="1"] .vir-cielo {
+  filter: hue-rotate(-25deg) saturate(1.15);
+}
+
+.vir[data-grieta="2"] .vir-cielo {
+  filter: saturate(.45) brightness(.8);
+}
+
+.vir[data-grieta="2"] .vir-fragmento {
+  filter: saturate(.55);
+}
+
+.vir[data-grieta="3"] .vir-cielo {
+  filter: grayscale(.9) brightness(.6) contrast(1.15);
+}
+
+.vir[data-grieta="3"] .vir-fragmento {
+  filter: grayscale(1) brightness(.85);
+}
+
+.vir[data-grieta="3"] .vir-titulo {
+  background-image: linear-gradient(90deg, #8d8a93, #d4d3cf, #6b6a66, #8d8a93);
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 40rem) {
+  .vir-fragmentos { aspect-ratio: 4 / 5; }
+  .vir-isla--1 { --tam: .65; left: -6%; }
+  .vir-isla--2 { --tam: .5; right: -4%; }
+  .vir-isla--3 { --tam: .4; }
+}

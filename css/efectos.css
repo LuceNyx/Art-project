@@ -1,0 +1,207 @@
+/* =========================================================================
+   EFECTOS · Integrante 4
+   Efectos reutilizables que se activan con atributos data-*:
+     [data-revelar]  → aparece al entrar en pantalla
+     [data-maquina]  → texto escrito letra por letra
+     [data-glitch]   → distorsión RGB (solo dentro de [data-grieta] ≥ 1)
+     [data-parallax] → se mueve con el mouse (solo JS)
+   Además: el PORTAL (.fx-portal) y el modo de movimiento reducido.
+   Prefijo obligatorio: .fx-
+   ========================================================================= */
+
+/* ---------- Aparición al hacer scroll ---------- */
+/* Usa las propiedades "translate" y "scale" (no "transform") para no
+   chocar con animaciones propias de cada elemento. */
+.js [data-revelar] {
+  opacity: 0;
+  translate: 0 2.5rem;
+  filter: blur(6px);
+  transition:
+    opacity var(--dur-lenta) var(--curva-suave),
+    translate var(--dur-lenta) var(--curva-suave),
+    filter var(--dur-lenta) var(--curva-suave);
+  transition-delay: var(--retraso, 0s);
+}
+
+.js [data-revelar].es-visible {
+  opacity: 1;
+  translate: 0 0;
+  filter: none;
+}
+
+/* ---------- Máquina de escribir ---------- */
+.fx-cursor {
+  display: inline-block;
+  width: .55em;
+  height: 1.1em;
+  margin-left: .1em;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: fx-cursor 1s steps(1) infinite;
+}
+
+@keyframes fx-cursor { 50% { opacity: 0; } }
+
+/* ---------- Glitch ---------- */
+/* efectos.js copia el texto del elemento en data-texto */
+[data-glitch] { position: relative; }
+
+[data-glitch]::before,
+[data-glitch]::after {
+  content: attr(data-texto);
+  position: absolute;
+  inset: 0;
+  white-space: pre-line;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-glitch]::before { color: var(--vir-4); }
+[data-glitch]::after  { color: var(--vir-3); }
+
+[data-grieta="1"] [data-glitch]::before { animation: fx-glitch-a 4s steps(1) infinite; }
+[data-grieta="1"] [data-glitch]::after  { animation: fx-glitch-b 4s steps(1) infinite; }
+[data-grieta="2"] [data-glitch]::before { animation: fx-glitch-a 1.8s steps(1) infinite; }
+[data-grieta="2"] [data-glitch]::after  { animation: fx-glitch-b 1.8s steps(1) infinite; }
+[data-grieta="3"] [data-glitch]::before { animation: fx-glitch-a .7s steps(1) infinite; }
+[data-grieta="3"] [data-glitch]::after  { animation: fx-glitch-b .7s steps(1) infinite; }
+
+@keyframes fx-glitch-a {
+  0%, 82%, 100% { opacity: 0; }
+  83% { opacity: .9; transform: translate(-4px, 1px); clip-path: inset(10% 0 62% 0); }
+  87% { opacity: .9; transform: translate(5px, -2px); clip-path: inset(55% 0 20% 0); }
+  91% { opacity: .9; transform: translate(-2px, 0);   clip-path: inset(30% 0 45% 0); }
+  95% { opacity: 0; }
+}
+
+@keyframes fx-glitch-b {
+  0%, 84%, 100% { opacity: 0; }
+  85% { opacity: .85; transform: translate(4px, -1px); clip-path: inset(65% 0 8% 0); }
+  89% { opacity: .85; transform: translate(-5px, 2px); clip-path: inset(5% 0 75% 0); }
+  93% { opacity: .85; transform: translate(3px, 0);    clip-path: inset(40% 0 35% 0); }
+  96% { opacity: 0; }
+}
+
+/* ---------- Líneas de escaneo (degradación) ---------- */
+/* Reservado: ::after de la sección con data-grieta */
+[data-grieta]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s ease;
+}
+
+[data-grieta="2"]::after { opacity: .5; }
+[data-grieta="3"]::after { opacity: .9; animation: fx-parpadeo 3s steps(1) infinite; }
+
+@keyframes fx-parpadeo {
+  0%, 100% { opacity: .9; }
+  47% { opacity: .55; }
+  49% { opacity: 1; }
+  73% { opacity: .7; }
+}
+
+/* =========================================================================
+   PORTAL: el celular crece hasta tragarse la pantalla
+   efectos.js actualiza --escala, --oscuro, --f1, --f2 y --luz con el scroll
+   ========================================================================= */
+.fx-portal {
+  height: calc(var(--alto-pantalla) * 3.2);
+  background: var(--cot-fondo);
+}
+
+.fx-portal__fijo {
+  position: sticky;
+  top: 0;
+  display: grid;
+  place-items: center;
+  height: var(--alto-pantalla);
+  overflow: hidden;
+}
+
+/* El cuarto se oscurece */
+.fx-portal__sombra {
+  position: absolute;
+  inset: 0;
+  background: var(--negro);
+  opacity: var(--oscuro, 0);
+}
+
+.fx-portal__celular {
+  position: relative;
+  z-index: 1;
+  width: clamp(13rem, 58vw, 17rem);
+  aspect-ratio: 9 / 19;
+  padding: 10px;
+  border-radius: 2.2rem;
+  background: #1c1c1c;
+  transform: scale(var(--escala, 1));
+  will-change: transform;
+  box-shadow: 0 0 calc(60px + var(--oscuro, 0) * 120px) rgba(255, 79, 184, .45);
+}
+
+.fx-portal__pantalla {
+  height: 100%;
+  border-radius: 1.6rem;
+  background:
+    radial-gradient(circle at 50% 70%, rgba(255, 79, 184, .95), transparent 60%),
+    radial-gradient(circle at 30% 20%, rgba(62, 240, 224, .7), transparent 55%),
+    var(--vir-1);
+  animation: fx-pantalla 6s ease-in-out infinite alternate;
+}
+
+@keyframes fx-pantalla {
+  to { filter: hue-rotate(40deg) brightness(1.15); }
+}
+
+.fx-portal__frase {
+  position: absolute;
+  bottom: 12%;
+  z-index: 2;
+  width: 100%;
+  padding-inline: 1.5rem;
+  color: var(--blanco);
+  font-family: var(--fuente-serif);
+  font-style: italic;
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  text-align: center;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, .6);
+}
+
+.fx-portal__frase--1 { opacity: var(--f1, 0); }
+.fx-portal__frase--2 { opacity: var(--f2, 0); }
+
+/* Luz final: coincide con el color inicial del mundo virtual */
+.fx-portal__luz {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--vir-1);
+  opacity: var(--luz, 0);
+  pointer-events: none;
+}
+
+/* =========================================================================
+   MOVIMIENTO REDUCIDO (accesibilidad)
+   Respeta la preferencia del sistema operativo del visitante.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+
+  .js [data-revelar] { translate: none; filter: none; }
+}

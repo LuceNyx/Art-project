@@ -1,0 +1,291 @@
+/* =========================================================================
+   MUNDO COTIDIANO · Integrante 2
+   Paleta gris, tipografía mecánica, ritmo lento y repetitivo.
+   El único color que aparece es la luz de las pantallas: es el
+   "llamado" del mundo virtual que se filtra poco a poco.
+   Prefijo obligatorio: .cot-
+   ========================================================================= */
+
+.cot {
+  overflow: hidden;
+  padding-block: 18vh 12vh;
+  background: var(--cot-fondo);
+  color: var(--cot-tinta);
+  font-family: var(--fuente-mono);
+}
+
+/* Grano de papel / concreto */
+.cot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--textura-grano);
+  opacity: .22;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* ---------- Encabezado ---------- */
+.cot-encabezado {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 1.5rem;
+  min-height: 70vh;
+}
+
+.cot-etiqueta,
+.cot-hora {
+  color: var(--cot-tenue);
+  font-size: .75rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+
+.cot-titulo {
+  font-weight: 400;
+  font-size: clamp(3rem, 11vw, 8.5rem);
+  line-height: .95;
+  letter-spacing: -.05em;
+}
+
+/* ---------- Escenas ---------- */
+.cot-escena {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2rem;
+  min-height: var(--alto-pantalla);
+  padding: 10vh 1.5rem;
+  text-align: center;
+}
+
+.cot-texto {
+  max-width: 32ch;
+  font-size: clamp(1rem, 2.1vw, 1.3rem);
+  line-height: 1.65;
+}
+
+.cot-texto--susurro {
+  color: var(--cot-tenue);
+  font-style: italic;
+  font-size: .95rem;
+}
+
+/* ---------- Escena 1: reloj ---------- */
+.cot-reloj {
+  font-weight: 300;
+  font-size: clamp(5rem, 24vw, 15rem);
+  line-height: 1;
+  letter-spacing: -.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cot-reloj__sep { animation: cot-parpadeo 1s steps(1) infinite; }
+
+/* Vibración al posponer */
+.cot-reloj--suena { animation: cot-vibrar .45s linear; }
+
+.cot-boton {
+  padding: .85rem 1.4rem;
+  border: 1px solid var(--cot-tinta);
+  background: transparent;
+  font-family: var(--fuente-mono);
+  font-size: .75rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  transition: background-color var(--dur-rapida), color var(--dur-rapida);
+}
+
+.cot-boton:hover:not(:disabled) {
+  background: var(--cot-tinta);
+  color: var(--cot-fondo);
+}
+
+.cot-boton:disabled {
+  border-style: dashed;
+  color: var(--cot-tenue);
+  cursor: default;
+}
+
+@keyframes cot-parpadeo { 50% { opacity: 0; } }
+
+@keyframes cot-vibrar {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px) rotate(-1deg); }
+  40% { transform: translateX(6px) rotate(1deg); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* ---------- Escena 2: tren ---------- */
+.cot-tren {
+  position: relative;
+  width: min(100%, 64rem);
+  height: clamp(10rem, 28vw, 16rem);
+  overflow: hidden;
+  border-block: 10px solid var(--cot-fondo-2);
+  background: #a8a7a2;
+}
+
+/* Paisaje que pasa: dos capas a distinta velocidad (parallax en CSS) */
+.cot-tren__paisaje {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7rem, rgba(35, 35, 35, .55) 7rem 7.4rem),
+    repeating-linear-gradient(90deg, #9a9994 0 3rem, #8c8b86 3rem 5.5rem, #b1b0ab 5.5rem 7rem, #94938e 7rem 11rem);
+  background-size: 22rem 100%, 11rem 100%;
+  animation: cot-paisaje 3.5s linear infinite;
+  filter: blur(1.5px);
+}
+
+@keyframes cot-paisaje {
+  to { background-position: -22rem 0, -11rem 0; }
+}
+
+.cot-tren__pasajeros {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+}
+
+/* Silueta: cabeza + hombros, todos mirando hacia abajo */
+.cot-tren__pasajeros span {
+  position: relative;
+  width: clamp(3.5rem, 9vw, 5.5rem);
+  aspect-ratio: 3 / 4;
+  background:
+    radial-gradient(circle at 50% 28%, var(--cot-tinta) 0 21%, transparent 22%),
+    radial-gradient(ellipse 50% 46% at 50% 100%, var(--cot-tinta) 0 98%, transparent 100%);
+  opacity: .88;
+}
+
+/* Luz blanca del celular en cada rostro */
+.cot-tren__pasajeros span::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 40%;
+  height: 22%;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(rgba(255, 255, 255, .75), transparent 70%);
+  animation: cot-pantallita 4s ease-in-out infinite alternate;
+}
+
+.cot-tren__pasajeros span:nth-child(2n)::after { animation-delay: -1.3s; }
+.cot-tren__pasajeros span:nth-child(3n)::after { animation-delay: -2.7s; }
+
+@keyframes cot-pantallita {
+  from { opacity: .45; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Escena 3: aula ---------- */
+.cot-pupitres {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(.5rem, 2vw, 1.1rem);
+  width: min(100%, 34rem);
+}
+
+.cot-pupitre {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1.5px solid var(--cot-tenue);
+  border-radius: 3px;
+  opacity: .6;
+}
+
+/* El tuyo: el único con una luz de color (la pantalla bajo la mesa) */
+.cot-pupitre--tu {
+  border-color: var(--cot-tinta);
+  opacity: 1;
+}
+
+.cot-pupitre--tu::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 2px;
+  background: var(--vir-4);
+  box-shadow: 0 0 12px 3px rgba(62, 240, 224, .6);
+  animation: cot-latido 2.4s ease-in-out infinite;
+}
+
+@keyframes cot-latido {
+  50% { opacity: .35; box-shadow: 0 0 4px 1px rgba(62, 240, 224, .3); }
+}
+
+/* ---------- Escena 4: celular ---------- */
+.cot-celular {
+  width: clamp(13rem, 58vw, 17rem);
+  aspect-ratio: 9 / 19;
+  padding: 10px;
+  border-radius: 2.2rem;
+  background: #1c1c1c;
+  box-shadow: 0 30px 60px -25px rgba(0, 0, 0, .55);
+  transition: box-shadow var(--dur-lenta);
+}
+
+.cot-celular__pantalla {
+  height: 100%;
+  overflow: hidden;
+  padding: 2.4rem .7rem .7rem;
+  border-radius: 1.6rem;
+  background: #111113;
+  transition: background var(--dur-lenta);
+}
+
+.cot-notificaciones {
+  display: grid;
+  gap: .45rem;
+}
+
+.cot-notif {
+  display: grid;
+  gap: .1rem;
+  padding: .5rem .65rem;
+  border-radius: .7rem;
+  background: rgba(212, 211, 207, .92);
+  color: var(--cot-tinta);
+  font-size: .66rem;
+  line-height: 1.35;
+  text-align: left;
+  animation: cot-entrar .5s var(--curva-suave) both;
+}
+
+.cot-notif b {
+  font-weight: 500;
+  font-size: .6rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cot-tenue);
+}
+
+@keyframes cot-entrar {
+  from { opacity: 0; transform: translateY(-1rem) scale(.96); }
+}
+
+/* Cuando se llena, la pantalla "llama": el color del otro mundo se filtra */
+.cot-celular--brilla {
+  box-shadow:
+    0 0 60px 10px rgba(255, 79, 184, .35),
+    0 0 140px 30px rgba(91, 31, 168, .3);
+}
+
+.cot-celular--brilla .cot-celular__pantalla {
+  background:
+    radial-gradient(circle at 50% 70%, rgba(255, 79, 184, .9), transparent 60%),
+    radial-gradient(circle at 30% 20%, rgba(62, 240, 224, .6), transparent 55%),
+    var(--vir-1);
+}

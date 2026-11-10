@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escapismo Digital</title>
+  <meta name="description" content="Una experiencia web interactiva sobre el escapismo digital: el mundo cotidiano frente al mundo imaginado. Proyecto de Artes Digitales, UTEC.">
+  <meta name="theme-color" content="#0a0a0c">
+
+  <!-- Marca que JavaScript está activo (permite ocultar elementos que luego se revelan) -->
+  <script>document.documentElement.classList.add('js');</script>
+
+  <!-- Tipografías libres (SIL Open Font License) — ver docs/atribuciones.md -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300;1,9..144,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+
+  <!-- Estilos: el orden importa. Rutas SIEMPRE relativas (GitHub Pages) -->
+  <link rel="stylesheet" href="css/base.css">        <!-- Integrante 1 -->
+  <link rel="stylesheet" href="css/estructura.css">  <!-- Integrante 1 -->
+  <link rel="stylesheet" href="css/cotidiano.css">   <!-- Integrante 2 -->
+  <link rel="stylesheet" href="css/virtual.css">     <!-- Integrante 3 -->
+  <link rel="stylesheet" href="css/efectos.css">     <!-- Integrante 4 -->
+
+  <script type="module" src="js/main.js"></script>
+</head>
+<body data-mundo="umbral">
+
+  <a class="ui-saltar" href="#cotidiano">Saltar al contenido</a>
+
+  <!-- ===================== NAVEGACIÓN · Integrante 1 ===================== -->
+  <div class="ui-progreso" aria-hidden="true"></div>
+  <nav class="ui-nav" aria-label="Recorrido de la experiencia">
+    <ol>
+      <li><a href="#prologo" aria-current="true"><span>Prólogo</span></a></li>
+      <li><a href="#cotidiano"><span>Cotidiano</span></a></li>
+      <li><a href="#portal"><span>Portal</span></a></li>
+      <li><a href="#virtual"><span>Virtual</span></a></li>
+      <li><a href="#reflexion"><span>Regreso</span></a></li>
+    </ol>
+  </nav>
+  <!-- =================== FIN NAVEGACIÓN · Integrante 1 =================== -->
+
+  <main>
+
+    <!-- ===================== PRÓLOGO · Integrante 1 ===================== -->
+    <section id="prologo" class="seccion pro" data-mundo="umbral" aria-labelledby="pro-titulo">
+      <div class="pro-centro">
+        <p class="pro-pregunta" data-maquina>¿Cuándo fue la última vez que estuviste aquí?</p>
+        <h1 id="pro-titulo" class="pro-titulo">Escapismo <em>Digital</em></h1>
+        <p class="pro-sub">Una experiencia sobre los mundos a los que huimos.</p>
+      </div>
+      <a href="#cotidiano" class="pro-bajar">
+        <span>Desliza</span>
+        <i aria-hidden="true"></i>
+      </a>
+    </section>
+    <!-- =================== FIN PRÓLOGO · Integrante 1 =================== -->
+
+
+    <!-- ===================== MUNDO COTIDIANO · Integrante 2 ===================== -->
+    <section id="cotidiano" class="seccion cot" data-mundo="cotidiano" aria-labelledby="cot-titulo">
+
+      <header class="cot-encabezado ui-contenedor">
+        <p class="cot-etiqueta" data-revelar>I · El mundo cotidiano</p>
+        <h2 id="cot-titulo" class="cot-titulo" data-revelar style="--retraso:.15s">Lunes.<br>Otra vez.</h2>
+      </header>
+
+      <!-- Escena 1: la alarma -->
+      <article class="cot-escena cot-escena--alarma">
+        <p class="cot-hora" data-revelar>Escena 1 · Despertar</p>
+        <div class="cot-reloj" data-revelar role="timer" aria-live="polite">
+          <span class="cot-reloj__h">06</span><span class="cot-reloj__sep">:</span><span class="cot-reloj__m">00</span>
+        </div>
+        <p class="cot-texto cot-reloj-mensaje" data-revelar>La alarma suena. Otra vez.</p>
+        <button class="cot-boton" type="button" data-revelar>Posponer 5 min</button>
+      </article>
+
+      <!-- Escena 2: el trayecto -->
+      <article class="cot-escena cot-escena--trayecto">
+        <p class="cot-hora" data-revelar>07:12 · Trayecto</p>
+        <div class="cot-tren" aria-hidden="true" data-revelar>
+          <div class="cot-tren__paisaje"></div>
+          <div class="cot-tren__pasajeros">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <p class="cot-texto" data-revelar>Mismo trayecto. Las mismas caras, iluminadas desde abajo, que no se miran.</p>
+      </article>
+
+      <!-- Escena 3: el aula -->
+      <article class="cot-escena cot-escena--aula">
+        <p class="cot-hora" data-revelar>10:40 · Aula</p>
+        <div class="cot-pupitres" aria-hidden="true" data-revelar><!-- generados por cotidiano.js --></div>
+        <p class="cot-texto" data-revelar>Todo se repite. Nadie notaría si estás o no estás.</p>
+      </article>
+
+      <!-- Escena 4: el celular (enlaza con el portal) -->
+      <article class="cot-escena cot-escena--celular">
+        <p class="cot-hora" data-revelar>23:58 · Cuarto</p>
+        <div class="cot-celular" data-revelar>
+          <div class="cot-celular__pantalla">
+            <ul class="cot-notificaciones" aria-label="Notificaciones"></ul>
+          </div>
+        </div>
+        <p class="cot-texto" data-revelar>El cuerpo, cansado. La pantalla, encendida.</p>
+        <p class="cot-texto cot-texto--susurro" data-revelar style="--retraso:.4s">Solo un momento…</p>
+      </article>
+
+    </section>
+    <!-- =================== FIN MUNDO COTIDIANO · Integrante 2 =================== -->
+
+
+    <!-- ===================== PORTAL · Integrante 4 ===================== -->
+    <section id="portal" class="seccion fx-portal" data-mundo="portal" aria-label="Transición hacia el mundo imaginado">
+      <div class="fx-portal__fijo">
+        <div class="fx-portal__sombra" aria-hidden="true"></div>
+        <div class="fx-portal__celular" aria-hidden="true">
+          <div class="fx-portal__pantalla"></div>
+        </div>
+        <p class="fx-portal__frase fx-portal__frase--1">Solo un momento.</p>
+        <p class="fx-portal__frase fx-portal__frase--2">Solo uno más.</p>
+        <div class="fx-portal__luz" aria-hidden="true"></div>
+      </div>
+    </section>
+    <!-- =================== FIN PORTAL · Integrante 4 =================== -->
+
+
+    <!-- ===================== MUNDO VIRTUAL · Integrante 3 ===================== -->
+    <!-- data-grieta (0 a 3) lo actualiza estado.js (Integrante 4). No editar a mano. -->
+    <section id="virtual" class="seccion vir" data-mundo="virtual" data-grieta="0" aria-labelledby="vir-titulo">
+
+      <div class="vir-cielo" aria-hidden="true">
+        <canvas class="vir-particulas"></canvas>
+        <div class="vir-orbe vir-orbe--1" data-parallax="0.5"></div>
+        <div class="vir-orbe vir-orbe--2" data-parallax="-0.35"></div>
+        <div class="vir-orbe vir-orbe--3" data-parallax="0.2"></div>
+        <div class="vir-isla vir-isla--1" data-parallax="0.9"></div>
+        <div class="vir-isla vir-isla--2" data-parallax="-0.6"></div>
+        <div class="vir-isla vir-isla--3" data-parallax="0.4"></div>
+      </div>
+
+      <div class="vir-contenido ui-contenedor">
+        <p class="vir-etiqueta" data-revelar>II · El mundo imaginado</p>
+        <h2 id="vir-titulo" class="vir-titulo" data-revelar data-glitch style="--retraso:.15s">Aquí todo<br>te espera.</h2>
+        <p class="vir-texto" data-revelar style="--retraso:.3s">Aquí nadie te pide nada. Aquí eres quien quisiste ser. Toca. Quédate.</p>
+
+        <!-- Fragmentos: cada clic divide el espacio (virtual.js) -->
+        <div class="vir-fragmentos" data-revelar role="group" aria-label="Fragmentos interactivos: haz clic para dividirlos">
+          <button class="vir-fragmento" type="button" data-profundidad="0">entra</button>
+        </div>
+        <p class="vir-pista" data-revelar>Haz clic en los fragmentos</p>
+
+        <!-- Aparece cuando la grieta llega al nivel 3 -->
+        <div class="vir-despertar" hidden>
+          <p class="vir-despertar__texto" data-glitch>¿Sigues ahí?</p>
+          <a class="vir-despertar__boton" href="#reflexion">Despertar</a>
+        </div>
+      </div>
+
+      <!-- Mensajes del mundo real que se filtran (virtual.js) -->
+      <ol class="vir-intrusiones" aria-live="polite" aria-label="Mensajes del mundo real"></ol>
+    </section>
+    <!-- =================== FIN MUNDO VIRTUAL · Integrante 3 =================== -->
+
+
+    <!-- ===================== REFLEXIÓN · Integrante 1 ===================== -->
+    <section id="reflexion" class="seccion ref" data-mundo="reflexion" aria-labelledby="ref-titulo">
+      <div class="ref-contenido ui-contenedor">
+        <p class="ref-etiqueta" data-revelar>III · Regreso</p>
+        <h2 id="ref-titulo" class="ref-titulo" data-revelar style="--retraso:.15s">
+          Pasaste <span class="ref-dato" data-tiempo-escape>0 segundos</span> en otro lugar.
+        </h2>
+        <p class="ref-texto" data-revelar style="--retraso:.3s">
+          Y tocaste <span class="ref-dato" data-clics-escape>0</span> fragmentos que no existen.
+        </p>
+        <p class="ref-texto" data-revelar>
+          El mundo imaginado no es el enemigo. Es el lugar al que vamos cuando lo cotidiano pesa.
+          Pero cada minuto allí también es un minuto que aquí no vuelve.
+        </p>
+        <ul class="ref-preguntas">
+          <li data-revelar>¿De qué estabas huyendo?</li>
+          <li data-revelar style="--retraso:.2s">¿Qué te esperaba aquí mientras tanto?</li>
+          <li data-revelar style="--retraso:.4s">¿Y quién notó que no estabas?</li>
+        </ul>
+        <button class="ref-boton" type="button" data-reiniciar data-revelar>Volver a la realidad</button>
+      </div>
+
+      <footer class="ref-pie ui-contenedor">
+        <p>Escapismo Digital · Proyecto de Artes Digitales · UTEC · 2026</p>
+        <p>Recursos y licencias: <code>docs/atribuciones.md</code></p>
+      </footer>
+    </section>
+    <!-- =================== FIN REFLEXIÓN · Integrante 1 =================== -->
+
+  </main>
+</body>
+</html>

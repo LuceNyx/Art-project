@@ -1,0 +1,212 @@
+/* =========================================================================
+   BASE · Integrante 1
+   Variables compartidas (el "contrato" visual), reset, tipografía y
+   navegación. Cambios en las variables: SOLO mediante Pull Request.
+   ========================================================================= */
+
+/* ---------- 1. Variables (tokens de diseño) ---------- */
+:root {
+  /* Umbral / prólogo */
+  --negro: #0a0a0c;
+  --blanco: #f4f1ec;
+
+  /* Mundo cotidiano: grises de concreto y papel */
+  --cot-fondo: #d4d3cf;
+  --cot-fondo-2: #bdbcb7;
+  --cot-tinta: #232323;
+  --cot-tenue: #6b6a66;
+
+  /* Mundo virtual: saturado y luminoso */
+  --vir-1: #1a0638;   /* violeta profundo (color de unión con el portal) */
+  --vir-2: #5b1fa8;
+  --vir-3: #ff4fb8;   /* magenta */
+  --vir-4: #3ef0e0;   /* cian */
+  --vir-5: #ffd56b;   /* oro */
+  --vir-texto: #fff8ff;
+
+  /* Reflexión: calma, neutralidad */
+  --ref-fondo: #14161c;
+  --ref-texto: #e8e6e1;
+  --ref-acento: #9aa3b5;
+
+  /* Tipografías */
+  --fuente-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --fuente-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --fuente-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Tiempos y curvas de animación */
+  --dur-rapida: .3s;
+  --dur-media: .8s;
+  --dur-lenta: 1.6s;
+  --curva-suave: cubic-bezier(.22, .61, .36, 1);
+
+  /* Medidas */
+  --ancho-max: 72rem;
+  --alto-pantalla: 100vh;
+
+  /* Textura de grano (SVG generado, sin archivos externos) */
+  --textura-grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Color de la interfaz (cambia según el mundo activo, ver abajo) */
+  --ui-color: var(--blanco);
+  --ui-acento: var(--blanco);
+}
+
+/* En móviles, 100svh evita saltos con la barra del navegador */
+@supports (height: 100svh) {
+  :root { --alto-pantalla: 100svh; }
+}
+
+/* El <body> recibe data-mundo desde navegacion.js */
+body[data-mundo="cotidiano"] { --ui-color: var(--cot-tinta); --ui-acento: var(--cot-tinta); }
+body[data-mundo="portal"]    { --ui-color: var(--blanco);    --ui-acento: var(--vir-3); }
+body[data-mundo="virtual"]   { --ui-color: var(--vir-texto); --ui-acento: var(--vir-4); }
+body[data-mundo="reflexion"] { --ui-color: var(--ref-texto); --ui-acento: var(--ref-acento); }
+
+/* ---------- 2. Reset mínimo ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+* { margin: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--negro);
+  color: var(--blanco);
+  font-family: var(--fuente-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, svg, canvas, video { display: block; max-width: 100%; }
+
+button, input { font: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+a { color: inherit; }
+
+ul[class], ol[class] { list-style: none; padding: 0; }
+
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 2px solid var(--ui-acento);
+  outline-offset: 4px;
+}
+
+/* ---------- 3. Utilidades comunes ---------- */
+.ui-contenedor {
+  width: min(100% - 2.5rem, var(--ancho-max));
+  margin-inline: auto;
+}
+
+.ui-solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.seccion {
+  position: relative;
+  min-height: var(--alto-pantalla);
+}
+
+/* Enlace para saltar (accesibilidad con teclado) */
+.ui-saltar {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  padding: .6rem 1rem;
+  background: var(--blanco);
+  color: var(--negro);
+  font-family: var(--fuente-mono);
+  font-size: .8rem;
+  translate: 0 -200%;
+  transition: translate var(--dur-rapida);
+}
+.ui-saltar:focus { translate: 0 0; }
+
+/* ---------- 4. Barra de progreso ---------- */
+.ui-progreso {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: 2px;
+  background: var(--ui-acento);
+  transform-origin: left;
+  transform: scaleX(var(--progreso-pagina, 0));
+  transition: background-color var(--dur-media);
+}
+
+/* ---------- 5. Navegación lateral (puntos) ---------- */
+.ui-nav {
+  position: fixed;
+  top: 50%;
+  right: clamp(.75rem, 2vw, 1.75rem);
+  z-index: 50;
+  translate: 0 -50%;
+}
+
+.ui-nav ol {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.ui-nav a {
+  position: relative;
+  display: block;
+  width: .55rem;
+  height: .55rem;
+  border: 1px solid var(--ui-color);
+  border-radius: 50%;
+  opacity: .55;
+  transition: opacity var(--dur-rapida), background-color var(--dur-rapida),
+              border-color var(--dur-media), scale var(--dur-rapida);
+}
+
+.ui-nav a[aria-current="true"] {
+  background: var(--ui-color);
+  opacity: 1;
+  scale: 1.3;
+}
+
+.ui-nav a:hover { opacity: 1; }
+
+/* Etiqueta que aparece al pasar el mouse */
+.ui-nav span {
+  position: absolute;
+  right: 1.4rem;
+  top: 50%;
+  translate: .5rem -50%;
+  color: var(--ui-color);
+  font-family: var(--fuente-mono);
+  font-size: .7rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-rapida), translate var(--dur-rapida);
+}
+
+.ui-nav a:hover span,
+.ui-nav a:focus-visible span {
+  opacity: 1;
+  translate: 0 -50%;
+}
+
+@media (max-width: 40rem) {
+  .ui-nav { right: .6rem; }
+  .ui-nav ol { gap: .8rem; }
+  .ui-nav a { width: .45rem; height: .45rem; }
+}

@@ -1,0 +1,194 @@
+/* =========================================================================
+   ESTRUCTURA · Integrante 1
+   Estilos del PRÓLOGO (.pro-) y de la REFLEXIÓN (.ref-).
+   ========================================================================= */
+
+/* ---------- PRÓLOGO ---------- */
+.pro {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 55%, rgba(91, 31, 168, .16), transparent 70%),
+    var(--negro);
+  text-align: center;
+}
+
+/* Grano sutil sobre el negro */
+.pro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--textura-grano);
+  opacity: .06;
+  pointer-events: none;
+}
+
+.pro-centro {
+  position: relative;
+  display: grid;
+  gap: 1.6rem;
+  padding-inline: 1.5rem;
+}
+
+.pro-pregunta {
+  min-height: 1.6em;
+  color: var(--ref-acento);
+  font-family: var(--fuente-mono);
+  font-size: clamp(.85rem, 1.8vw, 1.05rem);
+  letter-spacing: .04em;
+}
+
+.pro-titulo {
+  font-family: var(--fuente-serif);
+  font-weight: 300;
+  font-size: clamp(3.2rem, 13vw, 10rem);
+  line-height: .9;
+  letter-spacing: -.035em;
+  animation: pro-emerger 2.4s var(--curva-suave) 2.8s both;
+}
+
+.pro-titulo em {
+  display: block;
+  font-style: italic;
+  background: linear-gradient(90deg, var(--vir-4), var(--vir-3), var(--vir-5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pro-sub {
+  color: var(--ref-acento);
+  font-family: var(--fuente-serif);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  animation: pro-emerger 1.6s var(--curva-suave) 3.8s both;
+}
+
+.pro-bajar {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: .8rem;
+  color: var(--ref-acento);
+  font-family: var(--fuente-mono);
+  font-size: .7rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  text-decoration: none;
+  animation: pro-emerger 1.2s ease 4.6s both;
+}
+
+.pro-bajar i {
+  width: 1px;
+  height: 3.2rem;
+  background: linear-gradient(var(--ref-acento), transparent);
+  transform-origin: top;
+  animation: pro-linea 2.2s ease-in-out infinite;
+}
+
+@keyframes pro-emerger {
+  from { opacity: 0; filter: blur(12px); translate: 0 1rem; }
+  to   { opacity: 1; filter: blur(0);    translate: 0 0; }
+}
+
+@keyframes pro-linea {
+  0%   { transform: scaleY(0); opacity: 1; }
+  60%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* ---------- REFLEXIÓN ---------- */
+.ref {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6rem;
+  padding-block: 28vh 2.5rem;
+  /* Degradado desde el violeta del mundo virtual hacia la calma */
+  background: linear-gradient(180deg, var(--vir-1) 0, var(--ref-fondo) 40vh);
+  color: var(--ref-texto);
+}
+
+.ref-contenido {
+  display: grid;
+  justify-items: center;
+  gap: 1.8rem;
+  text-align: center;
+}
+
+.ref-etiqueta {
+  color: var(--ref-acento);
+  font-family: var(--fuente-mono);
+  font-size: .75rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+
+.ref-titulo {
+  max-width: 18ch;
+  font-family: var(--fuente-serif);
+  font-weight: 300;
+  font-size: clamp(2.2rem, 6vw, 4.6rem);
+  line-height: 1.08;
+  letter-spacing: -.02em;
+}
+
+.ref-dato {
+  font-style: italic;
+  color: var(--vir-3);
+  white-space: nowrap;
+}
+
+.ref-texto {
+  max-width: 38ch;
+  color: var(--ref-acento);
+  font-family: var(--fuente-serif);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.7;
+}
+
+.ref-preguntas {
+  display: grid;
+  gap: .9rem;
+  margin-block: 1.5rem;
+  font-family: var(--fuente-serif);
+  font-style: italic;
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+}
+
+.ref-boton {
+  margin-top: 1rem;
+  padding: 1rem 1.8rem;
+  border: 1px solid var(--ref-texto);
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--fuente-mono);
+  font-size: .8rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  transition: background-color var(--dur-rapida), color var(--dur-rapida);
+}
+
+.ref-boton:hover {
+  background: var(--ref-texto);
+  color: var(--ref-fondo);
+}
+
+.ref-pie {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .5rem 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(154, 163, 181, .2);
+  color: var(--ref-acento);
+  font-family: var(--fuente-mono);
+  font-size: .7rem;
+  letter-spacing: .05em;
+}
+
+.ref-pie code { font-family: inherit; }
