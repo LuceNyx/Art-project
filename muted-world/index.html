@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Muted World · Digital Escapism</title>
+  <meta name="description" content="Muted World: a dark room to explore. Part of Digital Escapism, a web experience about escaping into digital worlds.">
+  <meta name="theme-color" content="#000000">
+
+  <!-- Única dependencia externa: tipografía EB Garamond (SIL Open Font License) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
+
+  <link rel="stylesheet" href="css/muted.css">
+</head>
+<body class="mw-body">
+
+  <!-- Filtros SVG compartidos: trazos ligeramente imperfectos -->
+  <svg class="mw-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="mw-rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" result="ruido"/>
+      <feDisplacementMap in="SourceGraphic" in2="ruido" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="mw-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </svg>
+
+  <!-- ============ HABITACIÓN ============ -->
+  <main class="mw-viewport mw-room-viewport" id="mw-room-viewport" aria-label="Your room at night" inert>
+    <div class="mw-stage mw-room" id="mw-room">
+      <img class="mw-bg" id="mw-room-bg" alt="" data-file="room.jpg" data-kind="room">
+      <div class="mw-objects" id="mw-objects"><!-- room.js --></div>
+      <canvas class="mw-light" id="mw-light" aria-hidden="true"></canvas>
+    </div>
+  </main>
+
+  <!-- ============ PRIMER PLANO (situación) ============ -->
+  <section class="mw-scene" id="mw-scene" role="dialog" aria-modal="true" aria-labelledby="mw-scene-title" hidden>
+    <div class="mw-viewport mw-scene__viewport">
+      <div class="mw-stage mw-scene__stage">
+        <img class="mw-bg mw-scene__bg" alt="">
+        <div class="mw-scene__content"><!-- scenes.js --></div>
+        <div class="mw-scene__shade" aria-hidden="true"></div>
+      </div>
+    </div>
+    <h2 class="mw-visually-hidden" id="mw-scene-title"></h2>
+    <div class="mw-lines" aria-live="polite"></div>
+    <button class="mw-back" type="button">Back to the room</button>
+  </section>
+
+  <!-- ============ CAPAS DE ATMÓSFERA ============ -->
+  <div class="mw-vignette" aria-hidden="true"></div>
+  <div class="mw-grain" aria-hidden="true"></div>
+  <div class="mw-flash" aria-hidden="true"></div>
+
+  <!-- ============ ENTRADA ============ -->
+  <div class="mw-intro" id="mw-intro">
+    <button class="mw-intro__enter" type="button">Click to enter your room</button>
+  </div>
+
+  <button class="mw-mute" id="mw-mute" type="button" aria-pressed="false">sound on</button>
+
+  <noscript>
+    <p class="mw-noscript">This room needs JavaScript to open.</p>
+  </noscript>
+
+  <!-- Scripts clásicos (funcionan también con doble clic). El orden importa. -->
+  <script src="js/config.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/grain.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/scenes.js"></script>
+  <script src="js/room.js"></script>
+</body>
+</html>
