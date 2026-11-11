@@ -52,6 +52,76 @@ El escritorio visto de cerca, un poco desde arriba. Es una perspectiva incómoda
 
 ---
 
-## Próximas situaciones (pendientes)
+## `scene-loneliness.jpg`: la cama en la oscuridad
 
-`scene-loneliness.jpg`, `scene-emotional-overload.jpg`, `scene-lack-of-control.jpg`, `scene-social-comparison.jpg`, `scene-uncertain-future.jpg`, `scene-family-expectations.jpg`. Las especificaciones se añadirán cuando se construya cada situación. Usa las mismas reglas: 1920 × 1080, escala de grises.
+Es **casi negra**. La sábana, el celular, la figura y el mando los dibuja el código, y además la cámara se aleja despacio. Pinta solo el vacío del cuarto alrededor de la cama: el suelo y la pared, perdiéndose en la oscuridad.
+
+| Zona (x, y en %) | Qué hay (código) |
+|---|---|
+| x 0–100, y 0–100 | Fondo: oscuridad casi total, quizá el borde de un mueble muy lejos |
+| Centro (x 36–64, y 15–85) | La sábana y el celular. No pintes nada claro aquí |
+| x 74–87, y 78–91 | El mando en el suelo, con su luz |
+
+**Luz:** solo la del celular, en el centro (la pone el código). Todo lo demás, negro.
+
+---
+
+## `scene-emotional-overload.jpg`: la pared del corcho
+
+| Zona (x, y en %) | Qué hay (código) |
+|---|---|
+| x 12–76, y 6–92 | **El corcho, las notas y la sábana** (código). Deja la pared lisa |
+| x 79–88, y 12–48 | Audífonos colgados de una chincheta (código) |
+| x 76–100 | Sombra vertical fuerte sobre la pared |
+
+**Luz:** tenue y centrada en el corcho (x 44, y 46).
+
+---
+
+## `scene-lack-of-control.jpg`: la puerta y el reloj
+
+| Zona (x, y en %) | Qué hay (código) |
+|---|---|
+| x 38–64, y 8–92 | **La puerta** (código). Puedes pintar su marco y su sombra |
+| x 70–83, y 10–33 | **El reloj** (código). Debe haber luz en la pared a su alrededor |
+| y 92–100 | Suelo. La rendija de luz bajo la puerta la pone el código (x 38–64, y ≈ 95) |
+| x 10–30, y 60–80 | El borde de la cama, donde aparece "Stay" |
+
+**Luz:** una mancha clara en la pared, arriba a la derecha (x 76, y 20), y la rendija bajo la puerta.
+
+---
+
+## `scene-social-comparison.jpg`: el rincón del espejo
+
+| Zona (x, y en %) | Qué hay (código) |
+|---|---|
+| x 38–62, y 6–92 | **El espejo** (código). Deja la pared lisa detrás |
+| x 16–90, y 0–100 | Fotos pegadas alrededor del espejo (código) |
+| y 90–100 | Suelo |
+
+**Luz:** frontal y suave, centrada en el espejo (x 50, y 40).
+
+---
+
+## `scene-uncertain-future.jpg`: la pared alrededor de la ventana
+
+| Zona (x, y en %) | Qué hay (código) |
+|---|---|
+| x 16–80, y 6–90 | **La ventana entera** (código): ciudad, lluvia y persiana |
+| x 81–85, y 7–67 | El cordón de la persiana (código) |
+| El resto | Pared interior muy oscura. Puede tener la sombra del marco |
+
+**Luz:** solo la que entra por la ventana (la pone el código).
+
+---
+
+## `scene-family-expectations.jpg`: la pared del estante
+
+| Zona (x, y en %) | Qué hay (código) |
+|---|---|
+| y 72–76 | **El estante** (código). Bajo él, una sombra larga |
+| x 35–65, y 32–72 | El marco con la foto familiar (código) |
+| x 18–27 y x 72–81, y 44–72 | Trofeos (código) |
+| x 76–88, y 57–69 | La consola que asoma tras un trofeo (código) |
+
+**Luz:** cálida en intención, pero gris: centrada en la foto (x 50, y 40). La pared puede tener un papel tapiz muy tenue (sin patrón geométrico visible).

@@ -156,16 +156,65 @@
     label(ctx, file);
   }
 
-  /* ---------- Genérico (otras situaciones) ---------- */
-  function drawGeneric(ctx, file) {
-    ctx.fillStyle = '#151515';
+  /* ---------- Genérico: pared, suelo y una luz tenue ---------- */
+  function drawWallFloor(ctx, file, opciones) {
+    var r = seeded(opciones.semilla || 5);
+    ctx.fillStyle = opciones.pared || '#141414';
     ctx.fillRect(0, 0, W, H);
+
+    if (opciones.suelo) {
+      var suelo = ctx.createLinearGradient(0, py(opciones.suelo), 0, H);
+      suelo.addColorStop(0, '#0e0e0e');
+      suelo.addColorStop(1, '#050505');
+      roughPolygon(ctx, pct([[0, opciones.suelo], [100, opciones.suelo - 1], [100, 100], [0, 100]]), r, 4);
+      ctx.fillStyle = suelo;
+      ctx.fill();
+    }
+
+    if (opciones.luz) {
+      var l = opciones.luz;
+      var g = ctx.createRadialGradient(px(l[0]), py(l[1]), 0, px(l[0]), py(l[1]), px(l[2]));
+      g.addColorStop(0, 'rgba(255,255,255,.07)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    if (opciones.sombra) fill(ctx, opciones.sombra, 'rgba(0,0,0,.55)', r);
     label(ctx, file);
+  }
+
+  function drawGeneric(ctx, file) {
+    drawWallFloor(ctx, file, {});
   }
 
   var DIBUJOS = {
     room: drawRoom,
-    'academic-pressure': drawDesk
+    'academic-pressure': drawDesk,
+    // Cama en la oscuridad: casi negro (la sábana la dibuja el código)
+    'loneliness': function (ctx, file) {
+      drawWallFloor(ctx, file, { pared: '#070707', luz: [50, 50, 40] });
+    },
+    // Pared detrás del corcho
+    'emotional-overload': function (ctx, file) {
+      drawWallFloor(ctx, file, { pared: '#121212', luz: [44, 46, 45], sombra: [[76, 0], [100, 0], [100, 100], [84, 100]] });
+    },
+    // Pared, suelo y la sombra de la puerta
+    'lack-of-control': function (ctx, file) {
+      drawWallFloor(ctx, file, { pared: '#131313', suelo: 92, luz: [76, 20, 26], semilla: 9 });
+    },
+    // Rincón con el espejo
+    'social-comparison': function (ctx, file) {
+      drawWallFloor(ctx, file, { pared: '#141414', suelo: 90, luz: [50, 40, 40], semilla: 13 });
+    },
+    // Pared interior alrededor de la ventana
+    'uncertain-future': function (ctx, file) {
+      drawWallFloor(ctx, file, { pared: '#0e0e0e', luz: [48, 46, 50] });
+    },
+    // Pared con el estante
+    'family-expectations': function (ctx, file) {
+      drawWallFloor(ctx, file, { pared: '#151515', luz: [50, 40, 42], sombra: [[0, 76], [100, 76], [100, 100], [0, 100]], semilla: 17 });
+    }
   };
 
   /** Devuelve (y guarda) el placeholder como data URL. */

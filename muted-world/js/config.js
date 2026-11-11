@@ -24,7 +24,8 @@
    *   rect  → zona del objeto interactivo en la habitación { x, y, w, h }
    *   light → punto de luz que guía la mirada hacia el objeto { x, y, r }
    *   returnLight → luz nueva que aparece al volver del mundo imaginado
-   * ready: false → el objeto se dibuja en la habitación pero aún no se puede abrir.
+   * ready: false → el objeto se dibuja en la habitación pero no se puede abrir
+   * (útil para añadir situaciones nuevas poco a poco).
    */
   var MUTED_SCENES = [
     {
@@ -55,7 +56,7 @@
     {
       id: 'loneliness',
       title: 'Loneliness',
-      ready: false,
+      ready: true,
       roomObject: {
         name: 'Phone on the bed',
         ariaLabel: 'A phone lying on the bed',
@@ -80,7 +81,7 @@
     {
       id: 'emotional-overload',
       title: 'Emotional overload',
-      ready: false,
+      ready: true,
       roomObject: {
         name: 'Corkboard',
         ariaLabel: 'A corkboard covered in notes',
@@ -105,7 +106,7 @@
     {
       id: 'lack-of-control',
       title: 'Lack of control',
-      ready: false,
+      ready: true,
       roomObject: {
         name: 'Wall clock',
         ariaLabel: 'A wall clock above the door',
@@ -130,7 +131,7 @@
     {
       id: 'social-comparison',
       title: 'Social comparison',
-      ready: false,
+      ready: true,
       roomObject: {
         name: 'Mirror with photos',
         ariaLabel: 'A tall mirror with photos tucked into the frame',
@@ -155,7 +156,7 @@
     {
       id: 'uncertain-future',
       title: 'Uncertain future',
-      ready: false,
+      ready: true,
       roomObject: {
         name: 'Window with blinds',
         ariaLabel: 'A small window with half-lowered blinds, rain outside',
@@ -180,7 +181,7 @@
     {
       id: 'family-expectations',
       title: 'Family expectations',
-      ready: false,
+      ready: true,
       roomObject: {
         name: 'Family photo on the shelf',
         ariaLabel: 'A framed family photo between small trophies',

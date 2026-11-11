@@ -16,8 +16,10 @@ Ahora mismo **todo el sonido se genera en código** con la Web Audio API (`js/au
 | `lamp-hum.mp3` | Lámpara | Zumbido eléctrico suave de una lámpara o un fluorescente |
 | `clock-tick.mp3` | Reloj | Tic-tac de un reloj de pared, 1 tic por segundo, bucle exacto (por ejemplo, 30 s) |
 | `phone-vibration.mp3` | Celular | Vibración apagada contra un colchón: dos pulsos y luego silencio (por ejemplo, un ciclo de 9 s) |
+| `muffled-voices.mp3` | Voces | Conversación apagada al otro lado de una pared: no se entiende ninguna palabra |
 
 **Mezcla por escena** (en `PERFILES`, dentro de `js/audio.js`):
 - **Habitación:** respiración + lluvia + un poco de reloj y de vibración.
 - **Academic pressure:** domina el zumbido de la lámpara. Además, cada hoja que cae suena con un roce de papel, que siempre se genera en código.
+- **Loneliness:** domina la vibración del celular. **Emotional overload:** tic-tac y un murmullo. **Lack of control:** tic-tac fuerte, que calla al girar el reloj. **Social comparison:** zumbido de luz. **Uncertain future:** lluvia. **Family expectations:** voces tras la pared.
 - **Al ocultar** (evasión): todo suena más bajo y más apagado, como detrás de una pared.
