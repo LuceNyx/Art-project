@@ -23,7 +23,7 @@ MUTED WORLD (real, apagado) → clic (JS) → TRANSICIÓN DINÁMICA (CSS) → IM
 
 | Parte | Carpeta | Prefijo CSS | Estado |
 |---|---|---|---|
-| Muted World | `muted-world/` | `mw-` | **En construcción.** Cuando esté terminado, **no se modifica** salvo para conectarlo |
+| Muted World | `muted-world/` | `mw-` | **Completo: las 7 situaciones (en revisión visual).** No se modifica salvo para conectarlo o corregirlo |
 | Transición | `transition/` | `tr-` | `transition/index.html` es un **PLACEHOLDER — será reemplazado por la parte de mis compañeros**. Se puede sobrescribir completo sin dudar |
 | Imagined World | `imagined-world/` | `iw-` | Aún no existe. Llegará con el prompt de mis compañeros |
 

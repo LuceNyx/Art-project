@@ -523,6 +523,828 @@ button.mw-object:focus-visible {
   background: radial-gradient(ellipse 42% 12% at 50% 47%, rgba(255, 255, 255, .7), rgba(255, 255, 255, .14) 50%, transparent 72%);
 }
 
+/* Dibujos SVG dentro de cualquier objeto de escape */
+.mw-escape svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Voces al otro lado de la pared */
+.mw-line--voice { color: var(--mw-text-dim); letter-spacing: .03em; }
+.mw-line--voice.mw-line--on { filter: blur(.4px); }
+
+/* =========================================================================
+   SITUACIÓN 2 · LONELINESS
+   ========================================================================= */
+.mw-lo-zoom {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 52%;
+  transition: transform 45s linear;
+}
+
+/* La cámara se aleja: la cama queda en medio de un cuarto enorme y oscuro */
+.mw-lo-zoom--lejos { transform: scale(.48); }
+
+.mw-lo-sheet {
+  position: absolute;
+  inset: -12% -14%;
+  background:
+    radial-gradient(ellipse 30% 26% at 50% 50%, rgba(255, 255, 255, .14), transparent 70%),
+    repeating-linear-gradient(118deg, #262626 0 6%, #303030 8%, #232323 12%, #2a2a2a 15%);
+  box-shadow: 0 0 120px 60px #000;
+  border-radius: 3%;
+}
+
+.mw-lo-figure {
+  position: absolute;
+  left: 21%;
+  top: 46%;
+  width: 9%;
+  height: 30%;
+}
+
+.mw-lo-phone {
+  position: absolute;
+  left: 43%;
+  top: 20%;
+  width: 14%;
+  height: 58%;
+  perspective: 1200px;
+}
+
+.mw-lo-glow {
+  position: absolute;
+  inset: -40% -120%;
+  background: radial-gradient(ellipse 34% 38% at 50% 50%, rgba(255, 255, 255, .2), transparent 70%);
+  mix-blend-mode: screen;
+  transition: opacity var(--mw-slower);
+}
+
+.mw-scene--hidden .mw-lo-glow { opacity: .08; }
+
+.mw-lo-phone__inner {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-8deg);
+  transform-style: preserve-3d;
+  transition: transform 1.6s var(--mw-ease);
+}
+
+.mw-scene--hidden .mw-lo-phone__inner { transform: rotate(-8deg) rotateY(180deg); }
+
+.mw-lo-phone__front,
+.mw-lo-phone__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 14% / 7%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.mw-lo-phone__front {
+  display: flex;
+  padding: 22% 7% 9%;
+  background: #0d0d0d;
+  border: 6px solid #1b1b1b;
+}
+
+.mw-lo-phone__back {
+  transform: rotateY(180deg);
+  background: linear-gradient(160deg, #1e1e1e, #0e0e0e);
+  border: 6px solid #222;
+}
+
+.mw-lo-chat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4%;
+  padding: 8% 6%;
+  border-radius: 6%;
+  background: linear-gradient(180deg, #a9a9a9, #cfcfcf);
+}
+
+.mw-lo-bubble {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: .35em .7em;
+  border-radius: 1em 1em .2em 1em;
+  background: #2e2e2e;
+  color: #ececec;
+  font-size: clamp(.7rem, 1.35vw, 1.3rem);
+  line-height: 1.2;
+  animation: mw-lo-pop .9s var(--mw-ease) both;
+}
+
+.mw-lo-seen {
+  align-self: flex-end;
+  color: #3a3a3a;
+  font-style: italic;
+  font-size: clamp(.55rem, .95vw, .95rem);
+  animation: mw-lo-pop 1.6s ease both;
+}
+
+@keyframes mw-lo-pop {
+  from { opacity: 0; translate: 0 30%; }
+}
+
+/* El borde que vibra contra la sábana (también boca abajo) */
+.mw-lo-buzz {
+  position: absolute;
+  inset: -2%;
+  border-radius: 15% / 7.5%;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  animation: mw-lo-buzz 9s linear infinite;
+}
+
+@keyframes mw-lo-buzz {
+  0%, 91%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); translate: 0 0; }
+  92%, 95% { box-shadow: 0 0 22px 4px rgba(255, 255, 255, .35), 0 0 0 1px rgba(255, 255, 255, .5); translate: 1px 0; }
+  93%, 96% { translate: -1px 0; }
+  97% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+.mw-lo-hide {
+  position: absolute;
+  left: 41%;
+  top: 18%;
+  width: 18%;
+  height: 62%;
+  border-radius: 14%;
+}
+
+.mw-lo-controller {
+  left: 74%;
+  top: 78%;
+  width: 13%;
+  height: 13%;
+}
+
+.mw-lo-controller .mw-escape__glow {
+  inset: -80% -40%;
+  background: radial-gradient(ellipse 30% 30% at 50% 42%, rgba(255, 255, 255, .5), rgba(255, 255, 255, .08) 55%, transparent 72%);
+}
+
+/* =========================================================================
+   SITUACIÓN 3 · EMOTIONAL OVERLOAD
+   ========================================================================= */
+.mw-eo-frame {
+  position: absolute;
+  left: 12%;
+  top: 6%;
+  width: 64%;
+  height: 86%;
+  overflow: hidden;
+  border: 14px solid #161616;
+  box-shadow: 0 30px 70px -20px #000;
+}
+
+.mw-eo-board {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 40% 45%, rgba(255, 255, 255, .1), transparent 70%),
+    radial-gradient(#444 1px, transparent 1.6px) 0 0 / 7px 9px,
+    radial-gradient(#1e1e1e 1px, transparent 1.6px) 3px 4px / 11px 13px,
+    #2e2e2e;
+}
+
+.mw-eo-notes { position: absolute; inset: 0; }
+
+.mw-eo-note {
+  position: absolute;
+  width: calc(19% * var(--tam, 1));
+  min-height: calc(15% * var(--tam, 1));
+  padding: 1.2em .8em .7em;
+  background: rgb(var(--tono), var(--tono), var(--tono));
+  color: #1a1a1a;
+  font-style: italic;
+  font-size: clamp(.7rem, 1.35vw, 1.3rem);
+  line-height: 1.2;
+  rotate: var(--rot);
+  box-shadow: 0 8px 14px -6px rgba(0, 0, 0, .8);
+  animation: mw-eo-in 1s var(--mw-ease) both;
+}
+
+/* Chincheta */
+.mw-eo-note::before {
+  content: "";
+  position: absolute;
+  top: .4em;
+  left: 50%;
+  width: .55em;
+  height: .55em;
+  border-radius: 50%;
+  background: #111;
+  box-shadow: 0 1px 0 #666;
+}
+
+.mw-eo-note--scribble {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 16%, rgba(30, 30, 30, .45) 16% 20%) content-box,
+    rgb(var(--tono), var(--tono), var(--tono));
+}
+
+@keyframes mw-eo-in {
+  from { opacity: 0; transform: scale(1.18); }
+}
+
+/* La sábana: tapa casi todo; abajo siguen asomando las notas */
+.mw-eo-cloth {
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 0;
+  height: 84%;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, .25), transparent 30%, rgba(0, 0, 0, .35)),
+    repeating-linear-gradient(90deg, #6b6b6b 0 4%, #7a7a7a 6%, #5c5c5c 10%, #686868 13%);
+  opacity: .9;
+  clip-path: polygon(0 0, 100% 0, 100% 96%, 86% 100%, 70% 95%, 52% 99%, 34% 94%, 16% 99%, 0 95%);
+  transform: translateY(-104%);
+  transition: transform 2.2s var(--mw-ease);
+}
+
+.mw-scene--hidden .mw-eo-cloth { transform: none; }
+
+/* Tela enrollada arriba: indica que se puede bajar */
+.mw-eo-roll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3.5%;
+  background: linear-gradient(180deg, #8f8f8f, #5a5a5a 60%, #3a3a3a);
+  box-shadow: 0 4px 10px #000;
+}
+
+.mw-eo-hide {
+  position: absolute;
+  left: 12%;
+  top: 6%;
+  width: 64%;
+  height: 86%;
+}
+
+.mw-eo-headphones {
+  left: 79%;
+  top: 12%;
+  width: 9%;
+  height: 36%;
+}
+
+.mw-eo-headphones .mw-escape__glow {
+  inset: 20% -90% -30%;
+  background: radial-gradient(ellipse 26% 40% at 58% 70%, rgba(255, 255, 255, .45), rgba(255, 255, 255, .08) 55%, transparent 72%);
+}
+
+/* =========================================================================
+   SITUACIÓN 4 · LACK OF CONTROL
+   ========================================================================= */
+.mw-lc-door {
+  position: absolute;
+  left: 38%;
+  top: 8%;
+  width: 26%;
+  height: 84%;
+  border: 10px solid #2a2a2a;
+  border-bottom: 0;
+  background: linear-gradient(90deg, #181818, #222 40%, #151515);
+}
+
+.mw-lc-door::before,
+.mw-lc-door::after {
+  content: "";
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  border: 2px solid #111;
+  box-shadow: 1px 1px 0 #2c2c2c;
+}
+
+.mw-lc-door::before { top: 8%; height: 34%; }
+.mw-lc-door::after { top: 50%; height: 42%; }
+
+.mw-lc-knob {
+  position: absolute;
+  left: 8%;
+  top: 52%;
+  width: 6%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #777, #2e2e2e);
+}
+
+/* Luz tenue en la pared, para que se vea la sombra del reloj */
+.mw-lc-shadow {
+  position: absolute;
+  left: 71.5%;
+  top: 13.5%;
+  width: 13%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, .7) 0 58%, transparent 62%);
+  filter: blur(6px);
+}
+
+.mw-lc-shadow__hand {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 3%;
+  height: 42%;
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  background: #000;
+  animation: mw-lc-spin 60s steps(60) infinite;
+}
+
+.mw-lc-clock {
+  position: absolute;
+  left: 70%;
+  top: 10%;
+  width: 13%;
+  aspect-ratio: 1;
+  perspective: 900px;
+}
+
+.mw-lc-clock__inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 1.6s var(--mw-ease);
+}
+
+.mw-scene--hidden .mw-lc-clock__inner { transform: rotateY(180deg); }
+
+.mw-lc-clock__front,
+.mw-lc-clock__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.mw-lc-clock__front svg { width: 100%; height: 100%; }
+
+.mw-lc-clock__back {
+  transform: rotateY(180deg);
+  background: radial-gradient(circle at 40% 40%, #2a2a2a, #111);
+  box-shadow: inset 0 0 0 5px #0a0a0a;
+}
+
+.mw-lc-second {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+}
+
+.mw-lc-clock--run .mw-lc-second { animation: mw-lc-spin 60s steps(60) infinite; }
+
+@keyframes mw-lc-spin { to { transform: rotate(360deg); } }
+
+/* Pared iluminada alrededor del reloj (así se ve su sombra) */
+.mw-lc-wash {
+  position: absolute;
+  left: 58%;
+  top: -6%;
+  width: 40%;
+  height: 58%;
+  pointer-events: none;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 255, 255, .16), transparent 70%);
+}
+
+.mw-lc-hide {
+  position: absolute;
+  left: 69%;
+  top: 9%;
+  width: 15%;
+  height: 27%;
+  border-radius: 50%;
+}
+
+.mw-lc-choice {
+  position: absolute;
+  z-index: 2;
+  padding: .5rem 1.1rem;
+  border-radius: 999px;
+  color: var(--mw-text-dim);
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.9vw, 1.6rem);
+  text-shadow: 0 0 12px #000;
+  animation: mw-lo-pop 1.6s ease both;
+  transition: color var(--mw-slow);
+}
+
+.mw-body .mw-lc-choice:hover,
+.mw-body .mw-lc-choice:focus-visible { color: var(--mw-white); }
+
+.mw-lc-choice--leave { left: 41.5%; top: 55%; }
+.mw-lc-choice--stay { left: 15%; top: 66%; }
+
+.mw-lc-under {
+  left: 38%;
+  top: 90%;
+  width: 26%;
+  height: 8%;
+}
+
+.mw-lc-under::before {
+  content: "";
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  top: 60%;
+  height: 2px;
+  background: #fff;
+  box-shadow: 0 0 12px 3px rgba(255, 255, 255, .55);
+}
+
+.mw-lc-under .mw-escape__glow {
+  inset: -60% -15%;
+  background: radial-gradient(ellipse 48% 16% at 50% 62%, rgba(255, 255, 255, .7), rgba(255, 255, 255, .12) 50%, transparent 72%);
+}
+
+.mw-lc-blackout {
+  position: absolute;
+  inset: -5%;
+  z-index: 3;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.4s var(--mw-ease);
+}
+
+.mw-lc-blackout--on { opacity: 1; }
+
+/* =========================================================================
+   SITUACIÓN 5 · SOCIAL COMPARISON
+   ========================================================================= */
+.mw-sc-mirror {
+  --sc-yo: 1;
+  position: absolute;
+  left: 38%;
+  top: 6%;
+  width: 24%;
+  height: 86%;
+  background: #202020;
+  box-shadow: inset 0 0 0 3px #0e0e0e, 0 30px 60px -20px #000;
+}
+
+.mw-sc-glass {
+  position: absolute;
+  inset: 5%;
+  overflow: hidden;
+  background: linear-gradient(160deg, #4a4a4a, #1c1c1c 55%, #0c0c0c);
+}
+
+/* Reflejo de luz sobre el vidrio */
+.mw-sc-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .12) 36%, transparent 44%);
+}
+
+/* Tu reflejo: se encoge con cada foto de los demás */
+.mw-sc-reflection {
+  position: absolute;
+  left: 6%;
+  bottom: 0;
+  width: 62%;
+  height: auto;
+  transform-origin: 50% 100%;
+  transform: scale(var(--sc-yo));
+  transition: transform 3s var(--mw-ease);
+}
+
+/* La camiseta que tapa el espejo (deja ver un borde del reflejo) */
+.mw-sc-shirt {
+  position: absolute;
+  left: 18%;
+  right: -4%;
+  top: -3%;
+  bottom: 7%;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, .3), transparent 25%, rgba(0, 0, 0, .25)),
+    repeating-linear-gradient(82deg, #383838 0 5%, #444 7%, #323232 11%);
+  clip-path: polygon(10% 0, 90% 2%, 100% 14%, 94% 40%, 98% 100%, 8% 97%, 3% 42%, 0 12%);
+  opacity: 0;
+  translate: 0 -10%;
+  transition: opacity 1.6s var(--mw-ease), translate 1.6s var(--mw-ease);
+}
+
+.mw-scene--hidden .mw-sc-shirt { opacity: 1; translate: 0 0; }
+
+.mw-sc-photos {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mw-sc-photo {
+  position: absolute;
+  width: 9%;
+  padding: .45% .45% 1.4%;
+  background: #d4d4d4;
+  rotate: var(--rot);
+  box-shadow: 0 8px 16px -6px #000;
+  animation: mw-sc-in 1.4s var(--mw-ease) both;
+}
+
+.mw-sc-photo svg { display: block; width: 100%; height: auto; }
+
+.mw-sc-caption {
+  display: block;
+  padding-top: .3em;
+  color: #222;
+  font-style: italic;
+  font-size: clamp(.5rem, .95vw, .95rem);
+  line-height: 1.1;
+  text-align: center;
+}
+
+@keyframes mw-sc-in {
+  from { opacity: 0; translate: 0 -14px; }
+}
+
+.mw-sc-hide {
+  position: absolute;
+  left: 39%;
+  top: 8%;
+  width: 22%;
+  height: 82%;
+}
+
+.mw-sc-blank {
+  left: 81%;
+  top: 72%;
+  width: 9%;
+  height: 15%;
+  rotate: -6deg;
+}
+
+.mw-sc-blank__paper {
+  position: absolute;
+  inset: 0;
+  background: #ededed;
+  box-shadow: inset 0 0 0 5px #f7f7f7, 0 8px 16px -6px #000;
+}
+
+.mw-sc-blank .mw-escape__glow {
+  inset: -70%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .45), rgba(255, 255, 255, .08) 45%, transparent 65%);
+}
+
+/* =========================================================================
+   SITUACIÓN 6 · UNCERTAIN FUTURE
+   ========================================================================= */
+.mw-uf-window {
+  position: absolute;
+  left: 16%;
+  top: 6%;
+  width: 64%;
+  height: 84%;
+  overflow: hidden;
+  border: 16px solid #1e1e1e;
+  background: #000;
+  box-shadow: inset 0 0 0 3px #0c0c0c, 0 0 0 6px #101010;
+}
+
+.mw-uf-outside {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #5c5c5c 0%, #3c3c3c 45%, #1c1c1c 100%);
+}
+
+/* Edificios enormes que se inclinan hacia quien mira */
+.mw-uf-city {
+  position: absolute;
+  inset: 0;
+  transform: perspective(700px) rotateX(-7deg);
+  transform-origin: 50% 100%;
+}
+
+.mw-uf-building {
+  position: absolute;
+  bottom: 22%;
+  background: rgb(var(--tono), var(--tono), var(--tono));
+  box-shadow: inset 6px 0 0 rgba(255, 255, 255, .03);
+}
+
+/* La única ventana encendida de toda la ciudad */
+.mw-uf-litpane {
+  position: absolute;
+  left: 54%;
+  top: 40%;
+  width: 3%;
+  height: 4.5%;
+  background: #f2f2f2;
+  box-shadow: 0 0 14px 3px rgba(255, 255, 255, .45);
+  animation: mw-flicker 7s steps(1) infinite;
+}
+
+.mw-uf-road {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 23%;
+  background: linear-gradient(180deg, #2a2a2a, #111);
+  clip-path: polygon(0 100%, 100% 100%, 53% 0, 47% 0);
+}
+
+.mw-uf-fog {
+  position: absolute;
+  inset: 28% -10% 0;
+  background: linear-gradient(180deg, transparent, rgba(130, 130, 130, .42) 45%, rgba(70, 70, 70, .3) 75%, transparent);
+  animation: mw-uf-niebla 20s ease-in-out infinite alternate;
+}
+
+@keyframes mw-uf-niebla {
+  to { transform: translateX(-5%); opacity: .7; }
+}
+
+.mw-uf-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mw-uf-drop {
+  position: absolute;
+  top: -12%;
+  width: 1px;
+  height: 9%;
+  background: linear-gradient(transparent, rgba(255, 255, 255, .38));
+  rotate: 7deg;
+  animation: mw-uf-gota var(--d) linear var(--del) infinite;
+}
+
+@keyframes mw-uf-gota {
+  to { translate: -14px 1300%; }
+}
+
+/* Persiana: subida (láminas juntas arriba) o bajada (separadas) */
+.mw-uf-blinds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mw-uf-slat {
+  position: absolute;
+  left: -1%;
+  right: -1%;
+  top: 0;
+  height: 5%;
+  background: linear-gradient(180deg, #a0a0a0, #707070 60%, #4a4a4a);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, .6);
+  transform: translateY(calc(var(--i) * 18%));
+  transition: transform 2.4s var(--mw-ease);
+}
+
+.mw-scene--hidden .mw-uf-slat {
+  transform: translateY(calc(var(--i) * 117%));
+  transition-delay: calc(var(--i) * 45ms);
+}
+
+.mw-uf-mullion {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  translate: -50% 0;
+  background: #1e1e1e;
+}
+
+/* Cordón de la persiana (el botón de ocultar) */
+.mw-uf-hide {
+  position: absolute;
+  left: 81.5%;
+  top: 7%;
+  width: 3.5%;
+  height: 60%;
+  border-radius: 999px;
+}
+
+.mw-uf-cord {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 8%;
+  width: 2px;
+  translate: -50% 0;
+  background: #5a5a5a;
+}
+
+.mw-uf-cord::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8%;
+  width: 10px;
+  height: 22px;
+  translate: -50% 0;
+  border-radius: 5px;
+  background: #7a7a7a;
+}
+
+/* El objeto de escape está encima de la persiana: su luz se filtra */
+.mw-uf-lit {
+  left: 49.8%;
+  top: 38.8%;
+  width: 3.6%;
+  height: 5.4%;
+}
+
+.mw-uf-lit .mw-escape__glow {
+  inset: -160%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .42), rgba(255, 255, 255, .06) 45%, transparent 65%);
+}
+
+/* =========================================================================
+   SITUACIÓN 7 · FAMILY EXPECTATIONS
+   ========================================================================= */
+.mw-fe-wall {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 42% 50% at 50% 42%, rgba(255, 255, 255, .1), transparent 70%);
+  mix-blend-mode: screen;
+}
+
+.mw-fe-shelf {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 72%;
+  height: 4%;
+  background: linear-gradient(180deg, #3a3a3a, #1c1c1c);
+  box-shadow: 0 34px 44px -12px #000;
+}
+
+.mw-fe-frame {
+  position: absolute;
+  left: 35%;
+  top: 32%;
+  width: 30%;
+  height: 40%;
+  perspective: 1200px;
+}
+
+.mw-fe-frame__inner {
+  position: absolute;
+  inset: 0;
+  padding: 4%;
+  background: #232323;
+  box-shadow: inset 0 0 0 3px #111, 0 20px 40px -12px #000;
+  transform-origin: 50% 100%;
+  transition: transform 1.8s var(--mw-ease);
+}
+
+.mw-fe-frame__inner svg { display: block; width: 100%; height: 100%; }
+
+/* Boca abajo: el marco cae hacia delante */
+.mw-scene--hidden .mw-fe-frame__inner { transform: rotateX(-86deg); }
+
+.mw-fe-trophy {
+  position: absolute;
+  top: 44%;
+  width: 9%;
+  height: 28%;
+  pointer-events: none;
+}
+
+.mw-fe-trophy svg { width: 100%; height: 100%; }
+.mw-fe-trophy--1 { left: 18%; }
+.mw-fe-trophy--2 { left: 72%; }
+
+/* La consola asoma detrás del segundo trofeo */
+.mw-fe-console {
+  left: 76%;
+  top: 57%;
+  width: 12%;
+  height: 12%;
+}
+
+.mw-fe-console .mw-escape__glow {
+  inset: -70%;
+  background: radial-gradient(ellipse 36% 32% at 50% 50%, rgba(255, 255, 255, .5), rgba(255, 255, 255, .08) 50%, transparent 70%);
+}
+
+.mw-fe-hide {
+  position: absolute;
+  left: 35%;
+  top: 32%;
+  width: 30%;
+  height: 40%;
+}
+
 /* =========================================================================
    ATMÓSFERA: viñeteado y grano
    ========================================================================= */

@@ -43,9 +43,13 @@ Todo el código vive dentro de `window.MutedWorld`: no hay otras variables globa
 
 | Situación | Estado |
 |---|---|
-| Academic pressure | ✅ completa |
-| Loneliness, Emotional overload, Lack of control | pendientes (obligatorias) |
-| Social comparison, Uncertain future, Family expectations | pendientes (propuestas) |
+| Academic pressure | ✅ |
+| Loneliness | ✅ |
+| Emotional overload | ✅ |
+| Lack of control | ✅ |
+| Social comparison | ✅ |
+| Uncertain future | ✅ |
+| Family expectations | ✅ |
 
 ## Créditos
 

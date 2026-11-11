@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Motif: an empty message bubble marked Seen">
+  <!-- Motivo "unanswered-bubble" (Loneliness). Escala de grises, fondo transparente. -->
+  <defs><filter id="r" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter></defs>
+  <g filter="url(#r)" stroke="#111" stroke-width="3">
+    <path d="M40 50 Q40 34 56 34 L150 34 Q166 34 166 50 L166 112 Q166 128 150 128 L128 128 L150 156 L104 128 L56 128 Q40 128 40 112 Z" fill="#d8d8d8"/>
+  </g>
+  <text x="166" y="152" text-anchor="end" font-family="Georgia, serif" font-style="italic" font-size="15" fill="#444">Seen</text>
+</svg>

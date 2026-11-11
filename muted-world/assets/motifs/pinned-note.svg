@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Motif: a crumpled note held by a single pin">
+  <!-- Motivo "pinned-note" (Emotional overload). Escala de grises, fondo transparente. -->
+  <defs><filter id="r" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter></defs>
+  <g filter="url(#r)" stroke="#111" stroke-width="2.5">
+    <path d="M52 46 L148 40 L156 92 L144 150 L60 160 L46 108 Z" fill="#d4d4d4"/>
+    <path d="M52 46 L96 100 L60 160 M148 40 L110 96 L144 150 M46 108 L96 100 L156 92" fill="none" stroke="#8a8a8a" stroke-width="1.5"/>
+  </g>
+  <circle cx="100" cy="48" r="9" fill="#111"/>
+  <circle cx="97" cy="45" r="3" fill="#777"/>
+</svg>

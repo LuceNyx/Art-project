@@ -46,12 +46,12 @@ Para obtener los datos completos, carga `<script src="../muted-world/js/config.j
 | scene | motif | Descripción del motivo | ¿Lista? |
 |---|---|---|---|
 | `academic-pressure` | `stacked-paper` | Una pila torcida de hojas que no deja de crecer | ✅ |
-| `loneliness` | `unanswered-bubble` | Una burbuja de mensaje vacía marcada como "Seen" | pendiente |
-| `emotional-overload` | `pinned-note` | Una nota arrugada sujeta con una sola chincheta | pendiente |
-| `lack-of-control` | `stopped-clock` | Un reloj detenido en las 7:00 | pendiente |
-| `social-comparison` | `blank-polaroid` | Una foto instantánea vacía | pendiente |
-| `uncertain-future` | `lit-window` | Un rectángulo encendido en un edificio oscuro | pendiente |
-| `family-expectations` | `facedown-frame` | Un marco de foto boca abajo | pendiente |
+| `loneliness` | `unanswered-bubble` | Una burbuja de mensaje vacía marcada como "Seen" | ✅ |
+| `emotional-overload` | `pinned-note` | Una nota arrugada sujeta con una sola chincheta | ✅ |
+| `lack-of-control` | `stopped-clock` | Un reloj detenido en las 7:00 | ✅ |
+| `social-comparison` | `blank-polaroid` | Una foto instantánea vacía | ✅ |
+| `uncertain-future` | `lit-window` | Un rectángulo encendido en un edificio oscuro | ✅ |
+| `family-expectations` | `facedown-frame` | Un marco de foto boca abajo | ✅ |
 
 Los SVG están en `muted-world/assets/motifs/<motif>.svg`. Desde `transition/` o desde `imagined-world/` la ruta es `../muted-world/assets/motifs/<motif>.svg`. Son grises con fondo transparente: se pueden recolorear, desenfocar o animar en el mundo imaginado. Recuerda que un motivo que sigue visible es un sentimiento que vuelve.
 
