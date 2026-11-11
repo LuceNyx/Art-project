@@ -1,0 +1,641 @@
+/* =========================================================================
+   MUTED WORLD · muted.css
+   Blanco y negro de alto contraste. CERO color. Movimiento lento y escaso.
+   Todas las clases usan el prefijo .mw-
+   ========================================================================= */
+
+:root {
+  /* Escala de grises (no se permite ningún color) */
+  --mw-black: #000;
+  --mw-ink: #070707;
+  --mw-dark: #111;
+  --mw-shadow: #1c1c1c;
+  --mw-mid: #6e6e6e;
+  --mw-pale: #bdbdbd;
+  --mw-paper: #d9d9d9;
+  --mw-white: #f2f2f2;
+  --mw-text: #d0d0d0;          /* texto principal: contraste ~13:1 sobre negro */
+  --mw-text-dim: #9a9a9a;      /* texto secundario: contraste ~7:1 */
+
+  /* Intensidad del grano (0 = sin grano, 0.3 = muy marcado) */
+  --mw-grain-intensity: 0.16;
+
+  /* Tiempos: todo es lento */
+  --mw-slow: 1.6s;
+  --mw-slower: 2.6s;
+  --mw-ease: cubic-bezier(.33, 0, .2, 1);
+
+  --mw-font: "EB Garamond", Garamond, Georgia, "Times New Roman", serif;
+  --mw-vh: 100vh;
+}
+
+@supports (height: 100svh) {
+  :root { --mw-vh: 100svh; }
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; height: 100%; }
+
+.mw-body {
+  overflow: hidden;
+  background: var(--mw-black);
+  color: var(--mw-text);
+  font-family: var(--mw-font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mw-body button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Foco: un halo de luz, nunca el contorno azul por defecto */
+.mw-body :focus { outline: none; }
+.mw-body :focus-visible {
+  outline: none;
+  text-shadow: 0 0 10px rgba(255, 255, 255, .9);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25), 0 0 22px 4px rgba(255, 255, 255, .22);
+}
+
+.mw-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.mw-defs { position: absolute; width: 0; height: 0; }
+
+/* =========================================================================
+   ESCENARIO 16:9
+   Cubre la pantalla. En pantallas estrechas se desplaza en horizontal.
+   Todo lo que va encima se posiciona en % → coincide con la imagen.
+   ========================================================================= */
+.mw-viewport {
+  position: fixed;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.mw-viewport::-webkit-scrollbar { display: none; }
+
+.mw-stage {
+  position: relative;
+  top: 50%;
+  width: max(100vw, calc(var(--mw-vh) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  translate: 0 -50%;
+  overflow: hidden;
+}
+
+.mw-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* =========================================================================
+   HABITACIÓN
+   ========================================================================= */
+.mw-room {
+  transform-origin: var(--mw-zoom-x, 50%) var(--mw-zoom-y, 50%);
+  transition: transform var(--mw-slower) var(--mw-ease), filter var(--mw-slower) var(--mw-ease);
+}
+
+/* Al abrir una situación, la habitación se acerca al objeto y se apaga */
+.mw-room--leaving {
+  transform: scale(1.35);
+  filter: brightness(.15);
+}
+
+.mw-objects { position: absolute; inset: 0; }
+
+.mw-object {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: calc(var(--w) * 1%);
+  height: calc(var(--h) * 1%);
+  transition: filter var(--mw-slower) var(--mw-ease), scale var(--mw-slow) var(--mw-ease);
+}
+
+.mw-object svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+button.mw-object { border-radius: 40%; }
+
+button.mw-object:hover,
+button.mw-object:focus-visible { scale: 1.02; }
+
+button.mw-object:focus-visible {
+  box-shadow: none;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, .5));
+}
+
+/* Huella: lo visitado queda más oscuro */
+.mw-object--visited { filter: brightness(.55) contrast(1.1); }
+.mw-object--visited:focus-visible { filter: brightness(.7) drop-shadow(0 0 12px rgba(255, 255, 255, .45)); }
+
+/* Detalles que solo existen después de visitar (p. ej. el cuaderno cerrado) */
+.mw-object .mw-after-visit { display: none; }
+.mw-object--visited .mw-after-visit { display: inline; }
+.mw-object--visited .mw-before-visit { display: none; }
+
+/* Capa de oscuridad (canvas, dibujada por room.js) */
+.mw-light {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   PRIMER PLANO (SITUACIÓN)
+   ========================================================================= */
+.mw-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--mw-black);
+  opacity: 0;
+  transition: opacity var(--mw-slower) var(--mw-ease);
+}
+
+.mw-scene--open { opacity: 1; }
+
+.mw-scene__stage {
+  scale: 1.05;
+  transition: scale 4s var(--mw-ease);
+}
+
+.mw-scene--open .mw-scene__stage { scale: 1; }
+
+.mw-scene__content { position: absolute; inset: 0; }
+
+/* Sombra general: se intensifica al "ocultar" (evasión) */
+.mw-scene__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 70% at 50% 55%, transparent 35%, rgba(0, 0, 0, .85) 100%);
+  transition: background-color var(--mw-slower) var(--mw-ease);
+}
+
+.mw-scene--hidden .mw-scene__shade { background-color: rgba(0, 0, 0, .45); }
+
+/* Texto fragmentario */
+/* Arriba a la derecha, sobre la pared oscura (no tapa los objetos) */
+.mw-lines {
+  position: fixed;
+  right: clamp(1.25rem, 6vw, 5.5rem);
+  top: clamp(4.5rem, 18vh, 11rem);
+  z-index: 12;
+  display: grid;
+  justify-items: end;
+  gap: .35rem;
+  text-align: right;
+  max-width: min(30rem, calc(100vw - 2.5rem));
+  pointer-events: none;
+}
+
+.mw-line {
+  margin: 0;
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.3vw, 1.65rem);
+  line-height: 1.35;
+  color: var(--mw-text);
+  text-shadow: 0 0 14px #000, 0 0 4px #000;
+  opacity: 0;
+  filter: blur(4px);
+  transition: opacity 2.4s var(--mw-ease), filter 2.4s var(--mw-ease);
+}
+
+.mw-line--on { opacity: 1; filter: blur(0); }
+
+/* Las líneas viejas se apagan un poco */
+.mw-line--old { opacity: .45; }
+
+/* Volver a la habitación (discreto) */
+.mw-back {
+  position: fixed;
+  top: clamp(1rem, 3vw, 2rem);
+  left: clamp(1rem, 3vw, 2rem);
+  z-index: 12;
+  padding: .45rem .8rem;
+  border-radius: 999px;
+  color: var(--mw-text-dim);
+  font-size: 1rem;
+  letter-spacing: .04em;
+  transition: color var(--mw-slow);
+}
+
+.mw-body .mw-back:hover,
+.mw-body .mw-back:focus-visible { color: var(--mw-white); }
+
+/* ---------- Objeto de escape (genérico) ---------- */
+.mw-escape {
+  position: absolute;
+  border-radius: 30%;
+}
+
+/* La luz que crece y titila al pasar el mouse */
+.mw-escape__glow {
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background: radial-gradient(ellipse 50% 22% at 50% 50%, rgba(255, 255, 255, .55), rgba(255, 255, 255, .12) 45%, transparent 70%);
+  mix-blend-mode: screen;
+  opacity: .5;
+  scale: .8;
+  transition: opacity var(--mw-slow) var(--mw-ease), scale var(--mw-slow) var(--mw-ease);
+  animation: mw-breathe 5s ease-in-out infinite;
+}
+
+.mw-escape:hover .mw-escape__glow,
+.mw-escape:focus-visible .mw-escape__glow {
+  opacity: 1;
+  scale: 1.25;
+  animation: mw-flicker 2.2s steps(1) infinite;
+}
+
+.mw-body .mw-escape:focus-visible { box-shadow: none; }
+
+@keyframes mw-breathe {
+  0%, 100% { opacity: .4; }
+  50% { opacity: .65; }
+}
+
+@keyframes mw-flicker {
+  0%, 100% { opacity: 1; }
+  12% { opacity: .82; }
+  14% { opacity: 1; }
+  57% { opacity: .9; }
+  59% { opacity: .7; }
+  61% { opacity: 1; }
+}
+
+/* Salida: un blanco suave llena la pantalla y se entrega el control */
+.mw-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mw-flash-x, 50%) var(--mw-flash-y, 50%), #fff 0, #fff 30%, #e6e6e6 100%);
+  opacity: 0;
+  transition: opacity 1.4s var(--mw-ease);
+}
+
+.mw-flash--on { opacity: 1; }
+
+/* =========================================================================
+   SITUACIÓN 1 · ACADEMIC PRESSURE
+   Elementos dibujados en código sobre scene-academic-pressure.jpg
+   ========================================================================= */
+
+/* Cono de luz de la lámpara */
+.mw-ap-cone {
+  position: absolute;
+  left: 8%;
+  top: 4%;
+  width: 70%;
+  height: 92%;
+  pointer-events: none;
+  background: radial-gradient(ellipse 48% 42% at 52% 72%, rgba(255, 255, 255, .34), rgba(255, 255, 255, .08) 55%, transparent 75%);
+  mix-blend-mode: screen;
+  transition: opacity var(--mw-slower) var(--mw-ease);
+  animation: mw-lamp 7s ease-in-out infinite;
+}
+
+.mw-scene--hidden .mw-ap-cone { opacity: .35; }
+
+@keyframes mw-lamp {
+  0%, 100% { opacity: 1; }
+  48% { opacity: .92; }
+  50% { opacity: .78; }
+  52% { opacity: .95; }
+}
+
+.mw-scene--hidden .mw-ap-cone { animation: none; }
+
+.mw-ap-lamp {
+  position: absolute;
+  left: 4%;
+  top: -2%;
+  width: 26%;
+  height: 50%;
+  pointer-events: none;
+}
+
+/* Pila de hojas: crece sin parar */
+.mw-ap-stack {
+  position: absolute;
+  left: 11%;
+  bottom: 13%;
+  width: 21%;
+  height: 84%;
+  pointer-events: none;
+}
+
+.mw-ap-sheet {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--i) * 1.05%);
+  width: 100%;
+  height: 6%;
+  background: linear-gradient(180deg, #e4e4e4, #c4c4c4);
+  border-bottom: 2px solid #7a7a7a;
+  transform: translateX(calc(var(--dx) * 1%)) rotate(calc(var(--rot) * 1deg)) skewX(-28deg);
+  box-shadow: 0 2px 0 #2a2a2a;
+}
+
+/* La que está cayendo */
+.mw-ap-sheet--falling {
+  animation: mw-ap-fall 1.8s cubic-bezier(.45, 0, .7, 1) both;
+}
+
+@keyframes mw-ap-fall {
+  0% {
+    opacity: 0;
+    transform: translate(calc(var(--dx) * 1% + 40%), -900%) rotate(calc(var(--rot) * 1deg - 25deg)) skewX(-28deg);
+  }
+  15% { opacity: 1; }
+  60% {
+    transform: translate(calc(var(--dx) * 1% - 12%), -180%) rotate(calc(var(--rot) * 1deg + 8deg)) skewX(-28deg);
+  }
+  100% {
+    transform: translateX(calc(var(--dx) * 1%)) rotate(calc(var(--rot) * 1deg)) skewX(-28deg);
+  }
+}
+
+/* Cuaderno: la hoja derecha gira sobre el lomo para cerrarlo */
+.mw-ap-notebook {
+  position: absolute;
+  left: 36%;
+  top: 56%;
+  width: 30%;
+  height: 26%;
+  perspective: 1400px;
+  transform: rotateX(48deg) rotateZ(-4deg);
+  transform-style: preserve-3d;
+  border-radius: 4px;
+}
+
+.mw-ap-page {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  padding: 7% 6%;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 11%, rgba(40, 40, 40, .35) 11% calc(11% + 1px)),
+    linear-gradient(90deg, #cfcfcf, #e8e8e8);
+  color: #2b2b2b;
+  font-size: clamp(.45rem, 1vw, .95rem);
+  font-style: italic;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.mw-ap-page--left {
+  left: 0;
+  border-radius: 4px 0 0 4px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 11%, rgba(40, 40, 40, .35) 11% calc(11% + 1px)),
+    linear-gradient(90deg, #e2e2e2, #bfbfbf);
+}
+
+/* Garabatos que imitan escritura (no se leen) */
+.mw-ap-scribble {
+  display: block;
+  height: 5%;
+  margin: 0 0 6.2%;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, #555 0 6%, transparent 6% 8%, #555 8% 17%, transparent 17% 19%);
+  opacity: .55;
+}
+
+.mw-ap-due {
+  display: block;
+  margin-bottom: 8%;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+
+.mw-ap-leaf {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transform: translateZ(1px);   /* evita que parpadee contra la página izquierda */
+  transition: transform 1.8s var(--mw-ease);
+}
+
+.mw-ap-leaf__front,
+.mw-ap-leaf__back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.mw-ap-leaf__front {
+  left: 0;
+  width: 100%;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Contraportada: cartón oscuro */
+.mw-ap-leaf__back {
+  transform: rotateY(180deg);
+  border-radius: 4px 0 0 4px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .06), transparent 30%),
+    #262626;
+  box-shadow: inset 0 0 0 2px #111;
+}
+
+.mw-scene--hidden .mw-ap-leaf { transform: translateZ(2px) rotateY(-180deg); }
+
+/* Hojas sueltas que asoman bajo el cuaderno (no desaparecen al cerrarlo) */
+.mw-ap-loose {
+  position: absolute;
+  width: 44%;
+  height: 70%;
+  background: #cbcbcb;
+  border-bottom: 2px solid #777;
+  transform: translateZ(-1px);
+}
+
+.mw-ap-loose--1 { left: -9%;  top: 22%; rotate: -11deg; }
+.mw-ap-loose--2 { left: 18%;  top: 52%; rotate: 7deg; }
+.mw-ap-loose--3 { left: -4%;  top: 48%; rotate: -3deg; opacity: .9; }
+
+/* Botón que cubre el cuaderno (ocultar = evasión) */
+.mw-ap-hide {
+  position: absolute;
+  left: 34%;
+  top: 50%;
+  width: 34%;
+  height: 36%;
+  border-radius: 12px;
+}
+
+/* Portátil entreabierto: el objeto de escape */
+.mw-ap-laptop {
+  left: 68%;
+  top: 56%;
+  width: 20%;
+  height: 24%;
+}
+
+.mw-ap-laptop svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.mw-ap-laptop .mw-escape__glow {
+  inset: -10% -25%;
+  background: radial-gradient(ellipse 42% 12% at 50% 47%, rgba(255, 255, 255, .7), rgba(255, 255, 255, .14) 50%, transparent 72%);
+}
+
+/* =========================================================================
+   ATMÓSFERA: viñeteado y grano
+   ========================================================================= */
+.mw-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 85% 80% at 50% 50%, transparent 55%, rgba(0, 0, 0, .75) 100%);
+}
+
+.mw-grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 21;
+  pointer-events: none;
+  background-image: var(--mw-grain-image, none);
+  background-size: 180px 180px;
+  opacity: var(--mw-grain-intensity);
+  mix-blend-mode: screen;
+  animation: mw-grain-drift 1.4s steps(4) infinite;
+}
+
+@keyframes mw-grain-drift {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-37px, 21px); }
+  50%  { transform: translate(19px, -43px); }
+  75%  { transform: translate(-11px, 33px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* =========================================================================
+   ENTRADA Y SONIDO
+   ========================================================================= */
+.mw-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: var(--mw-black);
+  transition: opacity 2.4s var(--mw-ease), visibility 2.4s;
+}
+
+.mw-intro--gone {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.mw-intro__enter {
+  padding: 1rem 1.6rem;
+  border-radius: 999px;
+  color: var(--mw-text);
+  font-style: italic;
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  letter-spacing: .02em;
+  animation: mw-breathe 4.5s ease-in-out infinite;
+}
+
+.mw-body .mw-intro__enter:hover { color: var(--mw-white); }
+
+.mw-mute {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 40;
+  padding: .45rem .8rem;
+  border-radius: 999px;
+  color: var(--mw-text-dim);
+  font-size: .95rem;
+  letter-spacing: .06em;
+  transition: color var(--mw-slow);
+}
+
+.mw-body .mw-mute:hover,
+.mw-body .mw-mute:focus-visible { color: var(--mw-white); }
+
+.mw-noscript {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  background: #000;
+  color: var(--mw-text);
+  font-style: italic;
+  font-size: 1.4rem;
+}
+
+/* =========================================================================
+   PANTALLAS ESTRECHAS
+   ========================================================================= */
+@media (max-aspect-ratio: 1 / 1) {
+  /* En vertical, el primer plano se encuadra más abierto (franjas negras
+     arriba y abajo, como en cine) para que casi todo quepa sin desplazarse */
+  .mw-scene__stage { width: max(100vw, min(calc(var(--mw-vh) * 16 / 9), 160vw)); }
+
+  /* El portátil se acerca al centro para no quedar fuera */
+  .mw-ap-laptop { left: 62%; top: 60%; width: 18%; height: 22%; }
+
+  /* En vertical hay franjas negras arriba: el texto va ahí */
+  .mw-lines { top: clamp(4.5rem, 10vh, 6rem); }
+}
+
+/* =========================================================================
+   MOVIMIENTO REDUCIDO: todo estático
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+}

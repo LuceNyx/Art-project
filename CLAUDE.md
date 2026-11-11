@@ -1,45 +1,65 @@
-# Reglas del proyecto para asistentes de IA (Claude Code y otros)
+# Digital Escapism: contexto para asistentes de IA
 
-Proyecto: **Escapismo Digital**, página web artística de una sola página (HTML5 + CSS3 + JavaScript modular, sin frameworks ni dependencias). Equipo de 4 integrantes (UTEC, Artes Digitales). Se publica en GitHub Pages.
+Proyecto final del curso **Arte y Tecnología (UTEC)**. Experiencia web interactiva hecha con HTML, CSS y JavaScript puros (sin frameworks, sin build, sin dependencias). Explora el escapismo digital **como refugio y como evasión a la vez**. La web no describe el escapismo: hace que el visitante **realice** la transición entre realidades.
 
-## Reglas obligatorias
+## Flujo
 
-1. **Escribe en español**: comentarios, nombres de variables y funciones, textos y mensajes de commit.
-2. **Toca solo los archivos del integrante que te está usando** (ver la tabla de abajo). Si una tarea exige cambiar un archivo de otra persona, detente y avisa: ese cambio va en un PR aparte y lo revisa su dueño.
-3. En `index.html`, edita **solo dentro del bloque marcado** de la sección correspondiente (`<!-- ===== SECCIÓN · Integrante N ===== -->` … `<!-- ===== FIN ... ===== -->`).
-4. **Nunca trabajes en `main`**. Usa una rama `feature/nombre-tarea`. No hagas commit, push ni merge sin autorización explícita.
-5. **No instales dependencias** ni agregues librerías externas sin consultarlo.
-6. **Rutas siempre relativas** (`css/base.css`, `assets/img/...`). Nunca empiezan con `/`. Nombres de archivo en minúsculas, sin tildes ni espacios.
-7. **Prefijos de clases CSS**: `.ui-`, `.pro-`, `.ref-` (I1) · `.cot-` (I2) · `.vir-` (I3) · `.fx-` (I4).
-8. No modifiques las variables de `css/base.css`, `js/utils.js` ni `js/main.js` salvo que la tarea lo pida expresamente.
-9. Todo recurso externo (imagen, audio, fuente, imagen generada por IA) se registra en `docs/atribuciones.md`, en el apartado del integrante.
-10. Respeta `prefers-reduced-motion` y mantén el diseño responsivo (probar a 375 px de ancho).
+```
+MUTED WORLD (real, apagado) → clic (JS) → TRANSICIÓN DINÁMICA (CSS) → IMAGINED WORLD (brillante) → RESIDUO
+  muted-world/                              transition/                  imagined-world/
+```
 
-## Dueños de archivos
+## Principios (obligatorios para todas las partes)
 
-| Integrante | Archivos |
-|---|---|
-| I1 · Estructura | `index.html` (estructura, `<head>`, navegación, prólogo, reflexión), `css/base.css`, `css/estructura.css`, `js/main.js`, `js/navegacion.js`, `README.md` |
-| I2 · Cotidiano | bloque `#cotidiano` en `index.html`, `css/cotidiano.css`, `js/cotidiano.js`, `assets/*/cotidiano/` |
-| I3 · Virtual | bloque `#virtual` en `index.html`, `css/virtual.css`, `js/virtual.js`, `assets/*/virtual/` |
-| I4 · Interactividad | bloque `#portal` en `index.html`, `css/efectos.css`, `js/efectos.js`, `js/estado.js`, `js/utils.js` |
+- **Contraste:** el mundo real es pesado, comprimido y opresivo (blanco y negro, sin color). El imaginado es color y libertad.
+- **Transición:** entrar al mundo imaginado es una acción visible que el visitante elige.
+- **Residuo:** cada situación del Muted World tiene un **motivo visual** que reaparece dentro del mundo imaginado. Un motivo que sigue visible representa un sentimiento no resuelto que vuelve.
+- **Significado de las interacciones:** ocultar contenido = evasión. Revelar una escena con color = alivio temporal (solo en el imagined world).
+- Es una obra artística reflexiva, **no** un instrumento de diagnóstico. Nada de lenguaje clínico, terror explícito ni moralejas simplistas ("los videojuegos son malos").
+- **Referencias:** de OMORI se toma solo el *principio* (cada espacio expresa una forma distinta de lidiar con el dolor). **Prohibido copiar personajes, historia, sprites o diseños concretos de OMORI** o de cualquier juego. Otras referencias de tono: *Journey* y *The Stanley Parable*.
+- Los textos que ve el visitante están en **inglés**. Los comentarios de código y la documentación, en **español**.
 
-## Cómo se comunican los módulos
+## Estado de cada parte
 
-- Los módulos **no se importan entre sí**: solo importan `js/utils.js`.
-- Eventos (definidos en `EVENTOS` dentro de `utils.js`):
-  - `escapismo:seccion` → `{ id, mundo }`: cambia la sección visible.
-  - `escapismo:interaccion` → `{ origen }`: interacción en el mundo virtual (suma a la grieta).
-  - `escapismo:grieta` → `{ nivel }`: nivel de degradación de 0 a 3.
-  - `escapismo:reiniciar`: el visitante vuelve a empezar.
-- Efectos por atributos (los implementa I4): `data-revelar`, `data-maquina`, `data-glitch`, `data-parallax="factor"`. Usa `style="--retraso:.2s"` para escalonar apariciones.
-- `[data-revelar]` y `[data-parallax]` usan la propiedad CSS `translate`: no los combines en el mismo elemento.
-- `.vir::after` está reservado para las líneas de escaneo de `efectos.css`.
+| Parte | Carpeta | Prefijo CSS | Estado |
+|---|---|---|---|
+| Muted World | `muted-world/` | `mw-` | **En construcción.** Cuando esté terminado, **no se modifica** salvo para conectarlo |
+| Transición | `transition/` | `tr-` | `transition/index.html` es un **PLACEHOLDER — será reemplazado por la parte de mis compañeros**. Se puede sobrescribir completo sin dudar |
+| Imagined World | `imagined-world/` | `iw-` | Aún no existe. Llegará con el prompt de mis compañeros |
+
+## Estructura
+
+```
+index.html              Entrada del sitio: redirige a muted-world/index.html
+CLAUDE.md               Este archivo
+muted-world/            Mundo real (ver muted-world/README.md e INTEGRATION.md)
+transition/index.html   PLACEHOLDER temporal de la transición
+prototipo-v0.1/         Prototipo anterior (página única de la v0.1), solo como referencia
+css/  js/  docs/        Archivos de la v0.1, sin uso en el sitio actual. No borrar sin acuerdo del equipo
+```
+
+## Contrato de integración (resumen; detalle en `muted-world/INTEGRATION.md`)
+
+1. Al hacer clic en el objeto de escape, el Muted World dispara en `window`:
+   `CustomEvent('muted:escape', { detail: { scene, motif }, cancelable: true })`
+2. Si nadie llama a `event.preventDefault()`, navega a
+   `TRANSITION_URL + '?from=<scene>&motif=<motif>'` (por defecto `../transition/index.html`, en `muted-world/js/config.js`).
+3. Los datos de las situaciones y sus motivos están en `window.MutedWorld.config.MUTED_SCENES` (cargando `muted-world/js/config.js`). Los SVG de los motivos están en `muted-world/assets/motifs/<motif>.svg`.
+4. Para volver: `muted-world/index.html?return=<scene>`. La habitación muestra esa situación como visitada y con una luz nueva.
+
+## Convenciones
+
+- Cada parte usa **solo su prefijo de clases** y su carpeta. No se editan archivos de otra parte.
+- Sin variables globales sueltas: cada parte agrupa su código en un objeto propio (`window.MutedWorld`, por ejemplo `window.Transition` o `window.ImaginedWorld`).
+- Rutas **relativas**. Nombres de archivo en minúsculas, sin espacios ni tildes. El sitio se publica en GitHub Pages.
+- Sin dependencias externas, salvo como máximo una fuente de Google Fonts por parte.
+- Respetar `prefers-reduced-motion`, la navegación con teclado y el diseño responsivo.
+- Nunca trabajar en `main`: usar ramas `feature/...`. No hacer commit, push ni merge sin autorización.
 
 ## Probar en local
 
 ```bash
-python3 -m http.server 8000   # luego abrir http://localhost:8000
+python3 -m http.server 8000   # abrir http://localhost:8000
 ```
 
-Los módulos JS no funcionan si se abre `index.html` con doble clic: siempre usa el servidor local.
+El Muted World también funciona abriendo `muted-world/index.html` con doble clic, aunque sin cargar los archivos de audio reales.
