@@ -869,6 +869,336 @@ html, body { margin: 0; height: 100%; }
 .iw-response--on { opacity: 1; }
 
 /* =========================================================================
+   REELS · si se entró con el celular (reels.js)
+   El mundo imaginado queda detrás, desenfocado: el feed lo es todo.
+   ========================================================================= */
+.iw-reels {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  align-items: center;
+  gap: .9rem;
+  padding: clamp(.8rem, 2.4vh, 1.6rem) 1rem;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 45%, rgba(120, 60, 170, .32), transparent 70%),
+    rgba(14, 10, 32, .78);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  opacity: 0;
+  transition: opacity .6s var(--iw-ease);
+}
+
+.iw-reels--on { opacity: 1; }
+
+.iw-reels__top {
+  display: flex;
+  gap: 1.4rem;
+  font-size: clamp(.95rem, 1.6vw, 1.1rem);
+  letter-spacing: .02em;
+}
+
+.iw-reels__tab { color: rgba(255, 248, 239, .55); }
+
+.iw-reels__tab--on {
+  position: relative;
+  color: var(--iw-text);
+  font-weight: 400;
+}
+
+.iw-reels__tab--on::after {
+  content: "";
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: -.35rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--iw-text);
+}
+
+.iw-reels__stage {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.1rem;
+  height: 100%;
+  min-height: 0;
+}
+
+/* El teléfono: marco con luz que gira alrededor */
+.iw-reels__phone {
+  position: relative;
+  height: min(100%, 860px);
+  aspect-ratio: 9 / 16;
+  max-width: calc(100vw - 7rem);
+  padding: 8px;
+  border-radius: 2.3rem;
+  background: linear-gradient(160deg, #2a2347, #100c20);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .1),
+    0 40px 90px -30px rgba(0, 0, 0, .9);
+  isolation: isolate;
+}
+
+.iw-reels__phone::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: 2.5rem;
+  background: conic-gradient(from var(--iw-giro, 0deg), #ff8fc4, #b38cff, #7fe6d0, #ffd28a, #ff8fc4);
+  filter: blur(14px);
+  opacity: .55;
+  animation: iw-borde 8s linear infinite;
+}
+
+@property --iw-giro {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes iw-borde { to { --iw-giro: 360deg; } }
+
+.iw-reels__screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 1.8rem;
+  background: #000;
+}
+
+/* Cada reel ocupa la pantalla y sube al pasar al siguiente */
+.iw-reel {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #000;
+  transition: transform .65s cubic-bezier(.3, 0, .2, 1), opacity .65s;
+}
+
+.iw-reel--in { transform: translateY(100%); }
+.iw-reel--out { transform: translateY(-100%); opacity: .4; }
+
+.iw-reel iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+/* Mientras carga: un brillo que recorre la pantalla */
+.iw-reel__loading {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, #120c24 30%, #2b2050 50%, #120c24 70%) 0 0 / 300% 100%;
+  animation: iw-cargando 1.4s linear infinite;
+  pointer-events: none;
+  transition: opacity .6s;
+}
+
+.iw-reel--loaded .iw-reel__loading { opacity: 0; }
+
+@keyframes iw-cargando { to { background-position: -300% 0; } }
+
+.iw-reel__chip {
+  position: absolute;
+  left: .8rem;
+  bottom: .8rem;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .45);
+  font-size: .72rem;
+  letter-spacing: .06em;
+  pointer-events: none;
+}
+
+/* Link que solo se puede abrir fuera */
+.iw-reel--card {
+  align-content: center;
+  gap: .6rem;
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(160deg, #3a2a6e, #1a1238 60%, #4a1f4f);
+}
+
+.iw-reel__platform { margin: 0; font-size: 1.6rem; font-style: italic; }
+.iw-reel__note { margin: 0; opacity: .8; }
+
+.iw-reel__open {
+  margin-top: .6rem;
+  padding: .6rem 1.3rem;
+  border: 1px solid rgba(255, 248, 239, .7);
+  border-radius: 999px;
+  color: var(--iw-text);
+  text-decoration: none;
+}
+
+/* El residuo: la foto vacía en medio del feed (en gris, como la realidad) */
+.iw-reel--blank {
+  align-content: center;
+  gap: .5rem;
+  background: #d9d9d9;
+  color: #2a2a2a;
+  filter: grayscale(1);
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 1.3rem;
+}
+
+.iw-reel--blank img { width: 42%; opacity: .8; }
+.iw-reel--blank p { margin: 0; }
+
+.iw-reel__sub { font-size: .85rem; opacity: .65; }
+
+/* Sin links válidos: un feed generativo */
+.iw-reel--gen {
+  overflow: hidden;
+  background: linear-gradient(160deg, hsl(var(--h) 70% 30%), hsl(calc(var(--h) + 60) 70% 18%));
+}
+
+.iw-reel__blob {
+  position: absolute;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(calc(var(--h) + 30) 90% 70%), transparent 70%);
+  animation: iw-flotar 3s ease-in-out infinite alternate;
+}
+
+.iw-reel__blob--2 { width: 50%; translate: 30% 40%; animation-delay: -1.5s; }
+
+.iw-reel--gen .iw-reel__sub { position: absolute; bottom: 1.2rem; }
+
+/* Barra lateral de acciones */
+.iw-reels__rail {
+  display: grid;
+  gap: 1.1rem;
+  padding-bottom: 12%;
+}
+
+.iw-reels__btn {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: .3rem;
+  font-size: .78rem;
+  letter-spacing: .03em;
+  color: var(--iw-text-soft);
+}
+
+.iw-reels__btn svg {
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: .8rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  fill: var(--iw-text);
+  stroke: var(--iw-text);
+  transition: background-color .3s, scale .3s;
+}
+
+.iw-reels__btn #iw-reels-likes { font-variant-numeric: tabular-nums; }
+
+.iw-body .iw-reels__btn:hover svg { background: rgba(255, 255, 255, .22); scale: 1.06; }
+
+.iw-reels__btn--liked svg { fill: #ff6f9c; stroke: #ff6f9c; }
+
+.iw-reels__btn--down svg { fill: none; }
+
+.iw-reels__heart {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 14px;
+  aspect-ratio: 1;
+  margin-left: -7px;
+  background: #ff6f9c;
+  clip-path: polygon(50% 100%, 4% 46%, 2% 22%, 16% 4%, 34% 2%, 50% 18%, 66% 2%, 84% 4%, 98% 22%, 96% 46%);
+  pointer-events: none;
+  animation: iw-corazon var(--d, 1.2s) ease-out forwards;
+}
+
+@keyframes iw-corazon {
+  to { transform: translate(var(--dx), -90px) scale(1.6); opacity: 0; }
+}
+
+/* Contador: videos vistos y tiempo que se va */
+.iw-reels__meter {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: 0;
+  padding: .35rem .9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+  font-size: .85rem;
+  letter-spacing: .03em;
+  font-variant-numeric: tabular-nums;
+  opacity: .85;
+}
+
+.iw-reels__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff6f9c;
+  animation: iw-latido 1.2s ease-in-out infinite alternate;
+}
+
+/* Volver a tomar el celular: siempre a mano, siempre tentando */
+.iw-reels-reopen {
+  position: fixed;
+  left: clamp(.9rem, 3vw, 1.8rem);
+  bottom: clamp(.9rem, 3vw, 1.8rem);
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  box-shadow: 0 0 22px 4px rgba(255, 143, 196, .45);
+  animation: iw-latido 1.8s ease-in-out infinite alternate;
+}
+
+.iw-reels-reopen svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: var(--iw-text);
+  stroke: var(--iw-text);
+}
+
+.iw-reels-reopen svg rect { fill: none; }
+
+/* Con el feed abierto, la interfaz del mundo se aparta */
+.iw-body.iw-reels-open .iw-zones,
+.iw-body.iw-reels-open .iw-mute,
+.iw-body.iw-reels-open .iw-response { opacity: 0; pointer-events: none; }
+
+/* Celular: el feed ocupa la pantalla y los botones van encima */
+@media (max-width: 40rem) {
+  .iw-reels { padding: .6rem; gap: .5rem; }
+  .iw-reels__stage { position: relative; width: 100%; justify-content: center; }
+  .iw-reels__phone { width: 100%; height: 100%; max-width: none; aspect-ratio: auto; padding: 5px; border-radius: 1.6rem; }
+  .iw-reels__screen { border-radius: 1.3rem; }
+  .iw-reels__rail {
+    position: absolute;
+    right: .7rem;
+    bottom: 14%;
+    z-index: 2;
+    padding: 0;
+  }
+  .iw-reels__btn span { display: none; }
+  .iw-reels__btn svg { width: 2.8rem; height: 2.8rem; padding: .7rem; background: rgba(0, 0, 0, .4); }
+}
+
+/* =========================================================================
    PORTAL A LA REALIDAD
    Lo único de la interfaz en blanco y negro (como el Muted World).
    Parpadea como un fluorescente viejo y, con el tiempo, llama más.

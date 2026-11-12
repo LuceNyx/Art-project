@@ -114,10 +114,11 @@
         light: { x: 88.5, y: 15.5, r: 5 }
       },
       hideAction: 'Turn the clock to the wall',
+      // La puerta YA NO es un escape: lleva a la rutina (ver ROUTINE más abajo)
       escapeObject: {
-        name: 'Light under the door',
-        ariaLabel: 'A line of light under the door',
-        description: 'The line of light under the door.'
+        name: 'Computer',
+        ariaLabel: 'An old computer on standby, its power light pulsing',
+        description: 'A computer on standby; the power light pulses like it is waiting.'
       },
       motif: {
         id: 'stopped-clock',
@@ -140,9 +141,9 @@
       },
       hideAction: 'Cover the mirror with a shirt',
       escapeObject: {
-        name: 'Blank photo',
-        ariaLabel: 'The only blank photo, faintly glowing',
-        description: 'The only photo with nothing on it, faintly glowing.'
+        name: 'Phone',
+        ariaLabel: 'A phone lying by the mirror, its screen lit with an endless feed',
+        description: 'A phone by the mirror; its screen keeps playing short videos.'
       },
       motif: {
         id: 'blank-polaroid',
@@ -165,9 +166,9 @@
       },
       hideAction: 'Lower the blinds',
       escapeObject: {
-        name: 'A lit window',
-        ariaLabel: 'A single lit window in the building across the street',
-        description: 'A single lit window in the building across the street.'
+        name: 'VR headset',
+        ariaLabel: 'A VR headset resting on the windowsill, its lenses faintly lit',
+        description: 'A VR headset on the windowsill; the lenses glow faintly.'
       },
       motif: {
         id: 'lit-window',
@@ -211,6 +212,23 @@
     { id: 'door-slit', x: 90, y: 80, r: 7, strength: 0.6, stretchX: 2.6, stretchY: 0.25, breathe: 0.08 }
   ];
 
+  /*
+   * LA PUERTA = EL MUNDO REAL (no es un escape).
+   * En la habitación y en "Lack of control", la puerta lleva a la rutina:
+   * el tiempo pasa muy rápido (js/routine.js) y se vuelve al cuarto.
+   */
+  var ROUTINE = {
+    door: {
+      ariaLabel: 'The door. Go out and face the day',
+      rect: { x: 83.5, y: 21.5, w: 13, h: 58.5 },
+      light: { x: 90, y: 60, r: 8 }
+    },
+    // Una jornada que se repite (inglés: lo ve el visitante)
+    steps: ['7:00 AM', 'Bus.', 'Work.', '12:30. Lunch at the desk.', 'Work.', '6:40 PM', 'Bus.', '11:58 PM'],
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    ending: 'Again.'
+  };
+
   MW.config = {
     TRANSITION_URL: TRANSITION_URL,
     ESCAPE_EVENT: 'muted:escape',
@@ -220,6 +238,7 @@
     STORAGE: { muted: 'mw:muted', visited: 'mw:visited', returned: 'mw:returned' },
     MUTED_SCENES: MUTED_SCENES,
     ROOM_LIGHTS: ROOM_LIGHTS,
+    ROUTINE: ROUTINE,
 
     /** Busca una situación por id (o null). */
     getScene: function (id) {

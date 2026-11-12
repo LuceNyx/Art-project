@@ -93,6 +93,42 @@
 
   <p class="iw-response" id="iw-response" aria-live="polite"></p>
 
+  <!-- ============ REELS: si se entró con el celular (reels.js) ============ -->
+  <section class="iw-reels" id="iw-reels" aria-label="Short videos" hidden>
+    <div class="iw-reels__top" aria-hidden="true">
+      <span class="iw-reels__tab">Following</span>
+      <span class="iw-reels__tab iw-reels__tab--on">For you</span>
+    </div>
+
+    <div class="iw-reels__stage">
+      <div class="iw-reels__phone">
+        <div class="iw-reels__screen" id="iw-reels-screen"><!-- reels.js --></div>
+      </div>
+
+      <div class="iw-reels__rail">
+        <button class="iw-reels__btn" id="iw-reels-like" type="button" aria-label="Like this video">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>
+          <span id="iw-reels-likes">0</span>
+        </button>
+        <button class="iw-reels__btn" id="iw-reels-next" type="button" aria-label="Next video">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14M5.5 11.5 12 18l6.5-6.5" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Next</span>
+        </button>
+        <button class="iw-reels__btn iw-reels__btn--down" id="iw-reels-close" type="button" aria-label="Put the phone down and look around">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="17" rx="2.4" fill="none" stroke-width="2"/><path d="M4 21.5h16" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Put down</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="iw-reels__meter"><span class="iw-reels__dot" aria-hidden="true"></span><span id="iw-reels-meter">0 videos · 0 min</span></p>
+  </section>
+
+  <!-- Volver a tomar el celular (aparece al dejarlo) -->
+  <button class="iw-reels-reopen" id="iw-reels-reopen" type="button" aria-label="Pick up the phone again" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4" fill="none" stroke-width="2"/><circle cx="12" cy="18" r="1.1"/></svg>
+  </button>
+
   <!-- PORTAL a la realidad: gris, parpadea y llama la atención cada vez más -->
   <a class="iw-portal" id="iw-portal" href="../muted-world/index.html" aria-label="A crack back to your room. Return to the real world">
     <span class="iw-portal__ring" aria-hidden="true"></span>
@@ -114,6 +150,8 @@
   <script src="js/audio.js"></script>
   <script src="js/residual-motif.js"></script>
   <script src="js/world-interactions.js"></script>
+  <script src="js/media-links.js"></script>   <!-- ← tus 10 links -->
+  <script src="js/reels.js"></script>
   <script src="js/imagined.js"></script>
 </body>
 </html>

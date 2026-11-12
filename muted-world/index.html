@@ -50,6 +50,22 @@
     <button class="mw-back" type="button">Back to the room</button>
   </section>
 
+  <!-- ============ RUTINA: la puerta lleva al mundo real (routine.js) ============ -->
+  <section class="mw-routine" id="mw-routine" aria-label="A day passes. And another. And another." hidden>
+    <div class="mw-routine__light" aria-hidden="true"></div>
+    <p class="mw-routine__day"></p>
+    <svg class="mw-routine__clock" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="#151515"/>
+      <circle cx="50" cy="50" r="40" fill="#cfcfcf"/>
+      <path d="M50 14 V20 M50 80 V86 M14 50 H20 M80 50 H86" stroke="#333" stroke-width="3"/>
+      <path class="mw-routine__hour" d="M50 50 L50 28" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+      <path class="mw-routine__minute" d="M50 50 L50 16" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="50" cy="50" r="3" fill="#111"/>
+    </svg>
+    <p class="mw-routine__step"></p>
+    <button class="mw-routine__skip" type="button">Skip</button>
+  </section>
+
   <!-- ============ CAPAS DE ATMÓSFERA ============ -->
   <div class="mw-vignette" aria-hidden="true"></div>
   <div class="mw-grain" aria-hidden="true"></div>
@@ -72,6 +88,7 @@
   <script src="js/grain.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/scenes.js"></script>
+  <script src="js/routine.js"></script>
   <script src="js/room.js"></script>
 </body>
 </html>

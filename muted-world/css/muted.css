@@ -64,6 +64,9 @@ html, body { margin: 0; height: 100%; }
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .25), 0 0 22px 4px rgba(255, 255, 255, .22);
 }
 
+/* Lo oculto con el atributo hidden se queda oculto aunque su clase defina display */
+.mw-body [hidden] { display: none !important; }
+
 .mw-visually-hidden {
   position: absolute;
   width: 1px;
@@ -947,27 +950,39 @@ button.mw-object:focus-visible {
 .mw-lc-choice--leave { left: 41.5%; top: 55%; }
 .mw-lc-choice--stay { left: 15%; top: 66%; }
 
+/* La luz bajo la puerta: ahora es la luz del mundo de fuera (decorado) */
 .mw-lc-under {
-  left: 38%;
-  top: 90%;
-  width: 26%;
-  height: 8%;
-}
-
-.mw-lc-under::before {
-  content: "";
   position: absolute;
-  left: 3%;
-  right: 3%;
-  top: 60%;
+  left: 39.5%;
+  top: 91.6%;
+  width: 23%;
   height: 2px;
   background: #fff;
-  box-shadow: 0 0 12px 3px rgba(255, 255, 255, .55);
+  box-shadow: 0 0 12px 3px rgba(255, 255, 255, .45);
+  pointer-events: none;
 }
 
-.mw-lc-under .mw-escape__glow {
-  inset: -60% -15%;
-  background: radial-gradient(ellipse 48% 16% at 50% 62%, rgba(255, 255, 255, .7), rgba(255, 255, 255, .12) 50%, transparent 72%);
+/* Computadora en espera: el objeto de escape */
+.mw-lc-computer {
+  left: 70%;
+  top: 56%;
+  width: 21%;
+  height: 30%;
+}
+
+.mw-lc-computer .mw-escape__glow {
+  inset: -30% -20%;
+  background: radial-gradient(ellipse 40% 34% at 50% 42%, rgba(255, 255, 255, .35), rgba(255, 255, 255, .06) 55%, transparent 72%);
+}
+
+/* El LED de espera late, como si esperara */
+.mw-lc-led { animation: mw-breathe 2.2s ease-in-out infinite; }
+
+.mw-lc-scan { animation: mw-lc-barrido 3.4s linear infinite; }
+
+@keyframes mw-lc-barrido {
+  from { transform: translateY(-40px); }
+  to { transform: translateY(46px); }
 }
 
 .mw-lc-blackout {
@@ -1081,24 +1096,59 @@ button.mw-object:focus-visible {
   height: 82%;
 }
 
-.mw-sc-blank {
+/* Celular junto al espejo: el objeto de escape (sin color: es la realidad) */
+.mw-sc-phone {
   left: 81%;
-  top: 72%;
-  width: 9%;
-  height: 15%;
-  rotate: -6deg;
+  top: 64%;
+  width: 6.4%;
+  height: 24%;
+  rotate: -8deg;
 }
 
-.mw-sc-blank__paper {
+.mw-sc-phone__body {
   position: absolute;
   inset: 0;
-  background: #ededed;
-  box-shadow: inset 0 0 0 5px #f7f7f7, 0 8px 16px -6px #000;
+  padding: 7% 7% 9%;
+  border-radius: 14% / 7%;
+  background: #141414;
+  box-shadow: 0 0 0 2px #2e2e2e, 0 12px 20px -8px #000;
 }
 
-.mw-sc-blank .mw-escape__glow {
-  inset: -70%;
-  background: radial-gradient(circle, rgba(255, 255, 255, .45), rgba(255, 255, 255, .08) 45%, transparent 65%);
+.mw-sc-phone__screen {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10% / 5%;
+  background: #cfcfcf;
+}
+
+/* Un feed vertical que sube solo, en grises */
+.mw-sc-phone__feed {
+  position: absolute;
+  inset: 0 8%;
+  display: grid;
+  gap: 6%;
+  padding-top: 8%;
+  animation: mw-sc-scroll 2.4s linear infinite;
+}
+
+.mw-sc-phone__feed i {
+  display: block;
+  height: 46%;
+  border-radius: 6px;
+  background: linear-gradient(160deg, #9a9a9a, #5a5a5a);
+}
+
+.mw-sc-phone__feed i:nth-child(2n) { background: linear-gradient(160deg, #e2e2e2, #8a8a8a); }
+
+@keyframes mw-sc-scroll {
+  to { transform: translateY(-52%); }
+}
+
+.mw-sc-phone .mw-escape__glow {
+  inset: -50% -120%;
+  background: radial-gradient(ellipse 30% 36% at 50% 50%, rgba(255, 255, 255, .45), rgba(255, 255, 255, .08) 50%, transparent 70%);
 }
 
 /* =========================================================================
@@ -1254,18 +1304,21 @@ button.mw-object:focus-visible {
   background: #7a7a7a;
 }
 
-/* El objeto de escape está encima de la persiana: su luz se filtra */
-.mw-uf-lit {
-  left: 49.8%;
-  top: 38.8%;
-  width: 3.6%;
-  height: 5.4%;
+/* Lentes VR sobre el alféizar: el objeto de escape (delante de la persiana) */
+.mw-uf-vr {
+  left: 44%;
+  top: 80%;
+  width: 17%;
+  height: 13%;
+  rotate: -3deg;
 }
 
-.mw-uf-lit .mw-escape__glow {
-  inset: -160%;
-  background: radial-gradient(circle, rgba(255, 255, 255, .42), rgba(255, 255, 255, .06) 45%, transparent 65%);
+.mw-uf-vr .mw-escape__glow {
+  inset: -80% -30%;
+  background: radial-gradient(ellipse 40% 30% at 50% 55%, rgba(255, 255, 255, .4), rgba(255, 255, 255, .06) 50%, transparent 70%);
 }
+
+.mw-uf-vr__lens { animation: mw-breathe 3.6s ease-in-out infinite; }
 
 /* =========================================================================
    SITUACIÓN 7 · FAMILY EXPECTATIONS
@@ -1344,6 +1397,123 @@ button.mw-object:focus-visible {
   width: 30%;
   height: 40%;
 }
+
+/* =========================================================================
+   RUTINA: la puerta lleva al mundo real (routine.js)
+   El tiempo pasa muy rápido: reloj acelerado, la luz del día va y viene,
+   los mismos pasos cada día. Luego, "Again." y de vuelta al cuarto.
+   ========================================================================= */
+.mw-routine {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2rem;
+  overflow: hidden;
+  background: #050505;
+  text-align: center;
+  opacity: 0;
+  transition: opacity .9s var(--mw-ease);
+}
+
+.mw-routine--on { opacity: 1; }
+
+/* La luz de cada día: sube, se queda, se va */
+.mw-routine__light {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 38%, #8c8c8c, #3c3c3c 50%, #0a0a0a 100%);
+}
+
+/* Y el rectángulo de la ventana que barre la pared */
+.mw-routine__light::after {
+  content: "";
+  position: absolute;
+  top: 8%;
+  left: 30%;
+  width: 22%;
+  height: 70%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .16), transparent);
+  transform: translateX(-160%) skewX(-18deg);
+}
+
+.mw-routine--run .mw-routine__light { animation: mw-dia var(--mw-dia, 1.35s) ease-in-out infinite; }
+.mw-routine--run .mw-routine__light::after { animation: mw-barrido var(--mw-dia, 1.35s) linear infinite; }
+
+@keyframes mw-dia {
+  0%, 100% { opacity: 0; }
+  40%, 60% { opacity: .85; }
+}
+
+@keyframes mw-barrido {
+  from { transform: translateX(-160%) skewX(-18deg); }
+  to { transform: translateX(260%) skewX(-18deg); }
+}
+
+.mw-routine__day {
+  position: relative;
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--mw-text-dim);
+  font-size: clamp(.85rem, 1.6vw, 1.1rem);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+
+.mw-routine__clock {
+  position: relative;
+  width: min(34vmin, 260px);
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, .7));
+  transition: opacity 1s var(--mw-ease);
+}
+
+.mw-routine__hour,
+.mw-routine__minute {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+}
+
+/* Dos vueltas por día la aguja corta; 24 la larga */
+.mw-routine--run .mw-routine__hour { animation: mw-gira calc(var(--mw-dia, 1.35s) / 2) linear infinite; }
+.mw-routine--run .mw-routine__minute { animation: mw-gira calc(var(--mw-dia, 1.35s) / 24) linear infinite; }
+
+@keyframes mw-gira { to { transform: rotate(360deg); } }
+
+.mw-routine__step {
+  position: relative;
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--mw-text);
+  font-style: italic;
+  font-size: clamp(1.4rem, 3.4vw, 2.4rem);
+  text-shadow: 0 0 14px #000;
+}
+
+.mw-routine--final .mw-routine__clock { opacity: .3; }
+.mw-routine--final .mw-routine__light,
+.mw-routine--final .mw-routine__light::after { animation: none; opacity: 0; }
+
+/* Abajo al centro (abajo a la derecha está el botón de sonido) */
+.mw-routine__skip {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1rem, 4vh, 2.4rem);
+  translate: -50% 0;
+  padding: .45rem .8rem;
+  border-radius: 999px;
+  color: var(--mw-text-dim);
+  font-size: .95rem;
+}
+
+.mw-body .mw-routine__skip:hover,
+.mw-body .mw-routine__skip:focus-visible { color: var(--mw-white); }
+
+/* La puerta de la habitación: un botón transparente sobre la puerta pintada */
+.mw-object--door { border-radius: 4px; }
 
 /* =========================================================================
    ATMÓSFERA: viñeteado y grano
