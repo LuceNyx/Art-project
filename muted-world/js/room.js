@@ -121,6 +121,9 @@
           '</g>' +
         '</g>' +
         '<path d="M88 6 V70" stroke="#555" stroke-width="1"/>' +
+        // Lentes VR sobre el alféizar (el escape de esta situación)
+        '<path d="M30 90 Q30 84 36 84 L64 84 Q70 84 70 90 L68 97 L54 97 L50 93 L46 97 L32 97 Z" fill="#141414" stroke="#3a3a3a" stroke-width="1"/>' +
+        '<circle cx="40" cy="91" r="3.2" fill="#9a9a9a" opacity=".6"/><circle cx="60" cy="91" r="3.2" fill="#9a9a9a" opacity=".6"/>' +
       '</g></svg>',
 
     'family-expectations':
@@ -181,6 +184,46 @@
       objetos[scene.id] = { el: nodo, scene: scene, hot: false, s: 0, r: o.light.r };
       actualizarHuella(scene.id);
     });
+
+    construirPuerta();
+  }
+
+  /**
+   * LA PUERTA = EL MUNDO REAL. No abre una situación ni lleva al mundo
+   * imaginado: lleva a la rutina (routine.js) y se vuelve al cuarto.
+   */
+  function construirPuerta() {
+    var puerta = cfg.ROUTINE && cfg.ROUTINE.door;
+    if (!puerta) return;
+
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'mw-object mw-object--door';
+    boton.setAttribute('aria-label', puerta.ariaLabel);
+    boton.style.setProperty('--x', puerta.rect.x);
+    boton.style.setProperty('--y', puerta.rect.y);
+    boton.style.setProperty('--w', puerta.rect.w);
+    boton.style.setProperty('--h', puerta.rect.h);
+
+    // Para la iluminación funciona como un objeto más (con su propia luz)
+    var pseudo = { id: 'door', ready: true, roomObject: { light: puerta.light, rect: puerta.rect } };
+    objetos.door = { el: boton, scene: pseudo, hot: false, s: 0, r: puerta.light.r };
+
+    boton.addEventListener('pointerenter', function () { objetos.door.hot = true; pedirDibujo(); });
+    boton.addEventListener('pointerleave', function () { objetos.door.hot = false; pedirDibujo(); });
+    boton.addEventListener('focus', function () {
+      objetos.door.hot = true;
+      cursor.tx = puerta.light.x;
+      cursor.ty = puerta.light.y;
+      pedirDibujo();
+    });
+    boton.addEventListener('blur', function () { objetos.door.hot = false; pedirDibujo(); });
+    boton.addEventListener('click', function () {
+      if (MW.scenes.isOpen() || MW.routine.isActive()) return;
+      MW.routine.play({ alTerminar: function () { boton.focus({ preventScroll: true }); } });
+    });
+
+    el.objects.appendChild(boton);
   }
 
   function actualizarHuella(id) {
@@ -476,6 +519,7 @@
     MW.grain.init();
     MW.audio.init();
     MW.scenes.init();
+    MW.routine.init();
 
     var volvio = leerRegreso();
     if (volvio) {

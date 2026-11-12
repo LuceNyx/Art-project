@@ -126,6 +126,9 @@
     );
     IW.motif.init(scene, motif);
 
+    // Si se entró con el CELULAR, lo primero es el feed de videos cortos
+    if (scene.medium === 'feed' && IW.reels) IW.reels.init(scene, motif);
+
     // "Step in": sonido (si se permite) y entrada al Open World
     document.getElementById('iw-step').addEventListener('click', function () {
       IW.audio.startIfAllowed();

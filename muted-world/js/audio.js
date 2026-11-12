@@ -281,6 +281,18 @@
     golpe(filtro, 2400 + Math.random() * 900, 0.45, 0.035);
   }
 
+  /** Tic-tac acelerado durante la rutina (ms de duración). */
+  function fastTicks(ms) {
+    if (!ctx || muted) return;
+    var fin = Date.now() + ms;
+    var par = false;
+    var id = setInterval(function () {
+      if (Date.now() > fin) { clearInterval(id); return; }
+      par = !par;
+      golpe(filtro, par ? 3200 : 2600, 0.025, 0.05);
+    }, 90);
+  }
+
   function setMuted(valor) {
     muted = !!valor;
     guardarMute();
@@ -313,6 +325,7 @@
     setProfile: setProfile,
     setDampened: setDampened,
     rustle: rustle,
+    fastTicks: fastTicks,
     setMuted: setMuted,
     isMuted: function () { return muted; }
   };

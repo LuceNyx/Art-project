@@ -19,9 +19,11 @@ Llega en blanco, igual que se sale del Muted World, y se va en blanco, igual que
 | Academic pressure | Portátil | `video`: series y videos | La tapa se abre, miniaturas que pasan solas, *Next episode in 5…* |
 | Loneliness | Mando | `online`: juego en línea | *Connecting…*, cinco amigos se conectan y saludan (*hey!*, *you're here*) |
 | Emotional overload | Audífonos | `music`: música | Las notas grises del corcho salen volando, ondas de sonido y ecualizador |
-| Lack of control | Luz bajo la puerta | `choice`: juego de decisiones | La rendija se abre en una puerta y un mapa de rutas que se encienden |
-| Social comparison | Foto en blanco | `feed`: reels | La foto se vuelve un teléfono con un feed que se acelera y corazones |
-| Uncertain future | Ventana encendida | `vr`: realidad virtual | La ventana se abre en las dos lentes de un visor: *Loading world… Welcome.* |
+| Lack of control | Computadora en espera | `choice`: juego de decisiones | El monitor se enciende (una línea que se abre) y aparece un mapa de rutas que se encienden: *Press start.* |
+| Social comparison | Celular | `feed`: reels | Se levanta el celular, la pantalla se enciende y el feed se acelera con corazones. Luego, en el Imagined World, se abre un **reproductor de reels con tus links** |
+| Uncertain future | Lentes VR | `vr`: realidad virtual | Los lentes se acercan hasta ponértelos y se ve a través de sus dos lentes: *Loading world… Welcome.* |
+
+**La puerta ya no es un escape.** En el Muted World, la puerta lleva al mundo real: una jornada que pasa muy rápido y vuelve al cuarto (`muted-world/js/routine.js`). No pasa por esta transición.
 | Family expectations | Consola portátil | `sandbox`: juego de construir | Un mundo de bloques se arma de abajo arriba: *New world* |
 
 Sin parámetros (o con parámetros no válidos) se muestra una luz genérica y se pasa al Imagined World sin situación.

@@ -28,7 +28,7 @@
     'academic-pressure':   { medium: 'video',   motif: 'stacked-paper',     lines: ['Just one more.', 'The desk disappears.'] },
     'loneliness':          { medium: 'online',  motif: 'unanswered-bubble', lines: ['Someone is online.', 'They were waiting for you.'] },
     'emotional-overload':  { medium: 'music',   motif: 'pinned-note',       lines: ['Turn it up.', 'Until nothing else fits.'] },
-    'lack-of-control':     { medium: 'choice',  motif: 'stopped-clock',     lines: ['Choose.', 'Here, it matters.'] },
+    'lack-of-control':     { medium: 'choice',  motif: 'stopped-clock',     lines: ['Press start.', 'Here, every choice matters.'] },
     'social-comparison':   { medium: 'feed',    motif: 'blank-polaroid',    lines: ['One more.', 'And another.'] },
     'uncertain-future':    { medium: 'vr',      motif: 'lit-window',        lines: ['Somewhere else.', 'Somewhere wider.'] },
     'family-expectations': { medium: 'sandbox', motif: 'facedown-frame',    lines: ['Build anything.', 'It is all yours.'] }
@@ -95,10 +95,10 @@
         '</div>';
     },
 
-    /* Decisiones: la luz bajo la puerta se abre en un mapa de rutas */
+    /* Decisiones: la computadora se enciende en un mapa de rutas */
     choice: function () {
       return '<div class="tr-choice">' +
-          '<span class="tr-choice__door"></span>' +
+          '<span class="tr-choice__screen"></span>' +
           '<svg class="tr-choice__map" viewBox="0 0 400 300" aria-hidden="true">' +
             '<path class="tr-route" style="--d:2.2s" d="M200 290 C200 230 200 210 200 180"/>' +
             '<path class="tr-route" style="--d:2.9s" d="M200 180 C170 150 120 140 90 100"/>' +
@@ -113,7 +113,7 @@
         '</div>';
     },
 
-    /* Reels: la foto en blanco se vuelve un feed que no termina */
+    /* Reels: el celular se enciende y el feed no termina */
     feed: function () {
       var tarjetas = repetir(16, function (i) {
         return '<span class="tr-card" style="--h:' + (i * 61 % 360) + '"><i></i></span>';
@@ -126,10 +126,10 @@
         '</div>';
     },
 
-    /* Realidad virtual: la ventana encendida se vuelve dos lentes */
+    /* Realidad virtual: te pones los lentes y ves a través de ellos */
     vr: function () {
       return '<div class="tr-vr">' +
-          '<span class="tr-vr__window"></span>' +
+          '<span class="tr-vr__headset"><i></i><i></i></span>' +
           '<div class="tr-vr__lenses">' +
             '<span class="tr-vr__lens"><span class="tr-vr__view"></span></span>' +
             '<span class="tr-vr__lens"><span class="tr-vr__view"></span></span>' +

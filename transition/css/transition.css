@@ -487,22 +487,24 @@ html, body { margin: 0; height: 100%; }
   aspect-ratio: 4 / 3;
 }
 
-.tr-choice__door {
+/* La computadora se enciende: una línea que se abre en pantalla (como un monitor viejo) */
+.tr-choice__screen {
   position: absolute;
   left: 50%;
-  bottom: 2%;
-  width: 60%;
+  top: 50%;
+  width: 4%;
   height: 1.2%;
-  translate: -50% 0;
+  translate: -50% -50%;
+  border-radius: 4px;
   background: #fff;
   box-shadow: 0 0 34px 10px rgba(255, 255, 255, .7);
-  animation: tr-puerta 1.6s .5s cubic-bezier(.5, 0, .2, 1) both;
+  animation: tr-encender 1.6s .5s cubic-bezier(.5, 0, .2, 1) both;
 }
 
-@keyframes tr-puerta {
-  0% { height: 1.2%; width: 60%; }
-  45% { height: 1.2%; width: 70%; }
-  100% { height: 96%; width: 46%; opacity: .14; }
+@keyframes tr-encender {
+  0% { width: 4%; height: 1.2%; }
+  40% { width: 96%; height: 1.2%; }
+  100% { width: 104%; height: 92%; opacity: .12; border-radius: 18px; }
 }
 
 .tr-choice__map {
@@ -550,13 +552,13 @@ html, body { margin: 0; height: 100%; }
   border-radius: 2.4rem;
   background: #f2f2f2;
   box-shadow: 0 0 90px 10px hsla(var(--tr-h), 80%, 60%, .32);
-  animation: tr-de-foto 1.4s .4s cubic-bezier(.3, 0, .2, 1) both;
+  animation: tr-levantar 1.4s .4s cubic-bezier(.3, 0, .2, 1) both;
 }
 
-/* Empieza como la foto en blanco (pequeña, torcida) y se vuelve pantalla */
-@keyframes tr-de-foto {
-  from { transform: scale(.5) rotate(-6deg); border-radius: 4px; border-color: #e6e6e6; }
-  to { transform: none; }
+/* El celular se levanta (estaba junto al espejo) y la pantalla se enciende */
+@keyframes tr-levantar {
+  from { transform: scale(.55) rotate(-8deg) translateY(18%); filter: brightness(.35); }
+  to { transform: none; filter: none; }
 }
 
 /* Scroll infinito que se acelera (cada animación toma el relevo) */
@@ -622,19 +624,32 @@ html, body { margin: 0; height: 100%; }
   height: 62vmin;
 }
 
-.tr-vr__window {
+/* Los lentes VR (vistos desde fuera) se acercan hasta ponértelos */
+.tr-vr__headset {
   position: absolute;
   z-index: 2;
-  width: 4vmin;
-  height: 6vmin;
-  background: #f2f2f2;
-  box-shadow: 0 0 34px 10px rgba(255, 255, 255, .6);
-  animation: tr-ventana 1.7s .5s cubic-bezier(.5, 0, .2, 1) both;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 24vmin;
+  height: 11vmin;
+  border-radius: 3.4vmin 3.4vmin 4.6vmin 4.6vmin;
+  background: #1d1d22;
+  box-shadow: 0 0 0 2px #34343c, 0 20px 40px -10px #000;
+  animation: tr-ponerse 1.8s .4s cubic-bezier(.5, 0, .2, 1) both;
 }
 
-@keyframes tr-ventana {
-  70% { transform: scale(4, 3); opacity: 1; }
-  100% { transform: scale(9, 5); opacity: 0; }
+.tr-vr__headset i {
+  width: 6vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, rgba(255, 255, 255, .25) 60%, transparent 72%);
+  box-shadow: 0 0 22px 6px rgba(255, 255, 255, .45);
+}
+
+@keyframes tr-ponerse {
+  65% { transform: scale(2.6); opacity: 1; }
+  100% { transform: scale(6); opacity: 0; }
 }
 
 .tr-vr__lenses {
@@ -770,11 +785,11 @@ html, body { margin: 0; height: 100%; }
 .tr-static .tr-route { stroke-dashoffset: 0; }
 .tr-static .tr-bar span { transform: none; }
 .tr-static .tr-paper,
-.tr-static .tr-vr__window,
+.tr-static .tr-vr__headset,
 .tr-static .tr-play,
 .tr-static .tr-wave,
 .tr-static .tr-heart,
-.tr-static .tr-choice__door { display: none; }
+.tr-static .tr-choice__screen { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-iteration-count: 1 !important; }

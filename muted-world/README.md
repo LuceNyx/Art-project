@@ -23,6 +23,7 @@ También funciona con **doble clic** en `muted-world/index.html`. En ese caso el
 | `js/grain.js` | Textura de grano fino. Intensidad: `--mw-grain-intensity` en `muted.css` |
 | `js/audio.js` | Ambiente con Web Audio (o archivos reales) y botón de silencio |
 | `js/scenes.js` | Primeros planos: entrada, texto, ocultar = evasión, escape. Un *builder* por situación |
+| `js/routine.js` | **La puerta = el mundo real.** Una jornada que pasa muy rápido (reloj acelerado, luz del día, *Monday… Friday*, *Again.*) y vuelve al cuarto |
 | `js/room.js` | Habitación: objetos SVG, foco de luz, polvo, huellas, regreso con `?return=`, inicio |
 | `assets/img/IMAGE_SPEC.md` | Qué imágenes pintar, con nombres, medidas y zonas |
 | `assets/audio/AUDIO_SPEC.md` | Qué audios se pueden añadir |
@@ -36,6 +37,8 @@ Todo el código vive dentro de `window.MutedWorld`: no hay otras variables globa
 - **Entrada:** *"Click to enter your room"*. El audio solo empieza aquí.
 - **Habitación:** un foco sigue al cursor. Los objetos interactivos reciben un poco de luz. Se navega con **Tab** y se abre con **Enter**. En pantallas estrechas, se desliza en horizontal.
 - **Situación:** **Escape** o *"Back to the room"* para volver. Cada una tiene una acción de ocultar (evasión) y un objeto de escape.
+- **Objetos de escape (aparatos):** portátil (series), mando (juego en línea), audífonos (música), computadora (juego de decisiones), **celular** (reels), **lentes VR** (realidad virtual) y consola portátil (construir). El aparato define lo que se ve después en la transición y en el Imagined World.
+- **La puerta no es un escape:** en la habitación, y con *Leave* en *Lack of control*, lleva a la rutina. El tiempo pasa rápido y se vuelve al cuarto. *Skip* o Escape la acortan.
 - **Huellas:** lo visitado queda más oscuro y la habitación se vuelve más densa. Se guarda en `sessionStorage`, así que cada visita empieza limpia.
 - **Silencio:** botón *sound on/off*, que se recuerda en `localStorage`.
 

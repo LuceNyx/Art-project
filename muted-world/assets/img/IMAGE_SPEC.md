@@ -23,7 +23,7 @@ El cuarto de una persona joven, de noche, visto casi de frente. Es un espacio co
 | Pared del fondo | Desde la línea del techo hasta y = 80 | Gris muy oscuro |
 | Suelo | y de 80 a 100 | Más oscuro aún |
 | Ventana pequeña y alta | x 57–73, y 16–43 | Vidrio gris (luz de luna). **Las persianas las dibuja el código**: deja el vidrio limpio |
-| Puerta | x 83–97, y 21–80 | **La rendija de luz bajo la puerta la pone el código** (en x ≈ 90, y ≈ 80) |
+| Puerta | x 83–97, y 21–80 | **La rendija de luz bajo la puerta la pone el código** (en x ≈ 90, y ≈ 80). La puerta es interactiva (botón transparente encima): lleva a la rutina |
 | Estante | Tabla en y ≈ 37, x 19–33 | El código pone encima la foto y los trofeos (y 29–37) |
 | Escritorio | Tablero en y ≈ 60–64, x 12–38, patas hasta y 82 | El código pone encima la lámpara, el cuaderno y la pila (y 41–61) |
 | Cama | x 44–82, y 64–86 | El código pone el celular en x 58–65, y 66–73 |
@@ -84,7 +84,8 @@ Es **casi negra**. La sábana, el celular, la figura y el mando los dibuja el c�
 |---|---|
 | x 38–64, y 8–92 | **La puerta** (código). Puedes pintar su marco y su sombra |
 | x 70–83, y 10–33 | **El reloj** (código). Debe haber luz en la pared a su alrededor |
-| y 92–100 | Suelo. La rendija de luz bajo la puerta la pone el código (x 38–64, y ≈ 95) |
+| y 92–100 | Suelo. La rendija de luz bajo la puerta la pone el código (x 39–63, y ≈ 92) |
+| x 70–91, y 56–86 | **La computadora en espera** (código), el objeto de escape. Pinta una mesa o un mueble bajo ella |
 | x 10–30, y 60–80 | El borde de la cama, donde aparece "Stay" |
 
 **Luz:** una mancha clara en la pared, arriba a la derecha (x 76, y 20), y la rendija bajo la puerta.
@@ -97,6 +98,7 @@ Es **casi negra**. La sábana, el celular, la figura y el mando los dibuja el c�
 |---|---|
 | x 38–62, y 6–92 | **El espejo** (código). Deja la pared lisa detrás |
 | x 16–90, y 0–100 | Fotos pegadas alrededor del espejo (código) |
+| x 80–88, y 62–90 | **El celular** (código), el objeto de escape. Pinta una superficie donde apoyarlo |
 | y 90–100 | Suelo |
 
 **Luz:** frontal y suave, centrada en el espejo (x 50, y 40).
@@ -109,6 +111,7 @@ Es **casi negra**. La sábana, el celular, la figura y el mando los dibuja el c�
 |---|---|
 | x 16–80, y 6–90 | **La ventana entera** (código): ciudad, lluvia y persiana |
 | x 81–85, y 7–67 | El cordón de la persiana (código) |
+| x 44–61, y 80–93 | **Los lentes VR** sobre el alféizar (código), el objeto de escape |
 | El resto | Pared interior muy oscura. Puede tener la sombra del marco |
 
 **Luz:** solo la que entra por la ventana (la pone el código).

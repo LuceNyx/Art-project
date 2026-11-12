@@ -165,7 +165,8 @@
     }, reducido ? 0 : 900);
   }
 
-  function close() {
+  /** inmediato: cerrar sin animación (cuando otra capa ya cubre la pantalla). */
+  function close(inmediato) {
     if (!actual || escapando) return;
     var cerrando = actual;
     actual = null;
@@ -179,7 +180,7 @@
       el.scene.hidden = true;
       MW.room.zoomTo(cerrando, false);
       if (origen) origen.focus({ preventScroll: true });
-    }, reducido ? 0 : 1400);
+    }, reducido || inmediato === true ? 0 : 1400);
   }
 
   function limpiar() {
@@ -515,10 +516,24 @@
       '<circle cx="50" cy="50" r="3" fill="#111"/>' +
     '</svg>';
 
+  // Computadora en espera: el escape de esta situación (la puerta ya no lo es)
+  var COMPUTADORA_SVG =
+    '<svg viewBox="0 0 220 170" aria-hidden="true"><g filter="url(#mw-rough)">' +
+      '<rect x="20" y="8" width="180" height="118" rx="10" fill="#161616" stroke="#2e2e2e" stroke-width="3"/>' +
+      '<rect x="34" y="20" width="152" height="92" rx="4" fill="#0b0b0b"/>' +
+      '<path d="M96 126 L124 126 L132 146 L88 146 Z" fill="#1c1c1c"/>' +
+      '<rect x="58" y="146" width="104" height="8" rx="3" fill="#202020"/>' +
+      '<path d="M40 162 L180 162" stroke="#1a1a1a" stroke-width="8" stroke-linecap="round"/>' +
+    '</g>' +
+    '<rect class="mw-lc-scan" x="34" y="64" width="152" height="2" fill="#fff" opacity=".18"/>' +
+    '<circle class="mw-lc-led" cx="186" cy="118" r="4" fill="#fff"/></svg>';
+
   BUILDERS['lack-of-control'] = function (api) {
     var s = api.scene;
     api.content.innerHTML =
       '<div class="mw-lc-door" aria-hidden="true"><span class="mw-lc-knob"></span></div>' +
+      // La luz bajo la puerta sigue ahí, pero ahora es la del mundo de fuera (rutina)
+      '<span class="mw-lc-under" aria-hidden="true"></span>' +
       '<div class="mw-lc-wash" aria-hidden="true"></div>' +
       '<div class="mw-lc-shadow" aria-hidden="true"><span class="mw-lc-shadow__hand"></span></div>' +
       '<div class="mw-lc-clock" aria-hidden="true">' +
@@ -528,9 +543,9 @@
         '</span>' +
       '</div>' +
       htmlOcultar('mw-lc-hide', s) +
-      '<button class="mw-lc-choice mw-lc-choice--leave" type="button" hidden>Leave</button>' +
+      '<button class="mw-lc-choice mw-lc-choice--leave" type="button" aria-label="Leave: open the door and go to work" hidden>Leave</button>' +
       '<button class="mw-lc-choice mw-lc-choice--stay" type="button" hidden>Stay</button>' +
-      htmlEscape('mw-lc-under', s) +
+      htmlEscape('mw-lc-computer', s, COMPUTADORA_SVG) +
       '<div class="mw-lc-blackout" aria-hidden="true"></div>';
 
     var opciones = api.content.querySelectorAll('.mw-lc-choice');
@@ -545,11 +560,18 @@
     api.later(function () { api.line(s.lines[0]); }, 1800);
     api.later(function () { api.line(s.lines[1]); mostrarOpciones(true); }, 5200);
 
-    // Elegir no cambia nada: todo vuelve a las 7:00
-    opciones.forEach(function (boton) {
+    // LEAVE: la puerta lleva al mundo real. Una jornada pasa muy rápido
+    // (js/routine.js) y se vuelve al cuarto.
+    opciones[0].addEventListener('click', function () {
+      mostrarOpciones(false);
+      MW.routine.play({ alCubrir: function () { close(true); } });
+    });
+
+    // STAY: quedarse tampoco cambia nada; todo vuelve a las 7:00
+    [opciones[1]].forEach(function (boton) {
       boton.addEventListener('click', function () {
         veces++;
-        var foco = boton.classList.contains('mw-lc-choice--leave') ? 0 : 1;
+        var foco = 1;
         mostrarOpciones(false);
         apagon.classList.add('mw-lc-blackout--on');
 
@@ -620,7 +642,11 @@
       '</div>' +
       '<div class="mw-sc-photos" aria-hidden="true"></div>' +
       htmlOcultar('mw-sc-hide', s) +
-      htmlEscape('mw-sc-blank', s, '<span class="mw-sc-blank__paper"></span>');
+      // El escape: un celular junto al espejo con un feed que no termina (en gris)
+      htmlEscape('mw-sc-phone', s,
+        '<span class="mw-sc-phone__body"><span class="mw-sc-phone__screen">' +
+          '<span class="mw-sc-phone__feed"><i></i><i></i><i></i><i></i><i></i><i></i></span>' +
+        '</span></span>');
 
     var fotos = api.content.querySelector('.mw-sc-photos');
     var espejo = api.content.querySelector('.mw-sc-mirror');
@@ -690,7 +716,14 @@
         '<span class="mw-uf-mullion"></span>' +
       '</div>' +
       '<button class="mw-uf-hide" type="button" aria-pressed="false" aria-label="' + esc(s.hideAction) + '"><span class="mw-uf-cord"></span></button>' +
-      htmlEscape('mw-uf-lit', s);
+      // El escape: unos lentes de realidad virtual sobre el alféizar
+      htmlEscape('mw-uf-vr', s,
+        '<svg viewBox="0 0 220 110" aria-hidden="true"><g filter="url(#mw-rough)">' +
+          '<path d="M14 40 Q10 30 30 26 L190 26 Q210 30 206 40 L200 84 Q196 96 180 96 L134 96 Q122 96 116 84 L110 74 L104 84 Q98 96 86 96 L40 96 Q24 96 20 84 Z" fill="#171717" stroke="#333" stroke-width="3"/>' +
+          '<path d="M30 26 Q110 4 190 26" fill="none" stroke="#2a2a2a" stroke-width="8"/>' +
+        '</g>' +
+        '<circle class="mw-uf-vr__lens" cx="66" cy="60" r="20" fill="#fff" opacity=".22"/>' +
+        '<circle class="mw-uf-vr__lens" cx="154" cy="60" r="20" fill="#fff" opacity=".22"/></svg>');
 
     var texto = api.sequence(s.lines, [1800, 6500, 12000], 24000);
 

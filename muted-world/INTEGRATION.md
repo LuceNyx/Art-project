@@ -63,6 +63,10 @@ Los SVG están en `muted-world/assets/motifs/<motif>.svg`. Desde `transition/` o
 
 La habitación muestra esa situación como visitada (más oscura, con un detalle cambiado) y una **luz nueva** que antes no estaba: el regreso no es igual a la partida. La pantalla de entrada dice *"Click to return to your room"*. Los ids no válidos se ignoran.
 
+## La puerta no lleva al mundo imaginado
+
+La puerta del cuarto (y *Leave* en *Lack of control*) **no dispara `muted:escape`**: lleva a la rutina (`js/routine.js`). Una jornada pasa muy rápido y el visitante vuelve al cuarto. Solo los aparatos (portátil, mando, audífonos, computadora, celular, lentes VR y consola) son escapes.
+
 ## 4. Lo que NO se toca
 
 Todo lo que está dentro de `muted-world/` pertenece al Muted World. Para conectarse, solo se necesita:
