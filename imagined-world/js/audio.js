@@ -1,171 +1,159 @@
 /* =========================================================================
    IMAGINED WORLD · audio.js
-   Sonido opcional. NUNCA hay autoplay: solo arranca con un clic del
-   visitante ("Step in" o el botón de sonido). La experiencia funciona
-   completa sin audio. Preferencia de silencio en localStorage.
+   Motor de sonido compartido por todas las experiencias (Web Audio, sin
+   archivos). NUNCA hay autoplay: arranca con el primer "Play" / "Start"
+   de cada aparato. Preferencia de silencio en localStorage.
 
-   Capas: un acorde suave (pad) y agua/viento. Si existen archivos en
-   assets/audio/ (ver AUDIO_SPEC.md) se usan; si no, se generan con
-   Web Audio. Las campanitas de los descubrimientos siempre son código.
+   API:
+     IW.audio.start()             crea el contexto (llamar desde un clic)
+     IW.audio.ctx / .out          contexto y nodo de salida (para conectar)
+     IW.audio.tone({...})         una nota (frecuencia, duración, forma…)
+     IW.audio.noise({...})        un golpe de ruido filtrado (batería, explosión)
+     IW.audio.loop(bpm, paso)     secuenciador: llama paso(n, tiempo) cada 1/16
+     IW.audio.setLevel(0..1)      volumen general de la experiencia
    ========================================================================= */
 
 (function () {
   'use strict';
 
   var IW = (window.ImaginedWorld = window.ImaginedWorld || {});
-  var CLAVE_SILENCIO = 'iw:muted';
-  var RUTA = 'assets/audio/';
-
-  // Escala pentatónica: cualquier combinación suena en armonía
-  var NOTAS = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+  var CLAVE = 'iw:muted';
 
   var ctx = null;
   var master = null;
-  var eco = null;
+  var nivel = null;
+  var bufferRuido = null;
   var muted = leer();
+  var bucles = [];
 
   function leer() {
-    try {
-      var v = localStorage.getItem(CLAVE_SILENCIO);
-      return v === null ? false : v === '1';
-    } catch (e) { return false; }
+    try { return localStorage.getItem(CLAVE) === '1'; } catch (e) { return false; }
   }
 
   function guardar() {
-    try { localStorage.setItem(CLAVE_SILENCIO, muted ? '1' : '0'); } catch (e) { /* sin almacenamiento */ }
+    try { localStorage.setItem(CLAVE, muted ? '1' : '0'); } catch (e) { /* sin almacenamiento */ }
   }
 
-  function ruido() {
-    var largo = ctx.sampleRate * 4;
-    var buffer = ctx.createBuffer(1, largo, ctx.sampleRate);
-    var d = buffer.getChannelData(0);
-    var b0 = 0, b1 = 0, b2 = 0;
-    for (var i = 0; i < largo; i++) {
-      // Ruido rosa aproximado: más suave que el blanco
-      var w = Math.random() * 2 - 1;
-      b0 = 0.99765 * b0 + w * 0.099;
-      b1 = 0.963 * b1 + w * 0.2965;
-      b2 = 0.57 * b2 + w * 1.0527;
-      d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.18;
-    }
-    return buffer;
-  }
-
-  function bucle(buffer, destino) {
-    var f = ctx.createBufferSource();
-    f.buffer = buffer;
-    f.loop = true;
-    f.connect(destino);
-    f.start();
-  }
-
-  /* ---------- Capas sintéticas (respaldo) ---------- */
-  function padSintetico(destino) {
-    // Acorde abierto y cálido, con un filtro que "respira"
-    var filtro = ctx.createBiquadFilter();
-    filtro.type = 'lowpass';
-    filtro.frequency.value = 900;
-    var lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.05;
-    var lfoG = ctx.createGain();
-    lfoG.gain.value = 400;
-    lfo.connect(lfoG).connect(filtro.frequency);
-    lfo.start();
-    [220, 277.18, 329.63, 440].forEach(function (f, i) {
-      var o = ctx.createOscillator();
-      o.type = i % 2 ? 'sine' : 'triangle';
-      o.frequency.value = f;
-      o.detune.value = (i - 1.5) * 4;
-      var g = ctx.createGain();
-      g.gain.value = 0.25 / (i + 1);
-      o.connect(g).connect(filtro);
-      o.start();
-    });
-    filtro.connect(destino);
-  }
-
-  function aguaSintetica(destino) {
-    var bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 700;
-    bp.Q.value = 0.5;
-    var g = ctx.createGain();
-    g.gain.value = 0.7;
-    var lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.09;
-    var lfoG = ctx.createGain();
-    lfoG.gain.value = 0.3;
-    lfo.connect(lfoG).connect(g.gain);
-    lfo.start();
-    bucle(ruido(), bp);
-    bp.connect(g).connect(destino);
-  }
-
-  function capa(archivo, volumen, respaldo) {
-    var g = ctx.createGain();
-    g.gain.value = volumen;
-    g.connect(master);
-    if (location.protocol === 'file:' || !window.fetch) { respaldo(g); return; }
-    fetch(RUTA + archivo)
-      .then(function (r) { if (!r.ok) throw new Error('sin archivo'); return r.arrayBuffer(); })
-      .then(function (d) { return ctx.decodeAudioData(d); })
-      .then(function (b) { bucle(b, g); })
-      .catch(function () { respaldo(g); });
-  }
-
-  /* ---------- API ---------- */
   function start() {
-    if (ctx) { ctx.resume(); return; }
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return true; }
     var C = window.AudioContext || window.webkitAudioContext;
-    if (!C) return;
+    if (!C) return false;
     ctx = new C();
+    var comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -14;
+    comp.ratio.value = 4;
     master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
+    master.gain.value = muted ? 0 : 1;
+    nivel = ctx.createGain();
+    nivel.gain.value = 0.8;
+    nivel.connect(master).connect(comp).connect(ctx.destination);
 
-    // Eco suave para las campanitas
-    eco = ctx.createDelay(1);
-    eco.delayTime.value = 0.34;
-    var retro = ctx.createGain();
-    retro.gain.value = 0.32;
-    eco.connect(retro).connect(eco);
-    eco.connect(master);
+    var largo = ctx.sampleRate * 2;
+    bufferRuido = ctx.createBuffer(1, largo, ctx.sampleRate);
+    var d = bufferRuido.getChannelData(0);
+    for (var i = 0; i < largo; i++) d[i] = Math.random() * 2 - 1;
 
-    capa('ambient-pad.mp3', 0.09, padSintetico);
-    capa('water.mp3', 0.05, aguaSintetica);
-    aplicar(3);
+    IW.audio.ctx = ctx;
+    IW.audio.out = nivel;   // pasa por el volumen de la experiencia
+    IW.audio.bus = master;  // directo (solo lo afecta el silencio)
+    actualizarBoton();
+    return true;
   }
 
-  function aplicar(tiempo) {
+  /** Una nota con envolvente suave. */
+  function tone(o) {
+    if (!ctx) return null;
+    var t = o.when || ctx.currentTime;
+    var dur = o.dur || 0.3;
+    var osc = ctx.createOscillator();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f || 440, t);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, t + dur);
+    if (o.detune) osc.detune.value = o.detune;
+    var g = ctx.createGain();
+    var vol = o.vol === undefined ? 0.2 : o.vol;
+    var ataque = o.attack || 0.01;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + ataque);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    var salida = g;
+    if (o.filter) {
+      var f = ctx.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.value = o.filter;
+      g.connect(f);
+      salida = f;
+    }
+    osc.connect(g);
+    salida.connect(o.dest || nivel);
+    osc.start(t);
+    osc.stop(t + dur + 0.05);
+    return osc;
+  }
+
+  /** Golpe de ruido filtrado (hi-hat, caja, explosión, roce). */
+  function noise(o) {
     if (!ctx) return;
-    master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, tiempo || 0.5);
+    var t = o.when || ctx.currentTime;
+    var dur = o.dur || 0.1;
+    var src = ctx.createBufferSource();
+    src.buffer = bufferRuido;
+    var f = ctx.createBiquadFilter();
+    f.type = o.type || 'bandpass';
+    f.frequency.value = o.freq || 2000;
+    f.Q.value = o.q || 0.8;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(o.vol || 0.2, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(o.dest || nivel);
+    src.start(t, Math.random());
+    src.stop(t + dur + 0.05);
   }
 
-  /** Campanita al descubrir algo (i elige la nota). */
-  function chime(i) {
-    if (!ctx || muted) return;
-    var t = ctx.currentTime;
-    var f = NOTAS[Math.abs(i || 0) % NOTAS.length];
-    [1, 2.01].forEach(function (mult, k) {
-      var o = ctx.createOscillator();
-      o.type = 'sine';
-      o.frequency.value = f * mult;
-      var g = ctx.createGain();
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(k ? 0.02 : 0.07, t + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 2.6);
-      o.connect(g);
-      g.connect(master);
-      g.connect(eco);
-      o.start(t);
-      o.stop(t + 2.8);
-    });
+  /** Bombo sintético. */
+  function kick(when, vol) {
+    if (!ctx) return;
+    var t = when || ctx.currentTime;
+    var o = ctx.createOscillator();
+    o.frequency.setValueAtTime(140, t);
+    o.frequency.exponentialRampToValueAtTime(42, t + 0.18);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(vol || 0.6, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+    o.connect(g).connect(nivel);
+    o.start(t);
+    o.stop(t + 0.35);
   }
 
-  function setMuted(valor) {
-    muted = !!valor;
+  /**
+   * Secuenciador: llama paso(n, tiempo) en cada semicorchea (1/16).
+   * Devuelve { stop(), setBpm(bpm) }.
+   */
+  function loop(bpm, paso) {
+    if (!ctx) return { stop: function () {}, setBpm: function () {} };
+    var n = 0;
+    var siguiente = ctx.currentTime + 0.08;
+    var dur = 60 / bpm / 4;
+    var id = setInterval(function () {
+      while (siguiente < ctx.currentTime + 0.12) {
+        paso(n, siguiente);
+        n++;
+        siguiente += dur;
+      }
+    }, 25);
+    var b = { stop: function () { clearInterval(id); }, setBpm: function (v) { dur = 60 / v / 4; } };
+    bucles.push(b);
+    return b;
+  }
+
+  function setLevel(v) {
+    if (nivel) nivel.gain.setTargetAtTime(Math.max(0, Math.min(1, v)), ctx.currentTime, 0.1);
+  }
+
+  function setMuted(v) {
+    muted = !!v;
     guardar();
-    aplicar();
+    if (master) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.2);
     actualizarBoton();
   }
 
@@ -182,19 +170,25 @@
     var b = document.getElementById('iw-mute');
     if (b) {
       b.addEventListener('click', function () {
-        if (!ctx) { muted = false; start(); guardar(); actualizarBoton(); return; }
+        if (!ctx) { muted = false; guardar(); start(); return; }
         setMuted(!muted);
       });
     }
     actualizarBoton();
   }
 
-  /** "Step in": arranca el sonido salvo que el visitante lo haya silenciado antes. */
-  function startIfAllowed() {
-    if (muted) return;
-    start();
-    actualizarBoton();
-  }
-
-  IW.audio = { init: init, start: start, startIfAllowed: startIfAllowed, chime: chime, setMuted: setMuted };
+  IW.audio = {
+    ctx: null,
+    out: null,
+    init: init,
+    start: start,
+    tone: tone,
+    noise: noise,
+    kick: kick,
+    loop: loop,
+    setLevel: setLevel,
+    setMuted: setMuted,
+    isMuted: function () { return muted; },
+    isOn: function () { return !!ctx; }
+  };
 })();

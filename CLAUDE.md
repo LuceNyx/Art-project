@@ -25,7 +25,7 @@ MUTED WORLD (real, apagado) → clic (JS) → TRANSICIÓN DINÁMICA (CSS) → IM
 |---|---|---|---|
 | Muted World | `muted-world/` | `mw-` | **Completo: las 7 situaciones (en revisión visual).** Los escapes son **aparatos** (portátil, mando, audífonos, computadora, celular, lentes VR, consola). **La puerta NO es un escape**: lleva a la rutina (`js/routine.js`) y vuelve al cuarto |
 | Transición | `transition/` | `tr-` | **Completa.** Una forma de escapismo por situación (series, juego en línea, música, decisiones, reels, VR, construir). Recibe `?from=&motif=` y pasa a `imagined-world/` con los mismos datos. Ver `transition/README.md` |
-| Imagined World | `imagined-world/` | `iw-` | **Completo: las 7 situaciones.** Entrada: `imagined-world/index.html?from=<scene>&motif=<motif>`. Regresa a `../muted-world/index.html?return=<scene>`. Si se entra con el celular (`feed`), abre un reproductor de reels con un link al azar de `js/media-links.js` (el usuario edita esa lista). Ver `imagined-world/README.md` |
+| Imagined World | `imagined-world/` | `iw-` | **Sin paisaje: el aparato define la experiencia** (decisión del usuario). Celular → reels con links de `js/media-links.js` (el usuario edita esa lista) · mando → juego en línea · audífonos → canción · portátil → series · computadora → decisiones · VR → vuelo · consola → construir (`js/exp-*.js`). Siempre: motivo gris como residuo y portal parpadeante a `../muted-world/index.html?return=<scene>`. Ver `imagined-world/README.md` |
 
 ## Estructura
 

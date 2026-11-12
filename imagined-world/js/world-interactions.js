@@ -1,3 +1,4 @@
+/* ⚠ OBSOLETO: ya no se carga (el paisaje se quitó; ahora cada aparato tiene su experiencia en js/exp-*.js). Se puede borrar. */
 /* =========================================================================
    IMAGINED WORLD · world-interactions.js
    Exploración y descubrimiento:
