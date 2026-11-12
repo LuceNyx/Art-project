@@ -25,7 +25,7 @@ MUTED WORLD (real, apagado) → clic (JS) → TRANSICIÓN DINÁMICA (CSS) → IM
 |---|---|---|---|
 | Muted World | `muted-world/` | `mw-` | **Completo: las 7 situaciones (en revisión visual).** No se modifica salvo para conectarlo o corregirlo |
 | Transición | `transition/` | `tr-` | `transition/index.html` es un **PLACEHOLDER — será reemplazado por la parte de mis compañeros**. Se puede sobrescribir completo sin dudar |
-| Imagined World | `imagined-world/` | `iw-` | Aún no existe. Llegará con el prompt de mis compañeros |
+| Imagined World | `imagined-world/` | `iw-` | **Completo: las 7 situaciones.** Entrada: `imagined-world/index.html?from=<scene>&motif=<motif>`. Regresa a `../muted-world/index.html?return=<scene>`. Ver `imagined-world/README.md` |
 
 ## Estructura
 
@@ -34,6 +34,7 @@ index.html              Entrada del sitio: redirige a muted-world/index.html
 CLAUDE.md               Este archivo
 muted-world/            Mundo real (ver muted-world/README.md e INTEGRATION.md)
 transition/index.html   PLACEHOLDER temporal de la transición
+imagined-world/         Mundo imaginado (ver imagined-world/README.md). Objeto global: window.ImaginedWorld
 prototipo-v0.1/         Prototipo anterior (página única de la v0.1), solo como referencia
 css/  js/  docs/        Archivos de la v0.1, sin uso en el sitio actual. No borrar sin acuerdo del equipo
 ```
