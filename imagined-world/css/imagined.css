@@ -1,0 +1,927 @@
+/* =========================================================================
+   IMAGINED WORLD · imagined.css
+   Color como alivio y posibilidad (no saturado). Movimiento ambiental sutil.
+   Todas las clases usan el prefijo .iw-
+   ========================================================================= */
+
+:root {
+  /* Paleta (imagined.js la ajusta según la situación) */
+  --iw-sky-top: #1c2a66;
+  --iw-sky-mid: #5a4ea6;
+  --iw-horizon: #ffb48c;
+  --iw-sun: #ffd98a;
+
+  --iw-far: #8d86c9;
+  --iw-mid: #4d8fa6;
+  --iw-near: #2e7566;
+  --iw-ground-top: #2b6e5f;
+  --iw-ground-bottom: #163c38;
+
+  --iw-text: #fff8ef;
+  --iw-text-soft: #f1e4ff;
+  --iw-warm: #ffd9a8;
+
+  --iw-font: "Fraunces", Georgia, "Times New Roman", serif;
+  --iw-vh: 100vh;
+  --iw-slow: 1.8s;
+  --iw-ease: cubic-bezier(.33, 0, .2, 1);
+}
+
+@supports (height: 100svh) {
+  :root { --iw-vh: 100svh; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; height: 100%; }
+
+.iw-body {
+  overflow: hidden;
+  background: var(--iw-sky-top);
+  color: var(--iw-text);
+  font-family: var(--iw-font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* :where() deja este reset con prioridad baja: cada botón define su relleno */
+.iw-body :where(button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.iw-body :focus { outline: none; }
+.iw-body :focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 248, 239, .9), 0 0 24px 6px rgba(255, 217, 168, .55);
+}
+
+/* Lo oculto con el atributo hidden se queda oculto aunque su clase defina display */
+[hidden] { display: none !important; }
+
+.iw-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   CIELO
+   ========================================================================= */
+.iw-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--iw-sky-top) 0%, var(--iw-sky-mid) 46%, var(--iw-horizon) 76%, #ffe6cc 100%);
+  transition: filter 4s var(--iw-ease);
+}
+
+/* Al llegar al Quiet Edge, la luz se vuelve más baja y cálida */
+.iw-body[data-zone="iw-edge"] .iw-sky { filter: saturate(.85) brightness(.92); }
+
+.iw-sun {
+  position: absolute;
+  left: 64%;
+  top: 46%;
+  width: 34vmin;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--iw-sun) 0 14%, rgba(255, 217, 138, .45) 24%, transparent 66%);
+  animation: iw-respirar 9s ease-in-out infinite alternate;
+}
+
+/* Cuando se descubre todo, la luz crece */
+.iw-body.iw-all-found .iw-sun { width: 46vmin; transition: width 6s var(--iw-ease); }
+
+.iw-stars { position: absolute; inset: 0 0 50% 0; }
+
+.iw-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: .7;
+  animation: iw-titilar var(--d, 4s) ease-in-out var(--del, 0s) infinite alternate;
+}
+
+.iw-star--lantern {
+  width: 5px;
+  height: 5px;
+  background: var(--iw-warm);
+  box-shadow: 0 0 10px 3px rgba(255, 217, 168, .6);
+  opacity: 1;
+}
+
+.iw-cloud {
+  position: absolute;
+  height: 10vh;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 240, 248, .32), transparent 70%);
+  animation: iw-nube 140s linear infinite;
+}
+
+.iw-cloud--1 { top: 14%; left: -20%; width: 40vw; }
+.iw-cloud--2 { top: 26%; left: 30%; width: 28vw; animation-duration: 180s; animation-delay: -60s; opacity: .8; }
+.iw-cloud--3 { top: 8%; left: 60%; width: 34vw; animation-duration: 220s; animation-delay: -120s; opacity: .6; }
+
+@keyframes iw-nube { to { transform: translateX(120vw); } }
+@keyframes iw-respirar { to { scale: 1.08; opacity: .92; } }
+@keyframes iw-titilar { to { opacity: .15; } }
+
+/* =========================================================================
+   CAPAS DE PAISAJE (fijas; world-interactions.js las desplaza con parallax)
+   ========================================================================= */
+.iw-layer {
+  position: fixed;
+  left: 0;
+  width: 100vw;   /* se ajusta en JS según la profundidad */
+  pointer-events: none;
+  will-change: transform;
+}
+
+.iw-layer svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+
+/* Relleno bajo cada capa: así nunca asoma el cielo entre las colinas y el suelo */
+.iw-layer::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 99%;
+  height: 60vh;
+  background: currentColor;
+}
+
+.iw-layer--far  { z-index: 1; bottom: 30%; height: 34vh; color: var(--iw-far); opacity: .82; }
+.iw-layer--mid  { z-index: 2; bottom: 22%; height: 30vh; color: var(--iw-mid); opacity: .92; }
+.iw-layer--near { z-index: 3; bottom: 14%; height: 26vh; color: var(--iw-near); }
+
+.iw-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   EL MUNDO: pista horizontal con tres zonas
+   ========================================================================= */
+.iw-world {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.iw-world::-webkit-scrollbar { display: none; }
+
+.iw-track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+}
+
+.iw-zone {
+  position: relative;
+  flex: none;
+  height: 100%;
+}
+
+.iw-zone--threshold { width: 100vw; }
+.iw-zone--open { width: 170vw; }
+.iw-zone--edge { width: 100vw; }
+
+/* Suelo continuo entre zonas (sin cortes en los cambios de zona) */
+.iw-ground {
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: 0;
+  height: 24%;
+  background:
+    linear-gradient(180deg, rgba(160, 230, 200, .16), transparent 18%),
+    linear-gradient(180deg, var(--iw-ground-top), var(--iw-ground-bottom));
+}
+
+/* Hierba que se mece (la genera world-interactions.js) */
+.iw-grass { position: absolute; inset: auto 0 0 0; height: 30%; pointer-events: none; }
+
+.iw-blade {
+  position: absolute;
+  bottom: calc(var(--b) * 1%);
+  width: 3px;
+  height: calc(var(--h) * 1vh);
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #8fd6b4, #2b6e5f);
+  transform-origin: 50% 100%;
+  animation: iw-mecer var(--d) ease-in-out var(--del) infinite alternate;
+}
+
+@keyframes iw-mecer {
+  from { rotate: -6deg; }
+  to { rotate: 7deg; }
+}
+
+/* ---------- The Threshold ---------- */
+.iw-threshold__text {
+  position: absolute;
+  left: clamp(1.5rem, 10vw, 9rem);
+  top: 26vh;
+  display: grid;
+  justify-items: start;
+  gap: 1.4rem;
+  max-width: min(36rem, 82vw);
+}
+
+.iw-kicker {
+  margin: 0;
+  color: var(--iw-text-soft);
+  font-style: italic;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  letter-spacing: .03em;
+  opacity: .85;
+}
+
+.iw-arrival {
+  margin: 0;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(2.4rem, 6.4vw, 5.4rem);
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  text-shadow: 0 4px 30px rgba(28, 42, 102, .45);
+}
+
+.iw-step {
+  margin-top: .6rem;
+  padding: .85rem 1.6rem;
+  border: 1px solid rgba(255, 248, 239, .7);
+  border-radius: 999px;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  letter-spacing: .04em;
+  transition: background-color var(--iw-slow), color var(--iw-slow);
+}
+
+.iw-body .iw-step:hover { background: rgba(255, 248, 239, .16); }
+
+/* =========================================================================
+   DESCUBRIMIENTOS (The Open World)
+   ========================================================================= */
+.iw-extras, .iw-discoveries { position: absolute; inset: 0; }
+.iw-extras { pointer-events: none; }
+
+.iw-disc {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  translate: -50% -50%;
+  border-radius: 40%;
+}
+
+.iw-disc__label {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  translate: -50% .5rem;
+  width: max-content;
+  max-width: 12rem;
+  color: var(--iw-text);
+  font-style: italic;
+  font-size: clamp(.85rem, 1.2vw, 1.05rem);
+  text-shadow: 0 2px 10px rgba(22, 30, 70, .7);
+  transition: opacity var(--iw-slow);
+}
+
+/* ----- Farolillos (academic-pressure): tareas pequeñas que suben ----- */
+.iw-disc--lantern {
+  width: clamp(3rem, 4.4vw, 4.4rem);
+  aspect-ratio: 4 / 5;
+  animation: iw-flotar 5s ease-in-out infinite alternate;
+}
+
+.iw-lantern__body {
+  position: absolute;
+  inset: 0;
+  border-radius: 42% 42% 46% 46%;
+  background: radial-gradient(circle at 50% 62%, #fff4cc, #ffb46e 58%, #e27a5e);
+  box-shadow: 0 0 26px 6px rgba(255, 180, 110, .45);
+  opacity: .78;
+  transition: opacity var(--iw-slow), box-shadow var(--iw-slow);
+}
+
+.iw-disc--lantern:hover .iw-lantern__body,
+.iw-disc--lantern.iw-found .iw-lantern__body {
+  opacity: 1;
+  box-shadow: 0 0 46px 14px rgba(255, 200, 130, .6);
+}
+
+.iw-disc--lantern.iw-rise {
+  translate: -50% calc(-50% - 52vh);
+  scale: .3;
+  transition: translate 8s cubic-bezier(.4, 0, .6, 1), scale 8s ease-in;
+}
+
+.iw-disc--lantern.iw-rise .iw-disc__label { opacity: 0; }
+
+@keyframes iw-flotar {
+  from { transform: translateY(-6px) rotate(-2deg); }
+  to { transform: translateY(6px) rotate(2deg); }
+}
+
+/* ----- Luciérnagas (loneliness): presencias que acompañan ----- */
+.iw-disc--firefly {
+  width: 3.4rem;
+  aspect-ratio: 1;
+  animation: iw-deriva 7s ease-in-out infinite alternate;
+}
+
+.iw-firefly__core,
+.iw-companion {
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0 18%, #b7f5e4 36%, rgba(127, 230, 208, 0) 70%);
+}
+
+.iw-firefly__core {
+  position: absolute;
+  inset: 22%;
+  box-shadow: 0 0 22px 6px rgba(159, 240, 220, .45);
+  animation: iw-latido 3s ease-in-out infinite alternate;
+}
+
+.iw-disc--firefly.iw-found { opacity: .25; }
+
+.iw-companion {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 8;
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 20px 6px rgba(159, 240, 220, .45);
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes iw-deriva {
+  from { transform: translate(-10px, -8px); }
+  to { transform: translate(12px, 10px); }
+}
+
+@keyframes iw-latido { to { scale: .8; opacity: .75; } }
+
+/* ----- Piedras (emotional-overload): ordenar con calma ----- */
+.iw-pond {
+  position: absolute;
+  left: 50%;
+  top: 87%;
+  width: 34%;
+  height: 11%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, #b9e6ee, #5f9fc4 55%, #3a6f9e);
+  box-shadow: inset 0 4px 14px rgba(255, 255, 255, .35);
+}
+
+.iw-pond::after {
+  content: "";
+  position: absolute;
+  inset: 30% 20%;
+  border: 1px solid rgba(255, 255, 255, .45);
+  border-radius: 50%;
+  animation: iw-onda 6s ease-out infinite;
+}
+
+@keyframes iw-onda {
+  from { scale: .4; opacity: .9; }
+  to { scale: 1.6; opacity: 0; }
+}
+
+.iw-disc--stone {
+  width: clamp(3.2rem, 4.6vw, 4.6rem);
+  aspect-ratio: 3 / 2;
+  transition: left 2.2s var(--iw-ease), top 2.2s var(--iw-ease);
+}
+
+.iw-stone__body {
+  position: absolute;
+  inset: 0;
+  border-radius: 52% 46% 50% 44% / 58% 52% 46% 42%;
+  background: radial-gradient(circle at 36% 30%, #d7e3ee, #8ea5bf 50%, #5d7290);
+  box-shadow: 0 8px 14px -6px rgba(10, 20, 40, .6);
+  rotate: var(--rot, 0deg);
+  transition: rotate 2.2s var(--iw-ease), box-shadow var(--iw-slow);
+}
+
+.iw-disc--stone.iw-found .iw-stone__body {
+  rotate: 0deg;
+  box-shadow: 0 0 22px 4px rgba(200, 240, 230, .45);
+}
+
+/* ----- Palancas y puente (lack-of-control): las decisiones cuentan ----- */
+.iw-disc--lever {
+  width: clamp(2.6rem, 3.4vw, 3.4rem);
+  aspect-ratio: 2 / 3;
+}
+
+.iw-lever__base {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 0;
+  height: 26%;
+  border-radius: 40% 40% 6px 6px;
+  background: linear-gradient(180deg, #8c7bc4, #4d4290);
+}
+
+.iw-lever__arm {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 12%;
+  height: 76%;
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  rotate: -38deg;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--iw-warm), #c98a5c);
+  transition: rotate 1.4s var(--iw-ease);
+}
+
+.iw-lever__arm::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -18%;
+  width: 260%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff2d6, #ffb46e);
+  box-shadow: 0 0 16px 4px rgba(255, 200, 130, .5);
+}
+
+.iw-disc--lever.iw-found .iw-lever__arm { rotate: 38deg; }
+
+/* Arroyo que corta el camino; el puente lo cruza hacia el árbol */
+.iw-stream {
+  position: absolute;
+  left: 47%;
+  top: 76%;
+  width: 24%;
+  height: 24%;
+  border-radius: 0 0 40% 40% / 0 0 30% 30%;
+  background: linear-gradient(180deg, #7fc0d6, #3d6fa3 60%, #24467a);
+  box-shadow: inset 0 6px 12px rgba(10, 20, 50, .45);
+}
+
+.iw-island {
+  position: absolute;
+  left: 80%;
+  top: 54%;
+  width: 6%;
+  height: 22%;
+}
+
+/* Tronco */
+.iw-island::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 9%;
+  height: 52%;
+  translate: -50% 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #8a6a5a, #4e3a3a);
+}
+
+.iw-island__tree {
+  position: absolute;
+  left: 50%;
+  bottom: 40%;
+  width: 80%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #bff0d4, #56b08c 60%, #2e7566);
+  box-shadow: 0 0 0 rgba(255, 230, 170, 0);
+  transition: box-shadow 4s var(--iw-ease), filter 4s var(--iw-ease);
+  filter: brightness(.7);
+}
+
+.iw-body.iw-all-found .iw-island__tree {
+  filter: brightness(1.15);
+  box-shadow: 0 0 60px 20px rgba(255, 230, 170, .5);
+}
+
+.iw-plank {
+  position: absolute;
+  left: calc(var(--px) * 1%);
+  top: 75.2%;
+  width: 8.2%;
+  height: 1.8%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #e7c39a, #9c6f4c);
+  transform-origin: 0 50%;
+  rotate: 72deg;
+  opacity: .35;
+  transition: rotate 1.6s var(--iw-ease), opacity 1.6s;
+}
+
+.iw-plank--set { rotate: 0deg; opacity: 1; }
+
+/* ----- Flores (social-comparison): ninguna se compara ----- */
+.iw-disc--flower {
+  width: clamp(3rem, 4vw, 4rem);
+  aspect-ratio: 2 / 3;
+}
+
+.iw-flower__stem {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  bottom: 0;
+  width: 3px;
+  translate: -50% 0;
+  background: linear-gradient(180deg, #7fd0a4, #2b6e5f);
+}
+
+.iw-flower__bud {
+  position: absolute;
+  left: 50%;
+  top: 24%;
+  width: 34%;
+  aspect-ratio: 2 / 3;
+  translate: -50% 0;
+  border-radius: 50% 50% 46% 46%;
+  background: linear-gradient(180deg, #b9a6e6, #6e5aa6);
+  transition: opacity 1.2s;
+}
+
+.iw-flower__bloom {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 120%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  scale: 0;
+  transition: scale 2.4s cubic-bezier(.2, .8, .2, 1.2);
+}
+
+.iw-disc--flower.iw-found .iw-flower__bud { opacity: 0; }
+.iw-disc--flower.iw-found .iw-flower__bloom { scale: 1; }
+
+/* ----- Caminos (uncertain-future): varios, todos válidos ----- */
+.iw-path {
+  position: absolute;
+  inset: 58% 0 0 0;
+  clip-path: polygon(calc(var(--bx) * 1% - 7%) 100%, calc(var(--bx) * 1% + 7%) 100%, 50.4% 0, 49.6% 0);
+  background: linear-gradient(0deg, rgba(255, 235, 205, .16), rgba(255, 235, 205, .02));
+  transition: background 3s var(--iw-ease);
+}
+
+.iw-path--lit {
+  background: linear-gradient(0deg, rgba(255, 228, 180, .75), rgba(255, 210, 160, .25) 70%, rgba(255, 240, 210, .9));
+}
+
+.iw-disc--path {
+  width: 9rem;
+  height: 4.5rem;
+  border-radius: 50% 50% 12px 12px;
+}
+
+.iw-disc--path .iw-disc__label { top: 0; translate: -50% -110%; }
+
+/* ----- Bloques (family-expectations): construir sin que nadie evalúe ----- */
+.iw-disc--block {
+  width: clamp(2.6rem, 3.4vw, 3.4rem);
+  aspect-ratio: 1;
+}
+
+.iw-block,
+.iw-placed {
+  display: block;
+  background: var(--c);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, .12), 0 8px 14px -8px rgba(10, 20, 40, .6);
+}
+
+.iw-disc--block .iw-block { position: absolute; inset: 0; }
+
+.iw-block--arch { border-radius: 50% 50% 6px 6px; }
+.iw-block--tower { inset: -40% 22% 0 22% !important; border-radius: 6px; }
+.iw-block--circle { border-radius: 50%; }
+.iw-block--square { border-radius: 6px; }
+
+.iw-disc--block.iw-found { opacity: .25; }
+
+.iw-build {
+  position: absolute;
+  left: 64%;
+  bottom: 23%;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 14%;
+}
+
+.iw-placed {
+  width: clamp(3.4rem, 5vw, 5rem);
+  aspect-ratio: 1;
+  margin-top: -4px;
+  rotate: var(--rot);
+  animation: iw-colocar 1.2s var(--iw-ease) both;
+}
+
+.iw-placed.iw-block--tower { width: clamp(1.8rem, 2.6vw, 2.6rem); aspect-ratio: 1 / 2; }
+
+@keyframes iw-colocar {
+  from { opacity: 0; translate: 0 -40px; }
+}
+
+/* =========================================================================
+   MOTIVO DE LA REALIDAD (residual-motif.js)
+   Sigue en gris: es lo único sin color en este mundo.
+   ========================================================================= */
+.iw-motif {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: calc(var(--size) * 1vh);
+  min-width: 2.4rem;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  animation: iw-flotar 7s ease-in-out infinite alternate;
+}
+
+/* Halo de color alrededor: el mundo lo rodea, pero no lo cambia */
+.iw-motif::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 200, .32), transparent 65%);
+}
+
+.iw-motif img,
+.iw-motif-echo img,
+.iw-reflection img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: grayscale(1) drop-shadow(0 0 14px rgba(255, 255, 255, .25));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Eco lejano en la llegada */
+.iw-motif-echo {
+  position: absolute;
+  left: 80%;
+  top: 58%;
+  width: 7vh;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  opacity: .45;
+  filter: blur(.6px);
+  pointer-events: none;
+}
+
+/* =========================================================================
+   THE QUIET EDGE
+   ========================================================================= */
+/* Orilla: el suelo del Open World baja suave hasta el agua */
+.iw-zone--edge::before {
+  content: "";
+  position: absolute;
+  left: -1%;
+  bottom: 0;
+  z-index: 1;
+  width: 30%;
+  height: 24%;
+  border-radius: 0 100% 0 0 / 0 100% 0 0;
+  background:
+    linear-gradient(180deg, rgba(160, 230, 200, .16), transparent 18%),
+    linear-gradient(180deg, var(--iw-ground-top), var(--iw-ground-bottom));
+}
+
+.iw-water {
+  position: absolute;
+  left: 8%;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  overflow: hidden;
+  border-radius: 60% 0 0 0 / 30% 0 0 0;
+  background: linear-gradient(180deg, #a6d6e2 0%, #5c8fbf 34%, #2f548a 70%, #1e3462 100%);
+}
+
+.iw-water__shine {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(178deg, transparent 0 14px, rgba(255, 255, 255, .12) 14px 15px, transparent 15px 30px);
+  animation: iw-brillo-agua 9s linear infinite;
+}
+
+@keyframes iw-brillo-agua { to { background-position: 0 120px; } }
+
+.iw-reflection {
+  position: absolute;
+  left: 62%;
+  top: 6%;
+  width: 14vh;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  opacity: .32;
+  filter: blur(1.6px);
+  transform: scaleY(-1);
+  animation: iw-ondular 5s ease-in-out infinite alternate;
+}
+
+@keyframes iw-ondular { to { transform: scaleY(-1) skewX(4deg) scaleX(1.04); } }
+
+.iw-edge__text {
+  position: absolute;
+  left: 50%;
+  top: 18vh;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: 1.6rem;
+  width: min(36rem, 86vw);
+  text-align: center;
+}
+
+.iw-edge__lines { display: grid; gap: .6rem; }
+
+.iw-edge-line {
+  margin: 0;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.3rem, 2.8vw, 2.1rem);
+  line-height: 1.25;
+  text-shadow: 0 3px 20px rgba(22, 30, 70, .5);
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 2.6s var(--iw-ease), filter 2.6s var(--iw-ease);
+}
+
+.iw-edge-line--on { opacity: 1; filter: none; }
+
+.iw-edge__actions {
+  display: grid;
+  justify-items: center;
+  gap: .9rem;
+  animation: iw-aparecer 2s var(--iw-ease) both;
+}
+
+.iw-return {
+  padding: .9rem 1.8rem;
+  border: 1px solid rgba(255, 248, 239, .8);
+  border-radius: 999px;
+  color: var(--iw-text);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  letter-spacing: .04em;
+  text-decoration: none;
+  transition: background-color var(--iw-slow);
+}
+
+.iw-return:hover { background: rgba(255, 248, 239, .16); }
+
+.iw-stay {
+  color: var(--iw-text-soft);
+  font-style: italic;
+  font-size: .98rem;
+  opacity: .85;
+}
+
+.iw-body .iw-stay:hover { opacity: 1; }
+
+@keyframes iw-aparecer { from { opacity: 0; translate: 0 10px; } }
+
+/* =========================================================================
+   INTERFAZ
+   ========================================================================= */
+.iw-zones {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(.9rem, 3vh, 1.6rem);
+  z-index: 10;
+  display: flex;
+  gap: .4rem;
+  translate: -50% 0;
+  padding: .3rem;
+  border-radius: 999px;
+  background: rgba(22, 30, 70, .28);
+  backdrop-filter: blur(6px);
+}
+
+.iw-zones button {
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  color: var(--iw-text-soft);
+  font-size: clamp(.75rem, 1.2vw, .9rem);
+  letter-spacing: .03em;
+  white-space: nowrap;
+  opacity: .75;
+  transition: background-color var(--iw-slow), opacity var(--iw-slow);
+}
+
+.iw-zones button[aria-current="true"] {
+  background: rgba(255, 248, 239, .2);
+  opacity: 1;
+}
+
+.iw-response {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(4rem, 12vh, 6.5rem);
+  z-index: 10;
+  width: min(34rem, 88vw);
+  margin: 0;
+  translate: -50% 0;
+  text-align: center;
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.4vw, 1.7rem);
+  text-shadow: 0 3px 18px rgba(22, 30, 70, .7);
+  opacity: 0;
+  transition: opacity 1.4s var(--iw-ease);
+  pointer-events: none;
+}
+
+.iw-response--on { opacity: 1; }
+
+.iw-mute {
+  position: fixed;
+  top: clamp(.9rem, 3vw, 1.6rem);
+  right: clamp(.9rem, 3vw, 1.6rem);
+  z-index: 10;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  color: var(--iw-text-soft);
+  font-size: .9rem;
+  letter-spacing: .05em;
+  opacity: .8;
+}
+
+.iw-body .iw-mute:hover { opacity: 1; }
+
+.iw-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #fff;
+  pointer-events: none;
+  transition: opacity 3.4s var(--iw-ease);
+}
+
+.iw-flash--gone { opacity: 0; }
+
+.iw-noscript {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  background: var(--iw-sky-top);
+  font-style: italic;
+  font-size: 1.4rem;
+}
+
+/* =========================================================================
+   PANTALLAS ESTRECHAS
+   ========================================================================= */
+@media (max-width: 40rem) {
+  .iw-zone--open { width: 260vw; }
+  .iw-threshold__text { top: 20vh; }
+  .iw-zones button { padding: .35rem .6rem; }
+}
+
+/* =========================================================================
+   MOVIMIENTO REDUCIDO: todo estático
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+}

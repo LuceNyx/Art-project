@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imagined World · Digital Escapism</title>
+  <meta name="description" content="Imagined World: a bright place to explore, part of Digital Escapism.">
+  <meta name="theme-color" content="#1c2a66">
+
+  <!-- Única dependencia externa: tipografía Fraunces (SIL Open Font License) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap">
+
+  <link rel="stylesheet" href="css/imagined.css">
+</head>
+<body class="iw-body">
+
+  <!-- ============ CIELO Y PAISAJE LEJANO (fijos, con parallax) ============ -->
+  <div class="iw-sky" aria-hidden="true">
+    <div class="iw-stars" id="iw-stars"></div>
+    <span class="iw-sun"></span>
+    <span class="iw-cloud iw-cloud--1"></span>
+    <span class="iw-cloud iw-cloud--2"></span>
+    <span class="iw-cloud iw-cloud--3"></span>
+  </div>
+
+  <div class="iw-layer iw-layer--far" data-depth="0.12" aria-hidden="true">
+    <svg viewBox="0 0 1000 300" preserveAspectRatio="none">
+      <path d="M0 300 L0 170 L60 122 L120 158 L190 92 L262 150 L332 112 L402 160 L470 80 L542 140 L612 102 L682 150 L752 72 L822 132 L892 100 L960 150 L1000 122 L1000 300 Z"/>
+    </svg>
+  </div>
+  <div class="iw-layer iw-layer--mid" data-depth="0.32" aria-hidden="true">
+    <svg viewBox="0 0 1000 300" preserveAspectRatio="none">
+      <path d="M0 300 L0 200 Q80 140 160 190 T320 182 T480 168 T640 192 T800 160 T1000 186 L1000 300 Z"/>
+    </svg>
+  </div>
+  <div class="iw-layer iw-layer--near" data-depth="0.62" aria-hidden="true">
+    <svg viewBox="0 0 1000 300" preserveAspectRatio="none">
+      <path d="M0 300 L0 232 Q100 190 200 226 T400 214 T600 232 T800 208 T1000 226 L1000 300 Z"/>
+    </svg>
+  </div>
+
+  <canvas class="iw-particles" id="iw-particles" aria-hidden="true"></canvas>
+
+  <!-- ============ EL MUNDO (se recorre en horizontal) ============ -->
+  <main class="iw-world" id="iw-world" aria-label="The imagined world">
+    <div class="iw-track" id="iw-track">
+
+      <!-- Arrival / The Threshold -->
+      <section class="iw-zone iw-zone--threshold" id="iw-threshold" aria-labelledby="iw-arrival">
+        <div class="iw-ground" aria-hidden="true"></div>
+        <div class="iw-threshold__text">
+          <p class="iw-kicker" id="iw-kicker">You left the room.</p>
+          <h1 class="iw-arrival" id="iw-arrival">You came from somewhere.</h1>
+          <button class="iw-step" id="iw-step" type="button">Step in</button>
+        </div>
+      </section>
+
+      <!-- The Open World -->
+      <section class="iw-zone iw-zone--open" id="iw-open" aria-label="The open world">
+        <div class="iw-ground" aria-hidden="true"></div>
+        <div class="iw-grass" id="iw-grass" aria-hidden="true"></div>
+        <div class="iw-extras" id="iw-extras" aria-hidden="true"><!-- world-interactions.js --></div>
+        <div class="iw-discoveries" id="iw-discoveries"><!-- world-interactions.js --></div>
+      </section>
+
+      <!-- The Quiet Edge -->
+      <section class="iw-zone iw-zone--edge" id="iw-edge" aria-labelledby="iw-edge-title">
+        <div class="iw-water" aria-hidden="true">
+          <span class="iw-water__shine"></span>
+          <div class="iw-reflection" id="iw-reflection"></div>
+        </div>
+        <div class="iw-edge__text">
+          <h2 class="iw-visually-hidden" id="iw-edge-title">The quiet edge</h2>
+          <div class="iw-edge__lines" id="iw-edge-lines" aria-live="polite"></div>
+          <div class="iw-edge__actions" id="iw-edge-actions" hidden>
+            <a class="iw-return" id="iw-return" href="../muted-world/index.html">Return to your room</a>
+            <button class="iw-stay" id="iw-stay" type="button">Stay a little longer</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ============ INTERFAZ ============ -->
+  <nav class="iw-zones" aria-label="Places in the imagined world">
+    <button type="button" data-zone="iw-threshold" aria-current="true">Threshold</button>
+    <button type="button" data-zone="iw-open">Open world</button>
+    <button type="button" data-zone="iw-edge">Quiet edge</button>
+  </nav>
+
+  <p class="iw-response" id="iw-response" aria-live="polite"></p>
+
+  <button class="iw-mute" id="iw-mute" type="button" aria-pressed="true">sound off</button>
+
+  <!-- Llegada: el blanco con el que se salió del Muted World se abre en color -->
+  <div class="iw-flash" id="iw-flash" aria-hidden="true"></div>
+
+  <noscript>
+    <p class="iw-noscript">This world needs JavaScript to open.</p>
+  </noscript>
+
+  <!-- Scripts clásicos (funcionan también con doble clic). El orden importa. -->
+  <script src="js/scene-data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/residual-motif.js"></script>
+  <script src="js/world-interactions.js"></script>
+  <script src="js/imagined.js"></script>
+</body>
+</html>
