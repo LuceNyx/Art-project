@@ -219,34 +219,17 @@
     }
   }
 
-  /* ---------- Abrir y dejar el celular ---------- */
+  /* ---------- El feed se abre al llegar (no hay "dejar el celular":
+                solo se sale por el portal a la realidad) ---------- */
   function abrir() {
     if (abierto) return;
     abierto = true;
     el.box.hidden = false;
-    el.reopen.hidden = true;
-    document.body.classList.add('iw-reels-open');
     requestAnimationFrame(function () {
       requestAnimationFrame(function () { el.box.classList.add('iw-reels--on'); });
     });
     if (!el.screen.querySelector('.iw-reel')) next();
     el.next.focus({ preventScroll: true });
-  }
-
-  function cerrar() {
-    if (!abierto) return;
-    abierto = false;
-    el.box.classList.remove('iw-reels--on');
-    document.body.classList.remove('iw-reels-open');
-    setTimeout(function () {
-      el.box.hidden = true;
-      // Se detiene el video (y su sonido) al dejar el celular
-      el.screen.replaceChildren();
-      el.reopen.hidden = false;
-      var step = document.getElementById('iw-step');
-      if (step) step.focus({ preventScroll: true });
-    }, reducido ? 0 : 600);
-    IW.ui.respond('You put the phone down. For now.');
   }
 
   /* ---------- Gestos ---------- */
@@ -271,7 +254,6 @@
   function alTeclado(e) {
     if (!abierto) return;
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'j') { e.preventDefault(); next(); }
-    if (e.key === 'Escape') { e.preventDefault(); cerrar(); }
   }
 
   /* =======================================================================
@@ -285,7 +267,6 @@
     el.like = document.getElementById('iw-reels-like');
     el.likes = document.getElementById('iw-reels-likes');
     el.next = document.getElementById('iw-reels-next');
-    el.reopen = document.getElementById('iw-reels-reopen');
 
     // Clasificar los links: los que se reproducen aquí y los que solo se abren fuera
     var vistosEmbed = {};
@@ -300,8 +281,6 @@
 
     el.next.addEventListener('click', next);
     el.like.addEventListener('click', like);
-    document.getElementById('iw-reels-close').addEventListener('click', cerrar);
-    el.reopen.addEventListener('click', abrir);
     el.box.addEventListener('wheel', alRueda, { passive: false });
     el.box.addEventListener('touchstart', alTocar, { passive: true });
     el.box.addEventListener('touchend', alSoltar, { passive: true });
@@ -315,8 +294,12 @@
     }, 1000);
 
     // Al terminar la transición, el celular ya está en la mano
-    setTimeout(abrir, reducido ? 0 : 1400);
+    setTimeout(abrir, reducido ? 0 : 900);
   }
 
-  IW.reels = { init: init, parse: parse, open: abrir, close: cerrar };
+  IW.reels = { init: init, parse: parse, open: abrir };
+
+  // El celular: su experiencia es el feed
+  IW.experiences = IW.experiences || {};
+  IW.experiences.feed = function (c) { init(c.scene, c.motifId); };
 })();
