@@ -20,7 +20,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 |---|---|---|---|
 | 📱 Celular | Social comparison | **Reels**: videos verticales al azar de tus links, Next / deslizar, ♥, contador de tiempo acelerado | `js/reels.js` |
 | 🎮 Mando | Loneliness | **Juego en línea**: disparas a sombras junto a 3 amigos que pelean contigo y te escriben; combos, rondas, la música se acelera, no hay game over | `js/exp-online.js` |
-| 🎧 Audífonos | Emotional overload | **Dentro de una canción** original (intro, subida, *drop*) con visualizador. *Turn it up* apaga las voces de la realidad. Tocar la pantalla agrega notas | `js/exp-music.js` |
+| 🎧 Audífonos | Emotional overload | **Reproductor de música**: la pantalla llena de portadas de éxitos (pop, latino, hip-hop, K-pop, R&B, rock, electrónica, afrobeats, indie), filtros por género y abajo anterior · pausa · siguiente, progreso y volumen. Vistas previas oficiales de 30 s (Apple Music); al terminar una, empieza la siguiente. En pausa, todo se vuelve gris y vuelven las voces de la realidad | `js/exp-music.js` + `js/music-tracks.js` |
 | 💻 Portátil | Academic pressure | **Series**: capítulos cinematográficos con subtítulos y música que crece. *Next episode in 5…* arranca solo | `js/exp-video.js` |
 | 🖥️ Computadora | Lack of control | **Juego de decisiones**: tres opciones por turno y cada una cambia el mundo al instante | `js/exp-choice.js` |
 | 🥽 Lentes VR | Uncertain future | **Volar en VR**: a través de dos lentes, atraviesas anillos y siempre hay un objetivo claro | `js/exp-vr.js` |
@@ -31,7 +31,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 |---|---|
 | Reels | Cada 5 videos, una tarjeta vacía: *"Nothing here."* |
 | Juego | La burbuja sin respuesta flota y las balas la atraviesan. En el chat llega un mensaje de fuera que nadie abre |
-| Música | La nota clavada sigue ahí a cualquier volumen |
+| Música | Una portada gris entre todas: la nota clavada. Y al pausar, la realidad vuelve |
 | Series | Entre capítulos, en la pantalla oscura, se refleja la pila de hojas |
 | Decisiones | El reloj detenido en las 7:00, junto al contador de turnos que sí avanza |
 | VR | La ventana encendida en el horizonte, que nunca se acerca |
@@ -40,7 +40,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 Tocar el motivo muestra una frase (*"Still no reply."*, *"It still says seven."*…).
 
 ### Común a todas
-- **Tarjeta de inicio** propia de cada aparato (*Play* / *Start*). También enciende el sonido, porque nunca hay autoplay.
+- **Sin pantallas de inicio:** cada experiencia arranca sola al terminar la transición (la frase del goce se ve en la transición). Si el navegador bloquea el sonido, el botón dice *tap for sound* y el primer toque o tecla lo enciende.
 - **Portal a la realidad** (arriba a la izquierda): una rendija gris que parpadea, muestra mensajes del cuarto y a los 20 y 50 s insiste más. Al hacer clic se vuelve al Muted World con `?return=<scene>`.
 - **Sonido** (abajo a la derecha): todo se genera en código con Web Audio. La preferencia de silencio se guarda.
 - Teclado: el juego y la VR usan WASD o flechas; las decisiones, 1/2/3; construir, flechas + Espacio y 1-9; los reels, ↓; la música, el control de volumen.
@@ -57,6 +57,7 @@ Tocar el motivo muestra una frase (*"Still no reply."*, *"It still says seven."*
 | `js/audio.js` | Motor de sonido compartido (notas, ruido, bombo, secuenciador) |
 | `js/residual-motif.js` | Carga el SVG original del motivo desde `../muted-world/assets/motifs/` |
 | `js/media-links.js` | **Tus links de reels** (lista `mediaLinks`) |
+| `js/music-tracks.js` | **Las canciones de los audífonos**: título, artista, género, portada, vista previa y enlace (instrucciones para agregar más dentro del archivo) |
 | `js/reels.js` · `js/exp-*.js` | Las siete experiencias |
 | `js/world-interactions.js` | ⚠ Obsoleto (el paisaje anterior). Ya no se carga |
 

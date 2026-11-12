@@ -25,13 +25,13 @@
    *   lines: dos frases breves (inglés)
    */
   var MEDIOS = {
-    'academic-pressure':   { medium: 'video',   motif: 'stacked-paper',     lines: ['Just one more.', 'The desk disappears.'] },
-    'loneliness':          { medium: 'online',  motif: 'unanswered-bubble', lines: ['Someone is online.', 'They were waiting for you.'] },
-    'emotional-overload':  { medium: 'music',   motif: 'pinned-note',       lines: ['Turn it up.', 'Until nothing else fits.'] },
-    'lack-of-control':     { medium: 'choice',  motif: 'stopped-clock',     lines: ['Press start.', 'Here, every choice matters.'] },
-    'social-comparison':   { medium: 'feed',    motif: 'blank-polaroid',    lines: ['One more.', 'And another.'] },
-    'uncertain-future':    { medium: 'vr',      motif: 'lit-window',        lines: ['Somewhere else.', 'Somewhere wider.'] },
-    'family-expectations': { medium: 'sandbox', motif: 'facedown-frame',    lines: ['Build anything.', 'It is all yours.'] }
+    'academic-pressure':   { medium: 'video',   motif: 'stacked-paper',     lines: ['Just one more.', 'The next episode starts on its own.'] },
+    'loneliness':          { medium: 'online',  motif: 'unanswered-bubble', lines: ['They were waiting for you.', 'Your friends are online.'] },
+    'emotional-overload':  { medium: 'music',   motif: 'pinned-note',       lines: ['Turn it up.', 'The music is louder than the room.'] },
+    'lack-of-control':     { medium: 'choice',  motif: 'stopped-clock',     lines: ['Press start.', 'Here, every choice works.'] },
+    'social-comparison':   { medium: 'feed',    motif: 'blank-polaroid',    lines: ['One more.', 'The feed never ends.'] },
+    'uncertain-future':    { medium: 'vr',      motif: 'lit-window',        lines: ['Somewhere else.', 'Here, the world has a map.'] },
+    'family-expectations': { medium: 'sandbox', motif: 'facedown-frame',    lines: ['Build anything.', 'In this world, you build the rules.'] }
   };
 
   var POR_DEFECTO = { medium: 'screen', motif: null, lines: ['Somewhere else.', 'Anywhere but here.'] };
