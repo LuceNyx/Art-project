@@ -1,11 +1,14 @@
 /* =========================================================================
    IMAGINED WORLD · exp-music.js
-   AUDÍFONOS → DENTRO DE UNA CANCIÓN (Emotional overload)
-   Una canción original (generada en código) con intro, subida y "drop".
-   Todo late con ella. "Turn it up": cuanto más alto el volumen, más se
-   apagan las voces de la realidad (las notas del corcho y su murmullo).
-   Tocar la pantalla agrega notas a la melodía.
-   Residuo: la nota clavada sigue ahí, en gris, a cualquier volumen.
+   AUDÍFONOS → MÚSICA (Emotional overload)
+   La pantalla entera es una pared de portadas de canciones exitosas de
+   muchos géneros (lista en js/music-tracks.js). Abajo, el reproductor de
+   siempre: anterior · pausa · siguiente, progreso y volumen.
+   Suena una vista previa oficial de 30 s de cada canción (Apple Music) y,
+   al terminar, empieza la siguiente sola: nunca hay silencio.
+   Si se pausa, las voces de la realidad vuelven a oírse... y a verse.
+   Residuo: entre las portadas hay una gris: la nota clavada.
+   Teclado: Espacio = pausa, ← → = anterior / siguiente.
    ========================================================================= */
 
 (function () {
@@ -14,267 +17,279 @@
   var IW = (window.ImaginedWorld = window.ImaginedWorld || {});
   IW.experiences = IW.experiences || {};
 
-  var BPM = 96;
-  // Am – F – C – G (frecuencias de cada acorde)
-  var ACORDES = [
-    [220, 261.63, 329.63],
-    [174.61, 220, 261.63],
-    [261.63, 329.63, 392],
-    [196, 246.94, 293.66]
-  ];
-  var BAJOS = [55, 43.65, 65.41, 49];
-  var PENTA = [440, 523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66];
-  // Melodía del "drop" (índices de PENTA por semicorchea; -1 = silencio)
-  var MELODIA = [4, -1, 3, -1, 2, -1, 3, 4, -1, 5, -1, 4, 3, -1, 2, -1];
+  var ICONOS = {
+    prev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>',
+    next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>',
+    play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>'
+  };
+
+  function esc(t) {
+    return String(t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function fmt(s) {
+    s = Math.max(0, Math.floor(s || 0));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function mezclar(lista) {
+    var a = lista.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
 
   IW.experiences.music = function (c) {
-    var reducido = c.reducido;
+    var todas = (IW.musicTracks || []).filter(function (t) { return t && t.preview && t.cover; });
+    var generos = ['All'];
+    todas.forEach(function (t) { if (generos.indexOf(t.genre) === -1) generos.push(t.genre); });
     var voces = c.scene.reality.concat(['Everyone else can.', 'Why are you like this?']);
 
     c.root.innerHTML =
-      '<div class="iw-music">' +
-        '<canvas class="iw-music__canvas" aria-hidden="true"></canvas>' +
-        '<div class="iw-music__voices" aria-hidden="true">' +
+      '<div class="iw-mp">' +
+        '<div class="iw-mp__bg" id="iw-mp-bg" aria-hidden="true"></div>' +
+        '<nav class="iw-mp__genres" id="iw-mp-genres" aria-label="Genres"></nav>' +
+        '<div class="iw-mp__grid" id="iw-mp-grid" role="list" aria-label="Songs"></div>' +
+        '<div class="iw-mp__voices" aria-hidden="true">' +
           voces.map(function (v, i) {
-            return '<span style="--i:' + i + ';--x:' + (8 + (i * 37) % 70) + '%;--y:' + (16 + (i * 23) % 60) + '%">' + v + '</span>';
+            return '<span style="--i:' + i + ';--x:' + (6 + (i * 37) % 70) + '%;--y:' + (14 + (i * 23) % 56) + '%">' + esc(v) + '</span>';
           }).join('') +
         '</div>' +
-        '<div class="iw-music__track">' +
-          '<p class="iw-music__now">Now playing</p>' +
-          '<p class="iw-music__title">Somewhere Louder</p>' +
-          '<p class="iw-music__artist">original · made for this room</p>' +
-          '<div class="iw-music__bar"><span id="iw-m-progress"></span></div>' +
-          '<p class="iw-music__section" id="iw-m-section">intro</p>' +
+        '<div class="iw-mp__bar">' +
+          '<div class="iw-mp__now">' +
+            '<img class="iw-mp__now-cover" id="iw-mp-cover" alt="">' +
+            '<div class="iw-mp__now-text">' +
+              '<p class="iw-mp__now-title" id="iw-mp-title">—</p>' +
+              '<p class="iw-mp__now-artist" id="iw-mp-artist"></p>' +
+              '<a class="iw-mp__now-link" id="iw-mp-link" target="_blank" rel="noopener noreferrer">Listen on Apple Music ↗</a>' +
+            '</div>' +
+          '</div>' +
+          '<div class="iw-mp__center">' +
+            '<div class="iw-mp__buttons">' +
+              '<button class="iw-mp__btn" id="iw-mp-prev" type="button" aria-label="Previous song">' + ICONOS.prev + '</button>' +
+              '<button class="iw-mp__btn iw-mp__btn--main" id="iw-mp-play" type="button" aria-label="Play">' + ICONOS.play + '</button>' +
+              '<button class="iw-mp__btn" id="iw-mp-next" type="button" aria-label="Next song">' + ICONOS.next + '</button>' +
+            '</div>' +
+            '<div class="iw-mp__progress">' +
+              '<span id="iw-mp-cur">0:00</span>' +
+              '<div class="iw-mp__track" id="iw-mp-seek" role="slider" aria-label="Song position" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="iw-mp-fill"></span></div>' +
+              '<span id="iw-mp-dur">0:30</span>' +
+            '</div>' +
+          '</div>' +
+          '<label class="iw-mp__vol">' +
+            '<span>Turn it up</span>' +
+            '<input type="range" id="iw-mp-vol" min="0" max="100" value="80" aria-label="Volume">' +
+          '</label>' +
         '</div>' +
-        '<label class="iw-music__volume">' +
-          '<span class="iw-music__volume-label">Turn it up</span>' +
-          '<input type="range" id="iw-m-vol" min="0" max="100" value="35" aria-label="Volume: turn it up to drown out the room">' +
-          '<span class="iw-music__volume-value" id="iw-m-volv">35</span>' +
-        '</label>' +
-        '<p class="iw-music__help">Tap anywhere to add a note</p>' +
+        '<p class="iw-mp__credit">Previews courtesy of Apple Music · 30 s each</p>' +
       '</div>';
 
-    var root = c.root.querySelector('.iw-music');
-    var canvas = root.querySelector('canvas');
-    var g = canvas.getContext('2d');
-    var vol = root.querySelector('#iw-m-vol');
-    var volv = root.querySelector('#iw-m-volv');
-    var barra = root.querySelector('#iw-m-progress');
-    var seccion = root.querySelector('#iw-m-section');
+    var root = c.root.querySelector('.iw-mp');
+    var $ = function (id) { return root.querySelector('#' + id); };
+    var el = {
+      bg: $('iw-mp-bg'), genres: $('iw-mp-genres'), grid: $('iw-mp-grid'), cover: $('iw-mp-cover'),
+      title: $('iw-mp-title'), artist: $('iw-mp-artist'), link: $('iw-mp-link'),
+      prev: $('iw-mp-prev'), play: $('iw-mp-play'), next: $('iw-mp-next'),
+      cur: $('iw-mp-cur'), dur: $('iw-mp-dur'), seek: $('iw-mp-seek'), fill: $('iw-mp-fill'), vol: $('iw-mp-vol')
+    };
 
-    var residuo = IW.motif.button(c.motifId, c.scene.residue, 'iw-music__residue', c.scene.motifDescription);
-    if (residuo) root.appendChild(residuo);
+    var audio = new Audio();
+    audio.preload = 'auto';
+    audio.volume = 0.8;
+    // El botón de sonido general también silencia las canciones
+    audio.muted = IW.audio.isMuted();
+    var botonSonido = document.getElementById('iw-mute');
+    if (botonSonido) botonSonido.addEventListener('click', function () {
+      setTimeout(function () { audio.muted = IW.audio.isMuted(); }, 0);
+    });
 
-    var W = 0, H = 0;
-    function medir() {
-      var d = Math.min(window.devicePixelRatio || 1, 1.5);
-      W = window.innerWidth;
-      H = window.innerHeight;
-      canvas.width = Math.round(W * d);
-      canvas.height = Math.round(H * d);
-      g.setTransform(d, 0, 0, d, 0, 0);
+    var cola = mezclar(todas);     // orden de reproducción
+    var filtro = 'All';
+    var actual = -1;               // índice en cola
+    var pendiente = false;         // el navegador bloqueó el autoplay
+    var tocadas = 0;
+
+    /* ---------- Pared de portadas ---------- */
+    function pintarGeneros() {
+      el.genres.innerHTML = generos.map(function (g) {
+        return '<button type="button" class="iw-mp__chip" aria-pressed="' + (g === filtro) + '" data-g="' + esc(g) + '">' + esc(g) + '</button>';
+      }).join('');
     }
-    window.addEventListener('resize', medir);
-    medir();
 
-    /* ---------- Volumen: la música tapa la realidad ---------- */
-    var nivel = 0.35;
-    var murmullo = null;
-
-    function aplicarVolumen() {
-      nivel = vol.value / 100;
-      volv.textContent = vol.value;
-      root.style.setProperty('--vol', nivel.toFixed(2));
-      IW.audio.setLevel(0.15 + nivel * 0.85);
-      if (murmullo) murmullo.gain.setTargetAtTime((1 - nivel) * 0.09, IW.audio.ctx.currentTime, 0.2);
-      if (nivel > 0.92 && !aplicarVolumen.dicho) {
-        aplicarVolumen.dicho = true;
-        IW.ui.toast('Now nothing else fits.');
+    function pintarPared() {
+      var visibles = cola.filter(function (t) { return filtro === 'All' || t.genre === filtro; });
+      var html = visibles.map(function (t) {
+        var i = cola.indexOf(t);
+        return '<button type="button" class="iw-mp__tile" role="listitem" data-i="' + i + '" aria-label="' + esc(t.title + ' by ' + t.artist) + '">' +
+          '<img src="' + esc(t.cover) + '" alt="" loading="lazy" decoding="async">' +
+          '<span class="iw-mp__tile-genre">' + esc(t.genre) + '</span>' +
+          '<span class="iw-mp__tile-info"><b>' + esc(t.title) + '</b><i>' + esc(t.artist) + '</i></span>' +
+          '<span class="iw-mp__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
+        '</button>';
+      });
+      // El residuo: una portada gris entre todas (la nota clavada)
+      var src = IW.motif.src(c.motifId);
+      if (src && filtro === 'All') {
+        var pos = Math.min(html.length, 7);
+        html.splice(pos, 0, '<button type="button" class="iw-mp__tile iw-mp__tile--residue" role="listitem" aria-label="Something from your room: ' + esc(c.scene.motifDescription) + '">' +
+          '<img src="' + src + '" alt=""><span class="iw-mp__tile-info"><b>Reply to her.</b><i>still pinned</i></span></button>');
       }
-    }
-    vol.addEventListener('input', aplicarVolumen);
-    root.addEventListener('wheel', function (e) {
-      vol.value = Math.max(0, Math.min(100, Number(vol.value) - Math.sign(e.deltaY) * 4));
-      aplicarVolumen();
-    }, { passive: true });
-
-    /** Las voces de la realidad: un murmullo que solo se oye con el volumen bajo. */
-    function crearMurmullo() {
-      var ctx = IW.audio.ctx;
-      if (!ctx) return;
-      var largo = ctx.sampleRate * 3;
-      var buf = ctx.createBuffer(1, largo, ctx.sampleRate);
-      var d = buf.getChannelData(0);
-      var u = 0;
-      for (var i = 0; i < largo; i++) { u = (u + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = u * 3.5; }
-      var src = ctx.createBufferSource();
-      src.buffer = buf;
-      src.loop = true;
-      var bp = ctx.createBiquadFilter();
-      bp.type = 'bandpass';
-      bp.frequency.value = 420;
-      bp.Q.value = 2;
-      murmullo = ctx.createGain();
-      murmullo.gain.value = 0;
-      // Va directo (sin el volumen de la música): por eso la música lo tapa
-      src.connect(bp).connect(murmullo).connect(IW.audio.bus);
-      src.start();
+      el.grid.innerHTML = html.join('') || '<p class="iw-mp__empty">Add songs in js/music-tracks.js</p>';
+      marcarActual();
     }
 
-    /* ---------- La canción ---------- */
-    var analizador = null;
-    var datos = null;
-    var golpe = 0;      // pulso visual del bombo
-    var compasTotal = 0;
-    var seccionActual = 'intro';
-    var chispas = [];
-
-    function nombreSeccion(c16) {
-      var b = c16 % 16;
-      return b < 4 ? 'intro' : b < 8 ? 'build' : 'drop';
-    }
-
-    function tocar() {
-      var ctx = IW.audio.ctx;
-      analizador = ctx.createAnalyser();
-      analizador.fftSize = 256;
-      datos = new Uint8Array(analizador.frequencyBinCount);
-      IW.audio.out.connect(analizador);
-
-      IW.audio.loop(BPM, function (n, t) {
-        var paso = n % 16;
-        var compas = Math.floor(n / 16);
-        var acorde = compas % 4;
-        var sec = nombreSeccion(compas);
-        var seg = 60 / BPM;
-
-        if (paso === 0) {
-          compasTotal = compas;
-          // Pad: el acorde entero, largo y suave
-          ACORDES[acorde].forEach(function (f, i) {
-            IW.audio.tone({ when: t, f: f, dur: seg * 4.2, type: 'sawtooth', vol: sec === 'drop' ? 0.03 : 0.04, attack: 0.5, filter: sec === 'intro' ? 700 : 1600, detune: (i - 1) * 6 });
-            IW.audio.tone({ when: t, f: f * 2, dur: seg * 4, type: 'sine', vol: 0.015, attack: 0.8 });
-          });
-        }
-        if (sec !== 'intro') {
-          if (paso % 4 === 0) { IW.audio.kick(t, sec === 'drop' ? 0.75 : 0.5); golpeEn(t); }
-          if (paso % 2 === 1) IW.audio.noise({ when: t, dur: 0.05, freq: 9000, type: 'highpass', vol: sec === 'drop' ? 0.06 : 0.035 });
-          if (paso % 4 === 2) IW.audio.tone({ when: t, f: BAJOS[acorde] * 2, dur: seg * 0.45, type: 'square', vol: 0.06, filter: 500 });
-          // Arpegio
-          var nota = ACORDES[acorde][paso % 3] * 2;
-          IW.audio.tone({ when: t, f: nota, dur: seg * 0.22, type: 'triangle', vol: 0.03 });
-        } else if (paso % 8 === 4) {
-          IW.audio.noise({ when: t, dur: 0.06, freq: 7000, type: 'highpass', vol: 0.02 });
-        }
-        if (sec === 'drop') {
-          if (paso === 4 || paso === 12) IW.audio.noise({ when: t, dur: 0.18, freq: 1900, vol: 0.16 });
-          var m = MELODIA[paso];
-          if (m >= 0) IW.audio.tone({ when: t, f: PENTA[m], dur: seg * 0.5, type: 'square', vol: 0.028, filter: 2600 });
-        }
-        // Subida antes del drop
-        if (compas % 16 === 7 && paso >= 8) {
-          IW.audio.noise({ when: t, dur: 0.08, freq: 2000 + paso * 400, vol: 0.02 + paso * 0.004 });
-        }
+    function marcarActual() {
+      el.grid.querySelectorAll('.iw-mp__tile').forEach(function (b) {
+        var on = Number(b.dataset.i) === actual;
+        b.classList.toggle('iw-mp__tile--on', on);
+        b.classList.toggle('iw-mp__tile--paused', on && audio.paused);
+        if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
       });
     }
 
-    function golpeEn(t) {
-      var ms = Math.max(0, (t - IW.audio.ctx.currentTime) * 1000);
-      setTimeout(function () { golpe = 1; }, ms);
+    /* ---------- Reproducción ---------- */
+    function cargar(i, tocar) {
+      if (!cola.length) return;
+      actual = (i + cola.length) % cola.length;
+      var t = cola[actual];
+      audio.src = t.preview;
+      el.cover.src = t.cover;
+      el.title.textContent = t.title;
+      el.artist.textContent = t.artist;
+      el.link.href = t.link || 'https://music.apple.com/';
+      el.bg.style.backgroundImage = 'url("' + t.cover.replace(/"/g, '') + '")';
+      el.fill.style.transform = 'scaleX(0)';
+      el.cur.textContent = '0:00';
+      if ('mediaSession' in navigator) {
+        try {
+          navigator.mediaSession.metadata = new window.MediaMetadata({ title: t.title, artist: t.artist, artwork: [{ src: t.cover, sizes: '600x600' }] });
+        } catch (e) { /* no disponible */ }
+      }
+      marcarActual();
+      if (tocar) reproducir();
     }
 
-    /* ---------- Tocar la pantalla: una nota más ---------- */
-    root.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('input, button, a')) return;
-      if (!IW.audio.ctx) return;
-      var f = PENTA[Math.floor((1 - e.clientY / H) * PENTA.length) % PENTA.length] || PENTA[0];
-      IW.audio.tone({ f: f, dur: 0.9, type: 'triangle', vol: 0.09 });
-      IW.audio.tone({ f: f * 2, dur: 0.6, type: 'sine', vol: 0.03 });
-      for (var i = 0; i < (reducido ? 6 : 22); i++) {
-        var a = Math.random() * Math.PI * 2;
-        var v = 1 + Math.random() * 4;
-        chispas.push({ x: e.clientX, y: e.clientY, vx: Math.cos(a) * v, vy: Math.sin(a) * v, vida: 50, h: 280 + Math.random() * 90 });
+    function reproducir() {
+      var p = audio.play();
+      if (p && p.catch) {
+        p.then(function () { pendiente = false; tocadas++; }).catch(function () {
+          // Autoplay bloqueado: el botón de play late hasta el primer toque
+          pendiente = true;
+          actualizarBoton();
+        });
+      }
+    }
+
+    function alternar() {
+      if (actual < 0) { cargar(0, true); return; }
+      if (audio.paused) reproducir(); else audio.pause();
+    }
+
+    function siguiente() { cargar(actual + 1, true); }
+
+    function anterior() {
+      if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+      cargar(actual - 1, true);
+    }
+
+    function actualizarBoton() {
+      var pausado = audio.paused;
+      el.play.innerHTML = pausado ? ICONOS.play : ICONOS.pause;
+      el.play.setAttribute('aria-label', pausado ? 'Play' : 'Pause');
+      el.play.classList.toggle('iw-mp__btn--waiting', pausado && pendiente);
+      // En silencio, la realidad vuelve
+      root.classList.toggle('iw-mp--paused', pausado);
+      marcarActual();
+    }
+
+    audio.addEventListener('play', actualizarBoton);
+    audio.addEventListener('pause', actualizarBoton);
+    audio.addEventListener('ended', siguiente);           // nunca hay silencio
+    // Si una vista previa falla, se pasa a la siguiente; si fallan varias
+    // seguidas (el navegador no reproduce AAC), se detiene y se avisa.
+    var fallos = 0;
+    audio.addEventListener('playing', function () { fallos = 0; });
+    audio.addEventListener('error', function () {
+      fallos++;
+      if (fallos >= 4) {
+        IW.ui.toast("This browser can't play these previews. Try Chrome, Edge or Safari.", 6000);
+        return;
+      }
+      setTimeout(siguiente, 400);
+    });
+    audio.addEventListener('loadedmetadata', function () { el.dur.textContent = fmt(audio.duration); });
+    audio.addEventListener('timeupdate', function () {
+      var d = audio.duration || 30;
+      el.cur.textContent = fmt(audio.currentTime);
+      el.fill.style.transform = 'scaleX(' + Math.min(1, audio.currentTime / d).toFixed(3) + ')';
+      el.seek.setAttribute('aria-valuenow', Math.round((audio.currentTime / d) * 100));
+    });
+
+    /* ---------- Controles ---------- */
+    el.play.addEventListener('click', alternar);
+    el.next.addEventListener('click', siguiente);
+    el.prev.addEventListener('click', anterior);
+    el.vol.addEventListener('input', function () {
+      audio.volume = el.vol.value / 100;
+      root.style.setProperty('--vol', (el.vol.value / 100).toFixed(2));
+    });
+    el.seek.addEventListener('click', function (e) {
+      var r = el.seek.getBoundingClientRect();
+      if (audio.duration) audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+    });
+
+    el.grid.addEventListener('click', function (e) {
+      var b = e.target.closest('.iw-mp__tile');
+      if (!b) return;
+      if (b.classList.contains('iw-mp__tile--residue')) { IW.ui.toast(c.scene.residue); return; }
+      var i = Number(b.dataset.i);
+      if (i === actual) alternar(); else cargar(i, true);
+    });
+
+    el.genres.addEventListener('click', function (e) {
+      var b = e.target.closest('.iw-mp__chip');
+      if (!b) return;
+      filtro = b.dataset.g;
+      pintarGeneros();
+      pintarPared();
+      // Al elegir un género, suena una canción de ese género
+      if (filtro !== 'All') {
+        var primera = cola.findIndex(function (t) { return t.genre === filtro; });
+        if (primera >= 0 && cola[actual] && cola[actual].genre !== filtro) cargar(primera, true);
       }
     });
 
-    /* ---------- Visualizador ---------- */
-    var t0 = performance.now();
-    function dibujar(t) {
-      var seg = (t - t0) / 1000;
-      if (analizador) analizador.getByteFrequencyData(datos);
-      golpe *= 0.9;
+    document.addEventListener('keydown', function (e) {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' && e.key === ' ')) return;
+      if (e.key === ' ') { e.preventDefault(); alternar(); }
+      if (e.key === 'ArrowRight') siguiente();
+      if (e.key === 'ArrowLeft') anterior();
+    });
 
-      var intensidad = 0.3 + nivel * 0.7;
-      var bg = g.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.7);
-      bg.addColorStop(0, 'hsl(' + (290 + Math.sin(seg * 0.2) * 30) + ',70%,' + (16 + golpe * 10 * intensidad) + '%)');
-      bg.addColorStop(1, '#07051a');
-      g.fillStyle = bg;
-      g.fillRect(0, 0, W, H);
+    // El primer toque en cualquier parte arranca la música si estaba bloqueada
+    window.addEventListener('pointerdown', function () { if (pendiente && audio.paused) reproducir(); }, { capture: true });
 
-      var cx = W / 2, cy = H * 0.46;
-      var base = Math.min(W, H) * (0.16 + golpe * 0.02 * intensidad);
-      var n = datos ? datos.length : 64;
-
-      g.globalCompositeOperation = 'lighter';
-      for (var i = 0; i < n; i++) {
-        var v = datos ? datos[i] / 255 : 0.15 + Math.abs(Math.sin(seg * 1.4 + i * 0.3)) * 0.1;
-        var a = (i / n) * Math.PI * 2 - Math.PI / 2;
-        var largo = base * 0.2 + v * base * 1.6 * intensidad;
-        var x1 = cx + Math.cos(a) * base, y1 = cy + Math.sin(a) * base;
-        var x2 = cx + Math.cos(a) * (base + largo), y2 = cy + Math.sin(a) * (base + largo);
-        g.strokeStyle = 'hsla(' + (260 + i * 2.2) + ',95%,' + (55 + v * 20) + '%,' + (0.35 + v * 0.65) + ')';
-        g.lineWidth = Math.max(2, (Math.PI * 2 * base) / n * 0.55);
-        g.lineCap = 'round';
-        g.beginPath();
-        g.moveTo(x1, y1);
-        g.lineTo(x2, y2);
-        g.stroke();
-      }
-
-      var nucleo = g.createRadialGradient(cx, cy, 0, cx, cy, base);
-      nucleo.addColorStop(0, 'rgba(255,240,255,' + (0.35 + golpe * 0.4) + ')');
-      nucleo.addColorStop(1, 'rgba(180,120,255,0)');
-      g.fillStyle = nucleo;
-      g.beginPath();
-      g.arc(cx, cy, base, 0, Math.PI * 2);
-      g.fill();
-
-      chispas.forEach(function (p) {
-        p.x += p.vx; p.y += p.vy; p.vy += 0.03; p.vida--;
-        g.fillStyle = 'hsla(' + p.h + ',95%,70%,' + (p.vida / 50) + ')';
-        g.beginPath();
-        g.arc(p.x, p.y, 2.4, 0, Math.PI * 2);
-        g.fill();
-      });
-      chispas = chispas.filter(function (p) { return p.vida > 0; });
-      g.globalCompositeOperation = 'source-over';
-
-      // Progreso dentro de la canción (16 compases)
-      barra.style.transform = 'scaleX(' + (((compasTotal % 16) + 1) / 16).toFixed(3) + ')';
-      var s = nombreSeccion(compasTotal);
-      if (s !== seccionActual && IW.audio.ctx) {
-        seccionActual = s;
-        seccion.textContent = s;
-        root.dataset.section = s;
-      }
-
-      requestAnimationFrame(dibujar);
+    if ('mediaSession' in navigator) {
+      try {
+        navigator.mediaSession.setActionHandler('nexttrack', siguiente);
+        navigator.mediaSession.setActionHandler('previoustrack', anterior);
+      } catch (e) { /* no disponible */ }
     }
-    requestAnimationFrame(dibujar);
-    aplicarVolumen();
 
-    IW.ui.startCard({
-      kicker: 'Headphones on',
-      title: 'Somewhere Louder',
-      sub: c.scene.pleasure,
-      button: 'Play'
-    }).then(function () {
-      if (!IW.audio.ctx) return;
-      crearMurmullo();
-      aplicarVolumen();
-      tocar();
-      vol.focus({ preventScroll: true });
-      setTimeout(function () { IW.ui.toast('Turn it up.'); }, 2500);
+    /* ---------- Inicio: suena sola al llegar ---------- */
+    pintarGeneros();
+    pintarPared();
+    actualizarBoton();
+
+    IW.ui.startCard().then(function () {
+      if (!cola.length) return;
+      cargar(0, true);
+      el.play.focus({ preventScroll: true });
     });
   };
 })();

@@ -183,6 +183,14 @@ html, body { margin: 0; height: 100%; }
 
 .iw-body .iw-mute:hover { opacity: 1; }
 
+/* El navegador aún no deja sonar: una pista discreta que late */
+.iw-mute--hint {
+  background: rgba(255, 143, 196, .25);
+  color: #fff;
+  opacity: 1;
+  animation: iw-latido 1.4s ease-in-out infinite alternate;
+}
+
 .iw-flash {
   position: fixed;
   inset: 0;

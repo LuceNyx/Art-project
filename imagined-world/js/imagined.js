@@ -33,33 +33,15 @@
     },
 
     /**
-     * Tarjeta de inicio del aparato. Devuelve una promesa que se cumple
-     * con el clic (y enciende el sonido, salvo que esté silenciado).
+     * Antes había una tarjeta "Play" / "Start". Ya no: la experiencia
+     * arranca sola al terminar la transición (la frase del goce se ve en la
+     * transición). El sonido se enciende ya; si el navegador lo bloquea,
+     * empieza con el primer toque o tecla (ver audio.js).
+     * Se mantiene el nombre para que las experiencias no cambien.
      */
-    startCard: function (o) {
-      var card = document.getElementById('iw-card');
-      card.querySelector('.iw-card__kicker').textContent = o.kicker || '';
-      card.querySelector('.iw-card__title').textContent = o.title || '';
-      card.querySelector('.iw-card__sub').textContent = o.sub || '';
-      var boton = card.querySelector('.iw-card__go');
-      boton.textContent = o.button || 'Play';
-      card.hidden = false;
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () { card.classList.add('iw-card--on'); });
-      });
-      setTimeout(function () { boton.focus({ preventScroll: true }); }, 60);
-
-      return new Promise(function (resolver) {
-        function ir() {
-          boton.removeEventListener('click', ir);
-          // Siempre se enciende el motor; si estaba silenciado, suena a volumen 0
-          IW.audio.start();
-          card.classList.remove('iw-card--on');
-          setTimeout(function () { card.hidden = true; }, reducido ? 0 : 500);
-          resolver();
-        }
-        boton.addEventListener('click', ir);
-      });
+    startCard: function () {
+      IW.audio.start();
+      return new Promise(function (resolver) { setTimeout(resolver, reducido ? 0 : 350); });
     }
   };
 

@@ -166,79 +166,310 @@
 /* =========================================================================
    AUDÍFONOS · MÚSICA
    ========================================================================= */
-.iw-music { --vol: .35; }
+/* Pared de portadas + reproductor abajo */
+.iw-mp {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--iw-ui);
+  background: #0c0818;
+}
 
-/* Las voces de la realidad: se apagan cuando sube el volumen */
-.iw-music__voices { position: absolute; inset: 0; pointer-events: none; }
+/* Fondo: la portada que suena, enorme y desenfocada */
+.iw-mp__bg {
+  position: absolute;
+  inset: -12%;
+  background-position: center;
+  background-size: cover;
+  filter: blur(70px) saturate(1.5) brightness(.5);
+  transition: opacity 1s;
+}
 
-.iw-music__voices span {
+/* Géneros */
+.iw-mp__genres {
+  position: absolute;
+  top: clamp(1rem, 3vw, 1.6rem);
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  gap: .45rem;
+  max-width: calc(100vw - 13rem);
+  overflow-x: auto;
+  scrollbar-width: none;
+  translate: -50% 0;
+}
+
+.iw-mp__chip {
+  flex: none;
+  padding: .45rem .95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  font-size: .85rem;
+  font-weight: 600;
+  transition: background-color .2s, color .2s;
+}
+
+.iw-body .iw-mp__chip:hover { background: rgba(255, 255, 255, .22); }
+.iw-mp__chip[aria-pressed="true"] { background: #fff; color: #120c24; }
+
+/* La pared: cuadritos de portadas */
+.iw-mp__grid {
+  position: absolute;
+  inset: clamp(6.6rem, 14vh, 7.6rem) 0 6.6rem 0;   /* debajo del portal */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(96px, 11vw, 170px), 1fr));
+  align-content: start;
+  gap: clamp(.4rem, 1vw, .7rem);
+  padding: 0 clamp(.8rem, 3vw, 2rem) 1rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, .25) transparent;
+  transition: filter 1.2s var(--iw-ease);
+}
+
+.iw-mp__tile {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: .6rem;
+  background: #1c1530;
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .8);
+  transition: scale .25s var(--iw-ease), box-shadow .25s;
+}
+
+/* La imagen va fuera del flujo: así el cuadrito es siempre 1:1 y las filas no se pisan */
+.iw-mp__tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.iw-body .iw-mp__tile:hover, .iw-mp__tile:focus-visible { scale: 1.04; z-index: 1; }
+
+.iw-mp__tile-genre {
+  position: absolute;
+  left: .4rem;
+  top: .4rem;
+  padding: .12rem .45rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .5);
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.iw-mp__tile-info {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: grid;
+  padding: 1.6rem .55rem .5rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, .85));
+  text-align: left;
+  font-size: .78rem;
+  line-height: 1.2;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.iw-mp__tile-info b { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.iw-mp__tile-info i { font-style: normal; opacity: .75; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.iw-body .iw-mp__tile:hover .iw-mp__tile-info,
+.iw-body .iw-mp__tile:hover .iw-mp__tile-genre,
+.iw-mp__tile:focus-visible .iw-mp__tile-info,
+.iw-mp__tile--on .iw-mp__tile-info { opacity: 1; }
+
+/* La que suena */
+.iw-mp__tile--on {
+  box-shadow: 0 0 0 3px #ff8fc4, 0 0 30px 4px rgba(255, 143, 196, .55);
+}
+
+.iw-mp__eq {
+  position: absolute;
+  right: .5rem;
+  top: .5rem;
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, .55);
+}
+
+.iw-mp__tile--on .iw-mp__eq { display: flex; }
+
+.iw-mp__eq i {
+  width: 3px;
+  height: 100%;
+  border-radius: 1px;
+  background: #ff8fc4;
+  transform-origin: bottom;
+  animation: iw-eq .5s ease-in-out infinite alternate;
+}
+
+.iw-mp__eq i:nth-child(2) { animation-delay: -.2s; }
+.iw-mp__eq i:nth-child(3) { animation-delay: -.35s; }
+.iw-mp__eq i:nth-child(4) { animation-delay: -.1s; }
+
+.iw-mp__tile--paused .iw-mp__eq i { animation-play-state: paused; }
+
+@keyframes iw-eq { from { transform: scaleY(.2); } to { transform: scaleY(1); } }
+
+/* El residuo: una portada gris entre todas */
+.iw-mp__tile--residue { background: #cfcfcf; filter: grayscale(1); }
+.iw-mp__tile--residue img { object-fit: contain; padding: 16%; opacity: .85; }
+
+.iw-mp__grid { grid-auto-rows: max-content; }
+.iw-mp__tile--residue .iw-mp__tile-info { color: #fff; font-family: "EB Garamond", Georgia, serif; font-style: italic; }
+
+.iw-mp__empty { grid-column: 1 / -1; text-align: center; opacity: .7; }
+
+/* En pausa: el color se va y las voces de la realidad vuelven */
+.iw-mp__voices { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+
+.iw-mp__voices span {
   position: absolute;
   left: var(--x);
   top: var(--y);
-  color: #c9c9c9;
+  color: #d6d6d6;
   font-family: "EB Garamond", Georgia, serif;
   font-style: italic;
-  font-size: clamp(1rem, 2.2vw, 1.6rem);
-  filter: grayscale(1) blur(calc(var(--vol) * 6px));
-  opacity: calc(1 - var(--vol) * 1.1);
+  font-size: clamp(1.1rem, 2.4vw, 1.8rem);
+  text-shadow: 0 2px 14px #000;
+  filter: grayscale(1);
+  opacity: 0;
+  transition: opacity 1.4s var(--iw-ease);
   animation: iw-voz 14s ease-in-out calc(var(--i) * -2.3s) infinite alternate;
-  transition: opacity .4s, filter .4s;
 }
+
+.iw-mp--paused .iw-mp__voices span { opacity: .9; }
+.iw-mp--paused .iw-mp__grid { filter: grayscale(.85) brightness(.55); }
+.iw-mp--paused .iw-mp__bg { opacity: .2; }
 
 @keyframes iw-voz { to { translate: 4vw -3vh; } }
 
-.iw-music__track {
+/* Barra del reproductor */
+.iw-mp__bar {
   position: absolute;
-  left: clamp(.9rem, 3vw, 1.8rem);
-  bottom: clamp(1rem, 4vh, 2rem);
-  width: min(20rem, 60vw);
-  padding: .9rem 1.1rem;
-  border-radius: 1rem;
-  background: rgba(14, 8, 40, .55);
-  backdrop-filter: blur(10px);
-  font-family: var(--iw-ui);
-}
-
-.iw-music__now { margin: 0; font-size: .68rem; letter-spacing: .25em; text-transform: uppercase; opacity: .6; }
-.iw-music__title { margin: .2rem 0 0; font-family: var(--iw-font); font-style: italic; font-size: 1.35rem; }
-.iw-music__artist { margin: 0 0 .7rem; font-size: .78rem; opacity: .65; }
-
-.iw-music__bar { height: 4px; overflow: hidden; border-radius: 4px; background: rgba(255, 255, 255, .15); }
-.iw-music__bar span { display: block; height: 100%; background: linear-gradient(90deg, #ff8fc4, #b38cff); transform-origin: left; transform: scaleX(0); transition: transform .4s; }
-
-.iw-music__section { margin: .45rem 0 0; font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
-.iw-music[data-section="drop"] .iw-music__section { color: #ff8fc4; opacity: 1; }
-
-/* Control de volumen grande y vertical */
-.iw-music__volume {
-  position: absolute;
-  right: clamp(1rem, 4vw, 2.4rem);
-  top: 50%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
   display: grid;
-  justify-items: center;
-  gap: .7rem;
-  translate: 0 -50%;
-  font-family: var(--iw-ui);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  min-height: 6.6rem;
+  padding: .7rem clamp(1rem, 3vw, 2rem);
+  background: rgba(10, 6, 24, .86);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, .08);
 }
 
-.iw-music__volume-label { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; }
-.iw-music__volume-value { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.iw-mp__now { display: flex; align-items: center; gap: .8rem; min-width: 0; }
 
-.iw-music__volume input {
-  writing-mode: vertical-lr;
-  direction: rtl;
+.iw-mp__now-cover {
+  flex: none;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: .4rem;
+  object-fit: cover;
+  background: #241b3c;
+}
+
+.iw-mp__now-text { display: grid; min-width: 0; }
+.iw-mp__now-title { margin: 0; font-weight: 700; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.iw-mp__now-artist { margin: 0; font-size: .85rem; opacity: .7; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.iw-mp__now-link { font-size: .72rem; color: #ff8fc4; text-decoration: none; opacity: .85; }
+
+.iw-mp__center { display: grid; justify-items: center; gap: .45rem; }
+
+.iw-mp__buttons { display: flex; align-items: center; gap: 1.1rem; }
+
+.iw-mp__btn {
+  display: grid;
+  place-items: center;
   width: 2.6rem;
-  height: min(46vh, 22rem);
-  accent-color: #ff8fc4;
+  height: 2.6rem;
+  border-radius: 50%;
+  transition: background-color .2s, scale .2s;
+}
+
+.iw-mp__btn svg { width: 1.4rem; height: 1.4rem; fill: #fff; }
+
+.iw-body .iw-mp__btn:hover { background: rgba(255, 255, 255, .12); }
+
+.iw-mp__btn--main { width: 3.2rem; height: 3.2rem; background: #fff; }
+.iw-mp__btn--main svg { fill: #120c24; }
+.iw-body .iw-mp__btn--main:hover { background: #fff; scale: 1.07; }
+
+/* El navegador bloqueó el sonido: el play late */
+.iw-mp__btn--waiting { box-shadow: 0 0 0 0 rgba(255, 143, 196, .7); animation: iw-pulso 1.3s ease-out infinite; }
+
+@keyframes iw-pulso { to { box-shadow: 0 0 0 16px rgba(255, 143, 196, 0); } }
+
+.iw-mp__progress {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .72rem;
+  font-variant-numeric: tabular-nums;
+  opacity: .85;
+}
+
+.iw-mp__track {
+  position: relative;
+  width: min(30rem, 36vw);
+  height: 5px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .2);
   cursor: pointer;
 }
 
-.iw-music__residue {
-  right: clamp(5rem, 12vw, 9rem);
-  top: clamp(5rem, 14vh, 8rem);
-  width: clamp(3.4rem, 7vw, 5rem);
-  aspect-ratio: 1;
-  opacity: .75;
+.iw-mp__track span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #ff8fc4, #b38cff);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.iw-mp__vol {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .6rem;
+  padding-right: 7rem;   /* deja sitio al botón de sonido */
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .85;
+}
+
+.iw-mp__vol input { width: min(9rem, 12vw); accent-color: #ff8fc4; }
+
+.iw-mp__credit {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: 7rem;
+  z-index: 4;
+  margin: 0;
+  font-size: .66rem;
+  opacity: .45;
+}
+
+/* En el reproductor, el botón de sonido va dentro de la barra */
+.iw-body[data-medium="music"] .iw-mute { bottom: 2.1rem; }
+
+@media (max-width: 40rem) {
+  .iw-mp__genres { left: 6.2rem; right: .8rem; max-width: none; translate: none; }
+  .iw-mp__grid { inset: 6.8rem 0 9.4rem 0; grid-template-columns: repeat(3, 1fr); }
+  .iw-mp__bar { grid-template-columns: 1fr; gap: .5rem; min-height: 9.4rem; padding-bottom: 1rem; }
+  .iw-mp__vol { display: none; }
+  .iw-mp__track { width: 62vw; }
+  .iw-mp__credit { display: none; }
+  /* El botón de sonido flota justo encima de la barra */
+  .iw-body[data-medium="music"] .iw-mute { bottom: 10rem; right: .8rem; }
 }
 
 /* =========================================================================

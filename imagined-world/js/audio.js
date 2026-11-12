@@ -56,6 +56,17 @@
     IW.audio.ctx = ctx;
     IW.audio.out = nivel;   // pasa por el volumen de la experiencia
     IW.audio.bus = master;  // directo (solo lo afecta el silencio)
+
+    // Si el navegador no deja sonar sin un gesto en esta página,
+    // el primer toque o tecla (en cualquier parte) lo desbloquea.
+    if (ctx.state === 'suspended') {
+      var desbloquear = function () {
+        ctx.resume().then(actualizarBoton);
+        ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { window.removeEventListener(ev, desbloquear, true); });
+      };
+      ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { window.addEventListener(ev, desbloquear, true); });
+      ctx.addEventListener('statechange', actualizarBoton);
+    }
     actualizarBoton();
     return true;
   }
@@ -161,7 +172,10 @@
     var b = document.getElementById('iw-mute');
     if (!b) return;
     var sonando = ctx && !muted;
-    b.textContent = sonando ? 'sound on' : 'sound off';
+    var bloqueado = ctx && ctx.state === 'suspended' && !muted;
+    // Si el navegador aún no deja sonar: una pista discreta, no una pantalla
+    b.classList.toggle('iw-mute--hint', !!bloqueado);
+    b.textContent = bloqueado ? 'tap for sound' : sonando ? 'sound on' : 'sound off';
     b.setAttribute('aria-pressed', sonando ? 'false' : 'true');
     b.setAttribute('aria-label', sonando ? 'Sound is on. Turn sound off' : 'Sound is off. Turn sound on');
   }
@@ -171,6 +185,8 @@
     if (b) {
       b.addEventListener('click', function () {
         if (!ctx) { muted = false; guardar(); start(); return; }
+        // Si estaba bloqueado, este toque ya lo desbloqueó: no silenciar
+        if (b.classList.contains('iw-mute--hint')) { ctx.resume().then(actualizarBoton); return; }
         setMuted(!muted);
       });
     }
