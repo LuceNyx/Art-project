@@ -72,4 +72,4 @@ Todo lo que está dentro de `muted-world/` pertenece al Muted World. Para conect
 
 No edites `muted-world/css/muted.css` ni los demás archivos de `muted-world/js/`. Usa siempre tus propios prefijos (`tr-`, `iw-`) y tu propio objeto global, para no chocar con `window.MutedWorld`.
 
-`transition/index.html` es un **PLACEHOLDER**: se puede reemplazar completo.
+La transición ya está hecha (`transition/`, ver su README). Muestra la forma de escapismo de cada situación y pasa al Imagined World con los mismos `from` y `motif`.

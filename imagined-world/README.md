@@ -43,8 +43,11 @@ Todo el código vive dentro de `window.ImaginedWorld`: no hay otras variables gl
 
 ## Interacción
 
+- Normalmente se llega desde `transition/`, que muestra la forma de escapismo de la situación.
 - Recibe `from` y `motif` mediante los parámetros de la URL. Si faltan o no son válidos, se abre una versión neutra del mundo.
-- **Arrival / The Threshold:** la pantalla blanca con la que se salió del *Muted World* se abre en color. Aparece una frase de llegada y el botón *Step in*.
+- **Arrival / The Threshold:** el blanco con el que termina la transición se abre en color. Arriba aparece **el goce**: la razón por la que se escapa (*"The music is louder than the room."*, *"Your friends are online."*…). Debajo, la frase de llegada y el botón *Step in*.
+- **El goce en el aire:** una de cada tres partículas tiene la forma del escapismo de esa situación: notas (música), corazones (reels), píxeles (construir), anillos (juego en línea), marcos (series), rombos (decisiones) o destellos (VR).
+- **Portal a la realidad:** arriba a la izquierda hay una rendija gris, la puerta del cuarto, que **parpadea** como un fluorescente viejo y emite un anillo que pide atención. Muestra, uno tras otro, mensajes del cuarto (*"Due 8:00 AM"*, *"Seen 11:42 PM"*…). A los 20 s parpadea más rápido y a los 50 s además tiembla. Al hacer clic se vuelve al Muted World (`?return=<scene>`). Es lo único de la interfaz que está en blanco y negro.
 - **The Open World:** el mundo se recorre en horizontal con la rueda del mouse, arrastrando con el dedo, con las flechas del teclado o con los botones de zona. Los elementos interactivos se descubren al activarlos. Cuando se descubren todos, la luz crece.
 - **The Quiet Edge:** una orilla con agua donde se refleja el motivo. Aparecen tres líneas de reflexión y dos opciones: *Return to your room* o *Stay a little longer*.
 - Todo se puede usar con mouse, teclado (Tab, Enter, flechas) o pantalla táctil.
@@ -75,6 +78,7 @@ Todo el código vive dentro de `window.ImaginedWorld`: no hay otras variables gl
 - Los ids coinciden con `muted-world/INTEGRATION.md` y `muted-world/js/config.js`.
 - Los SVG se cargan desde `../muted-world/assets/motifs/<motif>.svg`, sin duplicarlos.
 - Regreso: `../muted-world/index.html?return=<scene>`
+- `medium`, `pleasure` y `reality` de cada situación están en `js/scene-data.js`. `medium` coincide con la forma de escapismo de `transition/js/transition.js`.
 - Este módulo no modifica `muted-world/` ni `transition/`.
 
 ## Créditos

@@ -1,0 +1,781 @@
+/* =========================================================================
+   TRANSICIÓN DINÁMICA · transition.css
+   Cronología común (≈ 7 s):
+     0–1 s    llega en blanco (como se salió del Muted World)
+     0–1.5 s  la forma de escapismo aparece en GRIS: todavía es la realidad
+     1.5–4 s  el color la invade
+     5.6–7 s  la cámara se zambulle dentro y todo se vuelve luz
+   Cada forma de escapismo tiene su bloque. Prefijo obligatorio: .tr-
+   ========================================================================= */
+
+:root {
+  --tr-h: 280;   /* tono principal; cambia según la forma de escapismo */
+  --tr-font: "Fraunces", Georgia, "Times New Roman", serif;
+}
+
+/* Un color por forma de escapismo */
+body[data-medium="video"]   { --tr-h: 14; }
+body[data-medium="online"]  { --tr-h: 172; }
+body[data-medium="music"]   { --tr-h: 286; }
+body[data-medium="choice"]  { --tr-h: 42; }
+body[data-medium="feed"]    { --tr-h: 332; }
+body[data-medium="vr"]      { --tr-h: 222; }
+body[data-medium="sandbox"] { --tr-h: 134; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; height: 100%; }
+
+.tr-body {
+  overflow: hidden;
+  background: #0c0c12;
+  color: #fff;
+  font-family: var(--tr-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tr-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   ESCENARIO COMÚN
+   ========================================================================= */
+.tr-stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-bottom: 18vh;   /* deja sitio abajo para las frases */
+  overflow: hidden;
+  background: #0c0c12;
+  animation: tr-color 7.2s linear both;
+}
+
+/* Gris al principio (la realidad), color después (el escape) */
+@keyframes tr-color {
+  0%, 20% { filter: grayscale(1) contrast(1.1); }
+  58%, 100% { filter: grayscale(0) contrast(1); }
+}
+
+/* Resplandor de color detrás de todo */
+.tr-stage::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 50% 50%, hsla(var(--tr-h), 80%, 55%, .42), transparent 55%),
+    radial-gradient(circle at 20% 80%, hsla(calc(var(--tr-h) + 60), 80%, 60%, .22), transparent 50%),
+    radial-gradient(circle at 80% 20%, hsla(calc(var(--tr-h) - 50), 80%, 60%, .22), transparent 50%);
+  opacity: 0;
+  animation: tr-aparecer 2.6s 1.6s ease-out both;
+}
+
+/* Grano de la realidad: se va apagando */
+.tr-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .14;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: tr-desvanecer 2.4s 1.2s ease-out both;
+}
+
+.tr-scene {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  animation: tr-zambullir 1.8s 5.6s cubic-bezier(.6, 0, .4, 1) both;
+}
+
+/* Al final, la cámara entra en el medio */
+@keyframes tr-zambullir {
+  to { transform: scale(3.6); filter: blur(6px) brightness(1.5); }
+}
+
+/* Frases breves */
+.tr-caption {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 6vh;
+  z-index: 5;
+  display: grid;
+  justify-items: center;
+  gap: .35rem;
+  padding-inline: 1.5rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.tr-line {
+  margin: 0;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.3rem, 3.6vmin, 2.3rem);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, .65);
+  opacity: 0;
+  animation: tr-frase 4.4s both;
+}
+
+.tr-line:nth-child(1) { animation-delay: 1.1s; }
+.tr-line:nth-child(2) { animation-delay: 3.3s; }
+
+@keyframes tr-frase {
+  0% { opacity: 0; filter: blur(6px); translate: 0 8px; }
+  18%, 72% { opacity: 1; filter: none; translate: 0 0; }
+  100% { opacity: 0; }
+}
+
+/* Llegada en blanco y salida en blanco */
+.tr-white {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #fff;
+  pointer-events: none;
+  animation: tr-desvanecer 1s .15s ease-out both;
+}
+
+.tr-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: radial-gradient(circle, #fff 0 40%, #fff6ec 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease-in;
+}
+
+.tr-burst--on { opacity: 1; }
+
+.tr-skip {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 40;
+  padding: .45rem .9rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .7);
+  font: inherit;
+  font-size: .9rem;
+  letter-spacing: .05em;
+  cursor: pointer;
+}
+
+.tr-skip:hover { color: #fff; background: rgba(255, 255, 255, .16); }
+
+.tr-skip:focus { outline: none; }
+.tr-skip:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 20px 4px rgba(255, 255, 255, .45); }
+
+.tr-noscript {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-style: italic;
+  font-size: 1.3rem;
+}
+
+.tr-noscript a { color: #fff; }
+
+/* Animaciones comunes */
+@keyframes tr-aparecer { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tr-desvanecer { to { opacity: 0; visibility: hidden; } }
+@keyframes tr-girar { to { rotate: 360deg; } }
+@keyframes tr-latir { to { scale: 1.35; } }
+@keyframes tr-pop {
+  from { opacity: 0; scale: .2; }
+  to { opacity: 1; scale: 1; }
+}
+
+/* =========================================================================
+   VIDEO · Academic pressure (el portátil)
+   ========================================================================= */
+.tr-laptop {
+  display: grid;
+  justify-items: center;
+  width: min(78vmin, 640px);
+}
+
+.tr-laptop__screen {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 10px solid #1d1d22;
+  border-bottom-width: 12px;
+  border-radius: 14px 14px 4px 4px;
+  background: #08080c;
+  box-shadow: 0 0 90px 10px hsla(var(--tr-h), 80%, 60%, .28);
+  transform-origin: 50% 100%;
+  animation: tr-abrir 1.5s .4s cubic-bezier(.3, 0, .2, 1) both;
+}
+
+/* La tapa entreabierta se abre: de una línea de luz a la pantalla entera */
+@keyframes tr-abrir {
+  from { transform: perspective(900px) rotateX(-84deg); }
+  to { transform: perspective(900px) rotateX(0); }
+}
+
+.tr-laptop__base {
+  width: 112%;
+  height: 3.4vmin;
+  margin-top: -2px;
+  border-radius: 0 0 40% 40% / 0 0 100% 100%;
+  background: linear-gradient(#2c2c33, #141418);
+}
+
+.tr-play {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 12%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: #fff;
+  clip-path: polygon(22% 10%, 90% 50%, 22% 90%);
+  opacity: 0;
+  animation: tr-play 1.4s 1.7s both;
+}
+
+@keyframes tr-play {
+  0% { opacity: 0; scale: .6; }
+  30% { opacity: 1; scale: 1; }
+  100% { opacity: 0; scale: 1.7; }
+}
+
+.tr-thumbs {
+  position: absolute;
+  left: 0;
+  top: 22%;
+  display: flex;
+  gap: 2.4vmin;
+  width: max-content;
+  height: 34%;
+  padding-left: 4%;
+  opacity: 0;
+  animation: tr-aparecer .8s 2.6s both, tr-desfile 6s 2.6s linear infinite;
+}
+
+.tr-thumbs span {
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  background: linear-gradient(135deg, hsl(var(--h) 75% 64%), hsl(calc(var(--h) + 40) 70% 40%));
+}
+
+@keyframes tr-desfile { to { transform: translateX(-50%); } }
+
+.tr-bar {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 12%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .2);
+  opacity: 0;
+  animation: tr-aparecer .6s 2.2s both;
+}
+
+.tr-bar span {
+  display: block;
+  height: 100%;
+  background: hsl(var(--tr-h) 90% 64%);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: tr-llenar 3.2s 2.4s linear both;
+}
+
+@keyframes tr-llenar { to { transform: scaleX(1); } }
+
+.tr-next {
+  position: absolute;
+  right: 5%;
+  bottom: 20%;
+  margin: 0;
+  padding: .4em .9em;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .14);
+  font-size: clamp(.8rem, 2.4vmin, 1.15rem);
+  opacity: 0;
+  animation: tr-aparecer .6s 3s both;
+}
+
+.tr-next b { font-weight: 400; }
+
+/* =========================================================================
+   ONLINE · Loneliness (el mando)
+   ========================================================================= */
+.tr-online {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72vmin;
+  aspect-ratio: 1;
+}
+
+.tr-online__core {
+  width: 2.6vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 22px 6px rgba(255, 255, 255, .7);
+  animation: tr-latir 1.1s ease-in-out infinite alternate;
+}
+
+.tr-online__ring {
+  position: absolute;
+  width: 15vmin;
+  aspect-ratio: 1;
+  border: 3px solid transparent;
+  border-top-color: hsl(var(--tr-h) 90% 70%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: tr-aparecer .5s .7s both, tr-girar 1s linear infinite;
+}
+
+.tr-online__status {
+  position: absolute;
+  top: 60%;
+  margin: 0;
+  font-size: clamp(1rem, 2.8vmin, 1.35rem);
+  letter-spacing: .04em;
+  opacity: 0;
+  animation: tr-aparecer .6s .9s both;
+}
+
+.tr-avatar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8.5vmin;
+  aspect-ratio: 1;
+  margin: -4.25vmin 0 0 -4.25vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, hsl(var(--h) 90% 82%), hsl(var(--h) 70% 48%));
+  box-shadow: 0 0 26px 4px hsla(var(--h), 90%, 65%, .45);
+  transform: rotate(var(--a)) translate(28vmin) rotate(calc(-1 * var(--a)));
+  opacity: 0;
+  animation: tr-pop .7s var(--d) cubic-bezier(.2, .8, .3, 1.4) both;
+}
+
+.tr-avatar i {
+  position: absolute;
+  left: 50%;
+  bottom: 118%;
+  translate: -50% 0;
+  padding: .25em .65em;
+  border-radius: 1em;
+  background: #fff;
+  color: #1d1d22;
+  font-style: normal;
+  font-size: clamp(.72rem, 2vmin, 1rem);
+  white-space: nowrap;
+  opacity: 0;
+  animation: tr-aparecer .5s calc(var(--d) + .4s) both;
+}
+
+/* =========================================================================
+   MUSIC · Emotional overload (los audífonos)
+   ========================================================================= */
+.tr-music {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 68vmin;
+  aspect-ratio: 1;
+}
+
+.tr-headphones {
+  position: relative;
+  z-index: 2;
+  width: 30vmin;
+  color: #bdbdbd;
+  animation: tr-audifonos 3s 1.2s both;
+}
+
+@keyframes tr-audifonos {
+  to { color: hsl(var(--tr-h) 85% 78%); filter: drop-shadow(0 0 24px hsl(var(--tr-h) 90% 65%)); }
+}
+
+/* Ondas de sonido */
+.tr-wave {
+  position: absolute;
+  width: 30vmin;
+  aspect-ratio: 1;
+  border: 2px solid hsl(var(--tr-h) 90% 72%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: tr-onda 2.4s var(--d) ease-out infinite;
+}
+
+@keyframes tr-onda {
+  0% { opacity: .9; scale: .6; }
+  100% { opacity: 0; scale: 3.3; }
+}
+
+/* Las notas grises del corcho salen volando con el sonido */
+.tr-paper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9vmin;
+  height: 7vmin;
+  margin: -3.5vmin 0 0 -4.5vmin;
+  background: #cfcfcf;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .5);
+  transform: translate(var(--x), var(--y)) rotate(var(--r));
+  animation: tr-volar 1.6s var(--d) ease-in both;
+}
+
+@keyframes tr-volar {
+  to {
+    transform: translate(calc(var(--x) * 3), calc(var(--y) * 3 - 30vmin)) rotate(calc(var(--r) * 4));
+    opacity: 0;
+  }
+}
+
+.tr-eq {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  display: flex;
+  align-items: flex-end;
+  gap: .6vmin;
+  height: 16vmin;
+  translate: -50% 0;
+  opacity: 0;
+  animation: tr-aparecer .8s 2s both;
+}
+
+.tr-eq span {
+  width: 1.6vmin;
+  height: 100%;
+  border-radius: 4px;
+  background: hsl(var(--h) 85% 66%);
+  transform-origin: bottom;
+  animation: tr-eq var(--d) ease-in-out infinite alternate;
+}
+
+@keyframes tr-eq {
+  from { transform: scaleY(.12); }
+  to { transform: scaleY(1); }
+}
+
+/* =========================================================================
+   CHOICE · Lack of control (la luz bajo la puerta)
+   ========================================================================= */
+.tr-choice {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(80vmin, 640px);
+  aspect-ratio: 4 / 3;
+}
+
+.tr-choice__door {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  width: 60%;
+  height: 1.2%;
+  translate: -50% 0;
+  background: #fff;
+  box-shadow: 0 0 34px 10px rgba(255, 255, 255, .7);
+  animation: tr-puerta 1.6s .5s cubic-bezier(.5, 0, .2, 1) both;
+}
+
+@keyframes tr-puerta {
+  0% { height: 1.2%; width: 60%; }
+  45% { height: 1.2%; width: 70%; }
+  100% { height: 96%; width: 46%; opacity: .14; }
+}
+
+.tr-choice__map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tr-route {
+  fill: none;
+  stroke: hsl(var(--tr-h) 92% 70%);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  filter: drop-shadow(0 0 6px hsl(var(--tr-h) 90% 66%));
+  animation: tr-trazar 1.2s var(--d) ease-out forwards;
+}
+
+@keyframes tr-trazar { to { stroke-dashoffset: 0; } }
+
+.tr-node {
+  fill: #fff;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tr-pop .6s var(--d) both;
+}
+
+/* =========================================================================
+   FEED · Social comparison (la foto en blanco → reels)
+   ========================================================================= */
+.tr-feed {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.tr-phone {
+  width: min(32vmin, 280px);
+  aspect-ratio: 9 / 17;
+  overflow: hidden;
+  border: 8px solid #1d1d22;
+  border-radius: 2.4rem;
+  background: #f2f2f2;
+  box-shadow: 0 0 90px 10px hsla(var(--tr-h), 80%, 60%, .32);
+  animation: tr-de-foto 1.4s .4s cubic-bezier(.3, 0, .2, 1) both;
+}
+
+/* Empieza como la foto en blanco (pequeña, torcida) y se vuelve pantalla */
+@keyframes tr-de-foto {
+  from { transform: scale(.5) rotate(-6deg); border-radius: 4px; border-color: #e6e6e6; }
+  to { transform: none; }
+}
+
+/* Scroll infinito que se acelera (cada animación toma el relevo) */
+.tr-feed__col {
+  display: flex;
+  flex-direction: column;
+  gap: 3%;
+  padding: 4%;
+  animation:
+    tr-scroll 2.2s 1.6s linear 1,
+    tr-scroll .9s 3.8s linear 2,
+    tr-scroll .35s 5.6s linear infinite;
+}
+
+@keyframes tr-scroll { to { transform: translateY(-50%); } }
+
+.tr-card {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 100%;
+  aspect-ratio: 9 / 12;
+  border-radius: 14px;
+  background: linear-gradient(160deg, hsl(var(--h) 80% 72%), hsl(calc(var(--h) + 50) 75% 50%));
+}
+
+.tr-card i {
+  position: absolute;
+  left: 8%;
+  bottom: 8%;
+  width: 46%;
+  height: 4%;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .75);
+}
+
+.tr-heart {
+  position: absolute;
+  left: calc(50% + var(--x));
+  bottom: 18%;
+  width: 3.4vmin;
+  aspect-ratio: 1;
+  background: hsl(350 90% 66%);
+  clip-path: polygon(50% 100%, 4% 46%, 2% 22%, 16% 4%, 34% 2%, 50% 18%, 66% 2%, 84% 4%, 98% 22%, 96% 46%);
+  opacity: 0;
+  animation: tr-subir 2.2s var(--d) ease-out infinite;
+}
+
+@keyframes tr-subir {
+  0% { opacity: 0; transform: translateY(0) scale(.6); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-3vmin, -36vmin) scale(1.25); }
+}
+
+/* =========================================================================
+   VR · Uncertain future (la ventana encendida → visor)
+   ========================================================================= */
+.tr-vr {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 92vmin;
+  height: 62vmin;
+}
+
+.tr-vr__window {
+  position: absolute;
+  z-index: 2;
+  width: 4vmin;
+  height: 6vmin;
+  background: #f2f2f2;
+  box-shadow: 0 0 34px 10px rgba(255, 255, 255, .6);
+  animation: tr-ventana 1.7s .5s cubic-bezier(.5, 0, .2, 1) both;
+}
+
+@keyframes tr-ventana {
+  70% { transform: scale(4, 3); opacity: 1; }
+  100% { transform: scale(9, 5); opacity: 0; }
+}
+
+.tr-vr__lenses {
+  display: flex;
+  gap: 4vmin;
+  opacity: 0;
+  animation: tr-aparecer 1s 1.7s both;
+}
+
+.tr-vr__lens {
+  position: relative;
+  width: 36vmin;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 6px solid #1d1d22;
+  border-radius: 50%;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, .6), 0 0 70px hsla(var(--tr-h), 80%, 60%, .38);
+}
+
+.tr-vr__view {
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(circle at 50% 60%, hsl(42 100% 82%) 0 6%, transparent 7%),
+    linear-gradient(180deg, hsl(230 60% 30%), hsl(270 50% 55%) 48%, hsl(25 90% 76%) 61%, hsl(172 42% 38%) 62%, hsl(160 45% 22%));
+  animation: tr-mirar 6s 1.7s ease-in-out both;
+}
+
+@keyframes tr-mirar {
+  from { transform: translateX(-6%) scale(1.15); }
+  to { transform: translateX(6%) scale(1); }
+}
+
+.tr-vr__label {
+  position: absolute;
+  bottom: -4%;
+  margin: 0;
+  font-size: clamp(.9rem, 2.6vmin, 1.25rem);
+  letter-spacing: .12em;
+  opacity: 0;
+  animation: tr-aparecer .8s 2.2s both;
+}
+
+/* =========================================================================
+   SANDBOX · Family expectations (la consola portátil)
+   ========================================================================= */
+.tr-sandbox {
+  display: grid;
+  justify-items: center;
+}
+
+.tr-handheld {
+  display: flex;
+  align-items: center;
+  gap: 3vmin;
+  padding: 3vmin 4vmin;
+  border-radius: 6vmin;
+  background: linear-gradient(#2c2c33, #17171c);
+  box-shadow: 0 30px 60px -20px #000;
+}
+
+.tr-handheld__screen {
+  width: min(50vmin, 420px);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 1.2vmin;
+  background: #ececec;
+  box-shadow: 0 0 50px 6px rgba(255, 255, 255, .35);
+}
+
+.tr-handheld__pad {
+  width: 6.5vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #0d0d10;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, .08);
+}
+
+/* Un mundo de bloques que se construye de abajo hacia arriba */
+.tr-pixels {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.tr-pixels span {
+  background: var(--c);
+  opacity: 0;
+  animation: tr-bloque .45s var(--d) cubic-bezier(.2, .8, .3, 1.3) both;
+}
+
+@keyframes tr-bloque {
+  from { opacity: 0; transform: translateY(-60%) scale(.4); }
+  to { opacity: 1; transform: none; }
+}
+
+.tr-sandbox__title {
+  margin: 2.6vmin 0 0;
+  font-size: clamp(.85rem, 2.4vmin, 1.15rem);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: tr-aparecer .8s 4.3s both;
+}
+
+/* =========================================================================
+   SCREEN · sin situación
+   ========================================================================= */
+.tr-screen__glow {
+  display: block;
+  width: 4vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, hsl(var(--tr-h) 90% 70%) 50%, transparent 70%);
+  animation: tr-crecer 5s .6s ease-in both;
+}
+
+@keyframes tr-crecer { to { transform: scale(18); } }
+
+/* =========================================================================
+   MOVIMIENTO REDUCIDO: un solo cuadro quieto, ya en color
+   (transition.js añade .tr-static y pasa a los 2,6 s)
+   ========================================================================= */
+.tr-static *, .tr-static *::before, .tr-static *::after { animation: none !important; }
+.tr-static .tr-white { display: none; }
+.tr-static .tr-stage { filter: none; }
+.tr-static .tr-stage::before { opacity: 1; }
+.tr-static .tr-stage::after { opacity: 0; }
+.tr-static .tr-scene *,
+.tr-static .tr-line { opacity: 1; }
+.tr-static .tr-route { stroke-dashoffset: 0; }
+.tr-static .tr-bar span { transform: none; }
+.tr-static .tr-paper,
+.tr-static .tr-vr__window,
+.tr-static .tr-play,
+.tr-static .tr-wave,
+.tr-static .tr-heart,
+.tr-static .tr-choice__door { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-iteration-count: 1 !important; }
+}

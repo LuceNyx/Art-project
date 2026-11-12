@@ -868,6 +868,120 @@ html, body { margin: 0; height: 100%; }
 
 .iw-response--on { opacity: 1; }
 
+/* =========================================================================
+   PORTAL A LA REALIDAD
+   Lo único de la interfaz en blanco y negro (como el Muted World).
+   Parpadea como un fluorescente viejo y, con el tiempo, llama más.
+   imagined.js añade --louder (20 s) y --loudest (50 s).
+   ========================================================================= */
+.iw-portal {
+  position: fixed;
+  left: clamp(.9rem, 3vw, 1.8rem);
+  top: clamp(.9rem, 3vw, 1.8rem);
+  z-index: 12;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: .8rem;
+  padding: .4rem;
+  border-radius: 1rem;
+  color: #d0d0d0;
+  text-decoration: none;
+  filter: grayscale(1);
+}
+
+.iw-portal__door {
+  position: relative;
+  width: clamp(2.6rem, 4vw, 3.4rem);
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: 3px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #2a2a2a, #0c0c0c);
+  box-shadow: 0 0 0 2px #3a3a3a, 0 8px 24px rgba(0, 0, 0, .55);
+  transition: scale .6s var(--iw-ease);
+}
+
+/* La rendija de luz de la puerta del cuarto */
+.iw-portal__crack {
+  position: absolute;
+  left: 46%;
+  top: 6%;
+  bottom: 6%;
+  width: 3px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 0 10px 3px rgba(255, 255, 255, .8);
+  animation: iw-fluorescente 3.2s steps(1) infinite;
+}
+
+/* Un anillo que se expande: "atiéndeme" */
+.iw-portal__ring {
+  position: absolute;
+  left: .4rem;
+  top: 50%;
+  width: clamp(2.6rem, 4vw, 3.4rem);
+  aspect-ratio: 2 / 3;
+  translate: 0 -50%;
+  border: 2px solid rgba(220, 220, 220, .7);
+  border-radius: 6px;
+  pointer-events: none;
+  animation: iw-llamar 2.6s ease-out infinite;
+}
+
+.iw-portal__msg {
+  max-width: 13rem;
+  padding: .3rem .6rem;
+  border-radius: .4rem;
+  background: rgba(10, 10, 10, .55);
+  font-family: "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(.85rem, 1.3vw, 1rem);
+  line-height: 1.25;
+  opacity: 0;
+  transition: opacity 1.2s var(--iw-ease);
+}
+
+.iw-portal__msg--on { opacity: 1; }
+
+.iw-body .iw-portal:hover .iw-portal__door,
+.iw-body .iw-portal:focus-visible .iw-portal__door { scale: 1.12; }
+
+.iw-body .iw-portal:focus-visible { box-shadow: 0 0 0 2px #d0d0d0, 0 0 24px 6px rgba(210, 210, 210, .5); }
+
+/* Con el tiempo, la realidad insiste */
+.iw-portal--louder .iw-portal__crack { animation-duration: 1.6s; }
+.iw-portal--louder .iw-portal__ring { animation-duration: 1.6s; border-width: 3px; }
+
+.iw-portal--loudest .iw-portal__crack { animation-duration: .9s; }
+.iw-portal--loudest .iw-portal__ring { animation-duration: 1.1s; }
+.iw-portal--loudest .iw-portal__door { animation: iw-zumbido 4s ease-in-out infinite; }
+
+@keyframes iw-fluorescente {
+  0%, 100% { opacity: 1; }
+  8% { opacity: .2; }
+  10% { opacity: 1; }
+  46% { opacity: .9; }
+  48% { opacity: .1; }
+  51% { opacity: 1; }
+  53% { opacity: .35; }
+  55% { opacity: 1; }
+}
+
+@keyframes iw-llamar {
+  0% { opacity: .9; scale: 1; }
+  100% { opacity: 0; scale: 1.9; }
+}
+
+@keyframes iw-zumbido {
+  0%, 86%, 100% { translate: 0 0; }
+  88% { translate: -2px 0; }
+  90% { translate: 2px 0; }
+  92% { translate: -2px 0; }
+  94% { translate: 1px 0; }
+}
+
 .iw-mute {
   position: fixed;
   top: clamp(.9rem, 3vw, 1.6rem);
