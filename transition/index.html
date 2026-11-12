@@ -1,57 +1,43 @@
 <!DOCTYPE html>
 <!--
-  =====================================================================
-  PLACEHOLDER — será reemplazado por la parte de mis compañeros
-  (la TRANSICIÓN DINÁMICA). Este archivo solo sirve para probar que el
-  Muted World envía bien la escena y el motivo. Se puede sobrescribir
-  completo sin dudar. Contrato: ver muted-world/INTEGRATION.md
-  =====================================================================
+  TRANSICIÓN DINÁMICA · Digital Escapism
+  Recibe ?from=<scene>&motif=<motif> desde el Muted World, muestra la forma
+  de escapismo de esa situación (series, juego en línea, música, decisiones,
+  reels, realidad virtual o construir) y entrega al visitante al
+  Imagined World con los mismos datos. Ver transition/README.md
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Transition (placeholder) · Digital Escapism</title>
-  <style>
-    /* Prefijo tr- reservado para la transición */
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f2f2f2; color: #111; font-family: Georgia, serif; }
-    .tr-placeholder { display: grid; gap: 1rem; justify-items: center; padding: 2rem; text-align: center; }
-    .tr-placeholder__tag { font: 600 .75rem/1 monospace; letter-spacing: .2em; padding: .4rem .7rem; border: 1px dashed #111; }
-    .tr-placeholder__motif { width: 160px; height: 160px; }
-    .tr-placeholder code { background: #ddd; padding: .1rem .35rem; }
-    .tr-placeholder a { color: inherit; font-style: italic; font-size: 1.2rem; }
-  </style>
+  <title>Transition · Digital Escapism</title>
+  <meta name="theme-color" content="#0c0c12">
+
+  <!-- Única dependencia externa: tipografía Fraunces (SIL Open Font License) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap">
+
+  <link rel="stylesheet" href="css/transition.css">
 </head>
-<body>
-  <main class="tr-placeholder">
-    <span class="tr-placeholder__tag">PLACEHOLDER — TRANSITION</span>
-    <p>Received scene: <code id="tr-scene">—</code> · motif: <code id="tr-motif">—</code></p>
-    <img class="tr-placeholder__motif" id="tr-motif-img" alt="">
-    <a id="tr-back" href="../muted-world/index.html">Return to the room</a>
+<body class="tr-body">
+
+  <main class="tr-stage" id="tr-stage" aria-labelledby="tr-title">
+    <h1 class="tr-visually-hidden" id="tr-title">Leaving the room</h1>
+    <div class="tr-scene" id="tr-scene"><!-- transition.js --></div>
+    <div class="tr-caption" id="tr-caption" aria-live="polite"></div>
   </main>
 
-  <script>
-    (function () {
-      'use strict';
-      // Solo se aceptan ids simples (letras, números y guiones)
-      function limpio(valor) { return /^[a-z0-9-]+$/.test(valor || '') ? valor : ''; }
+  <!-- Llega en blanco (igual que se salió del Muted World) y se va en blanco -->
+  <div class="tr-white" aria-hidden="true"></div>
+  <div class="tr-burst" id="tr-burst" aria-hidden="true"></div>
 
-      var params = new URLSearchParams(location.search);
-      var scene = limpio(params.get('from'));
-      var motif = limpio(params.get('motif'));
+  <button class="tr-skip" id="tr-skip" type="button">Skip</button>
 
-      document.getElementById('tr-scene').textContent = scene || '(none)';
-      document.getElementById('tr-motif').textContent = motif || '(none)';
+  <noscript>
+    <p class="tr-noscript"><a href="../imagined-world/index.html">Continue to the imagined world</a></p>
+  </noscript>
 
-      if (motif) {
-        var img = document.getElementById('tr-motif-img');
-        img.src = '../muted-world/assets/motifs/' + motif + '.svg';
-        img.alt = 'Motif: ' + motif;
-      }
-      if (scene) {
-        document.getElementById('tr-back').href = '../muted-world/index.html?return=' + scene;
-      }
-    })();
-  </script>
+  <script src="js/transition.js"></script>
 </body>
 </html>

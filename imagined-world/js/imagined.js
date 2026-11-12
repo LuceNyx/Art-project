@@ -56,6 +56,35 @@
     setTimeout(function () { acciones.hidden = false; }, 600 + scene.edge.length * pausa);
   }
 
+  /* ---------- Portal a la realidad ---------- */
+  // La realidad insiste: el portal parpadea siempre, y con el tiempo más
+  var INSISTE_MAS = 20000;     // ms
+  var INSISTE_MUCHO = 50000;   // ms
+
+  function iniciarPortal(scene, urlRegreso) {
+    var portal = document.getElementById('iw-portal');
+    var msg = document.getElementById('iw-portal-msg');
+    if (!portal) return;
+    portal.href = urlRegreso;
+
+    // Mensajes del cuarto que se cuelan, uno tras otro
+    var mensajes = scene.reality && scene.reality.length ? scene.reality : ['Your room is still there.'];
+    var i = 0;
+    function siguiente() {
+      msg.textContent = mensajes[i % mensajes.length];
+      msg.classList.add('iw-portal__msg--on');
+      i++;
+      setTimeout(function () { msg.classList.remove('iw-portal__msg--on'); }, 3600);
+    }
+    setTimeout(function () {
+      siguiente();
+      setInterval(siguiente, 6000);
+    }, 4000);
+
+    setTimeout(function () { portal.classList.add('iw-portal--louder'); }, INSISTE_MAS);
+    setTimeout(function () { portal.classList.add('iw-portal--loudest'); }, INSISTE_MUCHO);
+  }
+
   /* ---------- Inicio ---------- */
   function init() {
     var params = new URLSearchParams(window.location.search);
@@ -76,12 +105,15 @@
     raiz.setProperty('--iw-sun', scene.palette.sun);
     document.body.dataset.scene = elegida.id || 'none';
 
-    // Textos de llegada
+    // Textos de llegada: el goce (por qué se escapa) y la frase del mundo
     document.getElementById('iw-arrival').textContent = scene.arrival;
-    if (!elegida.id) document.getElementById('iw-kicker').textContent = 'You are somewhere else.';
+    document.getElementById('iw-kicker').textContent = scene.pleasure || 'You left the room.';
+    document.body.dataset.medium = scene.medium || 'screen';
 
     // Salida: de vuelta a la misma situación del Muted World
-    document.getElementById('iw-return').href = IW.data.RETURN_URL + (elegida.id ? '?return=' + encodeURIComponent(elegida.id) : '');
+    var urlRegreso = IW.data.RETURN_URL + (elegida.id ? '?return=' + encodeURIComponent(elegida.id) : '');
+    document.getElementById('iw-return').href = urlRegreso;
+    iniciarPortal(scene, urlRegreso);
 
     IW.audio.init();
     IW.world.init(

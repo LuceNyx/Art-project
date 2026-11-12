@@ -138,6 +138,52 @@
   var COLORES = ['255,236,200', '190,240,226', '240,214,255', '255,214,200'];
   var particulas = [];
   var pctx = null;
+  var forma = 'screen';   // forma de escapismo: cambia la silueta de algunas partículas
+
+  /*
+   * El goce, en el aire: una de cada tres partículas tiene la forma del
+   * escapismo de la situación (notas, corazones, píxeles, marcos…).
+   */
+  function figura(x, y, r, color, alfa) {
+    var s = r * 3.2;
+    pctx.fillStyle = 'rgba(' + color + ',' + alfa + ')';
+    pctx.strokeStyle = 'rgba(' + color + ',' + alfa + ')';
+    pctx.lineWidth = Math.max(1, r * 0.5);
+    pctx.beginPath();
+    if (forma === 'music') {
+      // Nota musical
+      pctx.ellipse(x, y, s * 0.42, s * 0.32, -0.4, 0, 6.29);
+      pctx.fill();
+      pctx.fillRect(x + s * 0.3, y - s * 1.4, Math.max(1.2, r * 0.45), s * 1.4);
+      return;
+    }
+    if (forma === 'feed') {
+      // Corazón
+      pctx.moveTo(x, y + s * 0.5);
+      pctx.bezierCurveTo(x - s, y - s * 0.2, x - s * 0.4, y - s, x, y - s * 0.35);
+      pctx.bezierCurveTo(x + s * 0.4, y - s, x + s, y - s * 0.2, x, y + s * 0.5);
+      pctx.fill();
+      return;
+    }
+    if (forma === 'sandbox') { pctx.fillRect(x - s / 2, y - s / 2, s, s); return; }
+    if (forma === 'online') { pctx.arc(x, y, s * 0.5, 0, 6.29); pctx.stroke(); return; }
+    if (forma === 'video') { pctx.strokeRect(x - s * 0.6, y - s * 0.38, s * 1.2, s * 0.76); return; }
+    if (forma === 'choice') {
+      pctx.moveTo(x, y - s * 0.6); pctx.lineTo(x + s * 0.45, y); pctx.lineTo(x, y + s * 0.6); pctx.lineTo(x - s * 0.45, y);
+      pctx.fill();
+      return;
+    }
+    if (forma === 'vr') {
+      // Destello de cuatro puntas
+      pctx.moveTo(x, y - s * 0.7); pctx.lineTo(x + s * 0.15, y - s * 0.15); pctx.lineTo(x + s * 0.7, y);
+      pctx.lineTo(x + s * 0.15, y + s * 0.15); pctx.lineTo(x, y + s * 0.7); pctx.lineTo(x - s * 0.15, y + s * 0.15);
+      pctx.lineTo(x - s * 0.7, y); pctx.lineTo(x - s * 0.15, y - s * 0.15);
+      pctx.fill();
+      return;
+    }
+    pctx.arc(x, y, r, 0, 6.29);
+    pctx.fill();
+  }
 
   function iniciarParticulas() {
     var c = document.getElementById('iw-particles');
@@ -176,6 +222,10 @@
           if (p.x > window.innerWidth + 10) p.x = -10;
         }
         var a = 0.25 + 0.35 * Math.abs(Math.sin(t * 0.0008 + p.f));
+        if (i % 3 === 0 && forma !== 'screen') {
+          figura(p.x, p.y, p.r, p.c, (a * 1.2).toFixed(2));
+          continue;
+        }
         var g = pctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
         g.addColorStop(0, 'rgba(' + p.c + ',' + a.toFixed(2) + ')');
         g.addColorStop(1, 'rgba(' + p.c + ',0)');
@@ -391,6 +441,7 @@
       capas.push({ el: c, depth: parseFloat(c.dataset.depth) || 0 });
     });
 
+    forma = scene.medium || 'screen';
     crearEstrellas();
     crearHierba();
     iniciarParticulas();

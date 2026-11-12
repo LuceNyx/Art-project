@@ -18,6 +18,10 @@
   /*
    * Cada situación:
    *   motif        → id del motivo que llega desde la realidad
+   *   medium       → forma de escapismo (la misma de transition/): video,
+   *                  online, music, choice, feed, vr, sandbox
+   *   pleasure     → el goce: por qué se escapa (frase sobre la llegada)
+   *   reality      → mensajes de la realidad que muestra el portal de regreso
    *   palette      → ligera variación de color del cielo y la luz
    *   arrival      → frase de llegada (The Threshold)
    *   kind         → tipo de elemento interactivo del Open World
@@ -32,6 +36,9 @@
     'academic-pressure': {
       motif: 'stacked-paper',
       motifDescription: 'the stack of paper from your desk',
+      medium: 'video',
+      pleasure: 'The next episode started on its own.',
+      reality: ['Due 8:00 AM', 'It was due yesterday.', 'p. 1 / 312'],
       palette: { skyTop: '#1c2a66', skyMid: '#5a4ea6', horizon: '#ffb48c', sun: '#ffd98a' },
       arrival: 'Nothing is due here.',
       kind: 'lantern',
@@ -49,6 +56,9 @@
     'loneliness': {
       motif: 'unanswered-bubble',
       motifDescription: 'the unanswered message',
+      medium: 'online',
+      pleasure: 'Your friends are online.',
+      reality: ['Seen 11:42 PM', 'hey', 'are you up?'],
       palette: { skyTop: '#16224f', skyMid: '#3d4f9a', horizon: '#9fd6d2', sun: '#e6f4ff' },
       arrival: 'Something here noticed you came.',
       kind: 'firefly',
@@ -67,6 +77,9 @@
     'emotional-overload': {
       motif: 'pinned-note',
       motifDescription: 'the pinned note from the board',
+      medium: 'music',
+      pleasure: 'The music is louder than the room.',
+      reality: ['Reply to her.', "Don't forget.", 'Smile more.'],
       palette: { skyTop: '#1a3358', skyMid: '#4f7fa0', horizon: '#c9e8d6', sun: '#fff1c9' },
       arrival: 'Everything is quiet here.',
       kind: 'stone',
@@ -85,6 +98,9 @@
     'lack-of-control': {
       motif: 'stopped-clock',
       motifDescription: 'the clock that stopped at seven',
+      medium: 'choice',
+      pleasure: 'Here, every choice works.',
+      reality: ['7:00 AM', 'Choose.', 'Again.'],
       palette: { skyTop: '#22204f', skyMid: '#6a4f9c', horizon: '#ffc59a', sun: '#ffe1a6' },
       arrival: 'Here, things listen.',
       kind: 'lever',
@@ -102,6 +118,9 @@
     'social-comparison': {
       motif: 'blank-polaroid',
       motifDescription: 'the blank photo from the mirror',
+      medium: 'feed',
+      pleasure: 'The feed never ends.',
+      reality: ['Where were you?', 'You look tired.', 'Best summer ever.'],
       palette: { skyTop: '#2a1f5a', skyMid: '#8a5aa8', horizon: '#ffc2c9', sun: '#fff0d4' },
       arrival: 'Nobody is counting here.',
       kind: 'flower',
@@ -121,6 +140,9 @@
     'uncertain-future': {
       motif: 'lit-window',
       motifDescription: 'the single lit window',
+      medium: 'vr',
+      pleasure: 'Here, the world has a map.',
+      reality: ['What do you want to be?', 'Not yet.', 'Ask again later.'],
       palette: { skyTop: '#152a5e', skyMid: '#3f6fa6', horizon: '#ffd0a0', sun: '#fff0c2' },
       arrival: 'The horizon is wide here.',
       kind: 'path',
@@ -138,6 +160,9 @@
     'family-expectations': {
       motif: 'facedown-frame',
       motifDescription: 'the frame lying face down',
+      medium: 'sandbox',
+      pleasure: 'In this world, you build the rules.',
+      reality: ['Your cousin got in.', "Don't let us down.", 'We gave up so much.'],
       palette: { skyTop: '#1f2a5a', skyMid: '#5f5aa6', horizon: '#ffcfa8', sun: '#ffe6b0' },
       arrival: 'Here, you decide.',
       kind: 'block',
@@ -158,6 +183,9 @@
   var DEFAULT_SCENE = {
     motif: null,
     motifDescription: '',
+    medium: 'screen',
+    pleasure: 'You left the room.',
+    reality: ['Your room is still there.'],
     palette: { skyTop: '#1c2a66', skyMid: '#5a4ea6', horizon: '#ffb48c', sun: '#ffd98a' },
     arrival: 'You came from somewhere.',
     kind: 'lantern',
