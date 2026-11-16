@@ -28,7 +28,7 @@ MUTED WORLD ──clic en un APARATO──► TRANSICIÓN ──► IMAGINED WOR
 
 | Situación (`scene`) | Objeto en el cuarto | Aparato de escape | Transición | Experiencia imaginada | Motivo (residuo) |
 |---|---|---|---|---|---|
-| `academic-pressure` | Lámpara y cuaderno | Portátil | Series | **Series**: capítulos con subtítulos, *Next episode in 5…* automático (`exp-video.js`) | `stacked-paper`, reflejada en la pantalla entre capítulos |
+| `academic-pressure` | Lámpara y cuaderno | Portátil | Series | **Series**: catálogo de 8 plataformas (nombres en texto, no logos) → series populares como tarjetas generadas en código → capítulos con subtítulos, *Next episode in 5…* automático (`exp-video.js`) | `stacked-paper`, reflejada en la pantalla entre capítulos |
 | `loneliness` | Celular en la cama | Mando | Juego en línea | **Juego en línea** con 3 amigos que pelean y escriben, combos, rondas, sin game over (`exp-online.js`) | `unanswered-bubble`, flota y las balas la atraviesan |
 | `emotional-overload` | Corcho | Audífonos | Música | **Reproductor**: pared de portadas de éxitos, filtros por género, anterior/pausa/siguiente; en pausa vuelve la realidad (`exp-music.js`) | `pinned-note`, una portada gris |
 | `lack-of-control` | Reloj | Computadora | Decisiones (transición) | **Creador de personaje y mundo** vóxel: ficha del yo real (gris) frente al avatar personalizable hasta los extremos; luego su mundo (`exp-choice.js`) | `stopped-clock`, junto al contador de cambios |
