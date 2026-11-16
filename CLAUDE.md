@@ -32,7 +32,7 @@ MUTED WORLD ──clic en un APARATO──► TRANSICIÓN ──► IMAGINED WOR
 | `loneliness` | Celular en la cama | Mando | Juego en línea | **Juego en línea** con 3 amigos que pelean y escriben, combos, rondas, sin game over (`exp-online.js`) | `unanswered-bubble`, flota y las balas la atraviesan |
 | `emotional-overload` | Corcho | Audífonos | Música | **Reproductor**: pared de portadas de éxitos, filtros por género, anterior/pausa/siguiente; en pausa vuelve la realidad (`exp-music.js`) | `pinned-note`, una portada gris |
 | `lack-of-control` | Reloj | Computadora | Decisiones | **Decisiones**: cada elección cambia el mundo (`exp-choice.js`) | `stopped-clock`, junto al contador de turnos |
-| `social-comparison` | Espejo con fotos | Celular | Reels | **Reels** con links al azar (`reels.js`) | `blank-polaroid`, tarjeta vacía cada 5 videos |
+| `social-comparison` | Espejo con fotos | Celular | Reels | **Reels** con reproductores oficiales, lista barajada sin repeticiones, gestos y autoplay/sonido por API (`reels.js`) | `blank-polaroid`, tarjeta vacía cada 5 videos |
 | `uncertain-future` | Ventana | Lentes VR | VR | **Vuelo VR** con objetivos siempre claros (`exp-vr.js`) | `lit-window`, en el horizonte, nunca se acerca |
 | `family-expectations` | Foto en el estante | Consola portátil | Construir | **Construir** con bloques, sin evaluación (`exp-sandbox.js`) | `facedown-frame`, bloques que no se pueden tapar |
 
