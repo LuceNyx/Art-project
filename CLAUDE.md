@@ -40,9 +40,9 @@ MUTED WORLD ──clic en un APARATO──► TRANSICIÓN ──► IMAGINED WOR
 
 | Parte | Carpeta | Prefijo CSS | Objeto global | Estado |
 |---|---|---|---|---|
-| Muted World | `muted-world/` | `mw-` | `window.MutedWorld` | **Completo** (7 situaciones). Escapes = **aparatos**. **La puerta NO es un escape**: en la habitación y con *Leave* (Lack of control) lleva a la rutina (`js/routine.js`: reloj acelerado, *Monday… Friday*, *Again.*) y vuelve al cuarto. Imágenes: **placeholders** generados en código (pendiente: ilustraciones reales, ver `assets/img/IMAGE_SPEC.md`) |
+| Muted World | `muted-world/` | `mw-` | `window.MutedWorld` | **Completo** (7 situaciones). Escapes = **aparatos**. **La puerta NO es un escape**: en la habitación y con *Leave* (Lack of control) lleva a la rutina (`js/routine.js`: reloj acelerado, *Monday… Friday*, *Again.*) y vuelve al cuarto. **Con `?return=<scene>` se salta la pantalla de entrada**: la habitación se abre con el foco en ese objeto, ya visitado (más oscuro), y la luz nueva; si el navegador bloquea el sonido, el botón dice *tap for sound*. **Con `?preview=<scene>`** muestra solo el primer plano de la situación, sin sonido ni textos (la ventana del portal). Imágenes: **placeholders** generados en código (pendiente: ilustraciones reales, ver `assets/img/IMAGE_SPEC.md`) |
 | Transición | `transition/` | `tr-` | `window.Transition` | **Completa.** Una animación por aparato: empieza en gris, el color la invade y termina en blanco. Sus dos frases incluyen **el goce** (p. ej. *"The music is louder than the room."*). *Skip* o Enter/Espacio/Escape |
-| Imagined World | `imagined-world/` | `iw-` | `window.ImaginedWorld` | **Sin paisaje: el aparato define la experiencia** (tabla de arriba). **Sin pantallas de inicio**: cada experiencia arranca sola. Siempre: el residuo en gris y el **portal** (arriba a la izquierda) que parpadea, muestra mensajes del cuarto e insiste más a los 20 y 50 s; vuelve a `../muted-world/index.html?return=<scene>` |
+| Imagined World | `imagined-world/` | `iw-` | `window.ImaginedWorld` | **Sin paisaje: el aparato define la experiencia** (tabla de arriba). **Sin pantallas de inicio**: cada experiencia arranca sola. Siempre: el residuo en gris y el **portal** (arriba a la izquierda): una ventana en gris a la escena de origen con su aparato (`muted-world/index.html?preview=<scene>` en un iframe inerte), con chispazos (destellos, glitch en los bordes, luz que titila) que insisten más a los 20 y 50 s, y los mensajes del cuarto. Vuelve a `../muted-world/index.html?return=<scene>` |
 
 ## Archivos que edita el usuario
 
@@ -74,7 +74,8 @@ css/  js/  docs/        Archivos de la v0.1, sin uso en el sitio actual. No borr
 1. Al hacer clic en el aparato de escape, el Muted World dispara en `window`: `CustomEvent('muted:escape', { detail: { scene, motif }, cancelable: true })`.
 2. Si nadie llama a `preventDefault()`, navega a `../transition/index.html?from=<scene>&motif=<motif>`. La transición pasa a `../imagined-world/index.html` con los mismos parámetros.
 3. Datos: `window.MutedWorld.config.MUTED_SCENES` (cargando `muted-world/js/config.js`). Motivos: `muted-world/assets/motifs/<motif>.svg`.
-4. Regreso: `muted-world/index.html?return=<scene>`. La habitación marca la situación como visitada (más oscura) y muestra una luz nueva.
+4. Regreso: `muted-world/index.html?return=<scene>`. Entra directo a la habitación (sin *Click to enter*), con el foco en el objeto de esa situación, marcada como visitada (más oscura) y con una luz nueva.
+5. Miniatura: `muted-world/index.html?preview=<scene>` muestra solo el primer plano de la situación, sin sonido, textos ni controles, y no cuenta como visita. La usa la ventana del portal.
 
 ## Convenciones
 

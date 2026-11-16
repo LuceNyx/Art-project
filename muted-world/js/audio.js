@@ -261,6 +261,34 @@
     Object.keys(CAPAS).forEach(crearCapa);
     aplicarPerfil(2.5); // entrada lenta
     aplicarMaster();
+    // Sin clic previo (regreso directo con ?return=) el navegador puede
+    // dejar el sonido suspendido: se avisa y el primer gesto lo enciende.
+    if (ctx.state === 'suspended') esperarGesto();
+  }
+
+  /* ---------- Sonido bloqueado: "tap for sound" ---------- */
+  var esperando = false;
+  var GESTOS = ['pointerdown', 'keydown', 'touchend'];
+
+  function esperarGesto() {
+    if (esperando) return;
+    esperando = true;
+    actualizarBoton();
+    GESTOS.forEach(function (tipo) { window.addEventListener(tipo, alGesto, true); });
+  }
+
+  function desbloquear() {
+    if (!esperando) return;
+    esperando = false;
+    GESTOS.forEach(function (tipo) { window.removeEventListener(tipo, alGesto, true); });
+    if (ctx) ctx.resume();
+    actualizarBoton();
+  }
+
+  function alGesto(evento) {
+    // El botón de sonido se encarga en su propio clic (así no se silencia)
+    if (evento.target && evento.target.id === 'mw-mute') return;
+    desbloquear();
   }
 
   /** Cambia el ambiente: 'room' o el id de una situación. */
@@ -303,15 +331,23 @@
   function actualizarBoton() {
     var boton = document.getElementById('mw-mute');
     if (!boton) return;
+    var pista = esperando && !muted;
+    boton.classList.toggle('mw-mute--hint', pista);
     boton.setAttribute('aria-pressed', muted ? 'true' : 'false');
-    boton.textContent = muted ? 'sound off' : 'sound on';
-    boton.setAttribute('aria-label', muted ? 'Sound is off. Turn sound on' : 'Sound is on. Turn sound off');
+    boton.textContent = pista ? 'tap for sound' : (muted ? 'sound off' : 'sound on');
+    boton.setAttribute('aria-label', pista ? 'Sound is blocked. Tap to turn it on' :
+      (muted ? 'Sound is off. Turn sound on' : 'Sound is on. Turn sound off'));
   }
 
   function init() {
     var boton = document.getElementById('mw-mute');
     if (boton) {
       boton.addEventListener('click', function () {
+        if (esperando) {
+          var eraPista = !muted;
+          desbloquear();
+          if (eraPista) return; // solo encender el sonido bloqueado
+        }
         start();
         setMuted(!muted);
       });
@@ -327,6 +363,7 @@
     rustle: rustle,
     fastTicks: fastTicks,
     setMuted: setMuted,
-    isMuted: function () { return muted; }
+    isMuted: function () { return muted; },
+    isBlocked: function () { return esperando; }
   };
 })();
