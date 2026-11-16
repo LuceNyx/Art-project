@@ -10,7 +10,7 @@
      choice   computadora               juego de decisiones (exp-choice.js)
      feed     celular                   reels con links al azar (reels.js)
      vr       lentes VR                 vuelo en realidad virtual (exp-vr.js)
-     sandbox  consola portátil          construir con bloques (exp-sandbox.js)
+     sandbox  consola portátil          mini plataformero (exp-sandbox.js)
 
    Campos (los textos que ve el visitante, en inglés):
      motif / motifDescription  el residuo de la realidad (SVG de muted-world)
@@ -81,7 +81,7 @@
       medium: 'sandbox',
       motif: 'facedown-frame',
       motifDescription: 'the frame lying face down',
-      pleasure: 'In this world, you build the rules.',
+      pleasure: 'Run. Jump. Nobody keeps score.',
       reality: ['Your cousin got in.', "Don't let us down.", 'We gave up so much.'],
       residue: 'It is still face down.'
     }
