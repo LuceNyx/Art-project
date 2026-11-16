@@ -128,7 +128,10 @@
     var g = canvas.getContext('2d');
     var ayuda = root.querySelector('#iw-p-help');
     var imgResiduo = IW.motif.img(c.motifId);
-    if (window.matchMedia('(pointer: coarse), (max-width: 40rem)').matches) ayuda.textContent = '◀ ▶ run · ⤒ jump';
+    // En pantallas táctiles el nivel sube para dejar abajo una franja libre a los botones
+    var tactil = window.matchMedia('(pointer: coarse), (max-width: 40rem)').matches;
+    var MARGEN_BOTONES = tactil ? 112 : 0;
+    if (tactil) ayuda.textContent = '◀ ▶ run · ⤒ jump';
 
     var nivel = crearNivel();
     var rebote = {};   // "f,c" → tiempo de animación al golpear un bloque
@@ -144,7 +147,7 @@
       g.setTransform(d, 0, 0, d, 0, 0);
       g.imageSmoothingEnabled = false;
       // En vertical (celular) se ven al menos 12 columnas por delante
-      T = Math.max(24, Math.floor(Math.min(H / FILAS, W / 12)));
+      T = Math.max(24, Math.floor(Math.min((H - MARGEN_BOTONES) / FILAS, W / 12)));
     }
     window.addEventListener('resize', medir);
     medir();
@@ -315,7 +318,7 @@
     function dibujar(t) {
       var objetivo = j.x * T - W * 0.4;
       camX += (Math.max(0, Math.min(COLS * T - W, objetivo)) - camX) * 0.12;
-      var oy = H - FILAS * T;   // el nivel se apoya abajo
+      var oy = H - MARGEN_BOTONES - FILAS * T;   // el nivel se apoya abajo (sobre los botones táctiles)
 
       // Cielo
       var cielo = g.createLinearGradient(0, 0, 0, H);
@@ -349,6 +352,12 @@
           var y = Math.round(f * T + oy - (rebote[f + ',' + col] ? Math.sin((rebote[f + ',' + col] / 12) * Math.PI) * T * 0.3 : 0));
           dibujarTile(tt, x, y, f, col, t);
         }
+      }
+
+      // Tierra bajo el nivel (la franja de los botones táctiles)
+      if (MARGEN_BOTONES) {
+        g.fillStyle = '#8f5230';
+        g.fillRect(0, oy + FILAS * T, W, H);
       }
 
       // Chispas de los bloques ✦
