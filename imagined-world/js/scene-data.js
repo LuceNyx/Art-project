@@ -7,7 +7,7 @@
      video    portátil                  series (exp-video.js)
      online   mando                     juego en línea con amigos (exp-online.js)
      music    audífonos                 dentro de una canción (exp-music.js)
-     choice   computadora               juego de decisiones (exp-choice.js)
+     choice   computadora               crear personaje y mundo (exp-choice.js)
      feed     celular                   reels con links al azar (reels.js)
      vr       lentes VR                 un planeta alienígena inmersivo (exp-vr.js)
      sandbox  consola portátil          mini plataformero (exp-sandbox.js)
@@ -57,7 +57,7 @@
       medium: 'choice',
       motif: 'stopped-clock',
       motifDescription: 'the clock that stopped at seven',
-      pleasure: 'Here, every choice works.',
+      pleasure: 'Here, you can be anyone.',
       reality: ['7:00 AM', 'Choose.', 'Again.'],
       residue: 'It still says seven.'
     },
