@@ -9,7 +9,7 @@
      music    audífonos                 dentro de una canción (exp-music.js)
      choice   computadora               juego de decisiones (exp-choice.js)
      feed     celular                   reels con links al azar (reels.js)
-     vr       lentes VR                 vuelo en realidad virtual (exp-vr.js)
+     vr       lentes VR                 un planeta alienígena inmersivo (exp-vr.js)
      sandbox  consola portátil          mini plataformero (exp-sandbox.js)
 
    Campos (los textos que ve el visitante, en inglés):
