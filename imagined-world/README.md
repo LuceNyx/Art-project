@@ -24,7 +24,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 | 💻 Portátil | Academic pressure | **Series**: capítulos cinematográficos con subtítulos y música que crece. *Next episode in 5…* arranca solo | `js/exp-video.js` |
 | 🖥️ Computadora | Lack of control | **Juego de decisiones**: tres opciones por turno y cada una cambia el mundo al instante | `js/exp-choice.js` |
 | 🥽 Lentes VR | Uncertain future | **Volar en VR**: a través de dos lentes, atraviesas anillos y siempre hay un objetivo claro | `js/exp-vr.js` |
-| 🕹️ Consola portátil | Family expectations | **Construir**: un lienzo de bloques para pintar libremente; nadie evalúa | `js/exp-sandbox.js` |
+| 🕹️ Consola portátil | Family expectations | **Mini plataformero**: personaje pixel art original (gorra y overoles rojos), corre y salta entre plataformas y bloques ✦ con cámara lateral. Sin puntaje ni game over: si cae, reaparece en la última zona segura; la bandera reinicia el nivel. Teclado (flechas/A D + Espacio) y botones táctiles | `js/exp-sandbox.js` |
 
 ### El residuo (la realidad que sigue ahí)
 | Experiencia | Dónde aparece el motivo, en gris |
@@ -35,7 +35,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 | Series | Entre capítulos, en la pantalla oscura, se refleja la pila de hojas |
 | Decisiones | El reloj detenido en las 7:00, junto al contador de turnos que sí avanza |
 | VR | La ventana encendida en el horizonte, que nunca se acerca |
-| Construir | El marco boca abajo ocupa bloques que no se pueden tapar |
+| Plataformero | Bloques grises con el marco boca abajo: un muro que hay que saltar y una plataforma; no se rompen ni se tapan |
 
 Tocar el motivo muestra una frase (*"Still no reply."*, *"It still says seven."*…).
 
