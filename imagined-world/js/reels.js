@@ -1,14 +1,20 @@
 /* =========================================================================
    IMAGINED WORLD · reels.js
-   Si se entra al mundo imaginado con el CELULAR (medium "feed"), lo primero
-   que aparece es un reproductor vertical tipo reels / shorts con un video
-   ELEGIDO AL AZAR de media-links.js.
-   - "Next", la rueda, deslizar hacia arriba o ↓ eligen otro video al azar.
-   - Un contador muestra los videos vistos y un tiempo que corre más
-     rápido de lo real: horas que se van sin notarlo.
-   - Cada pocos videos aparece una tarjeta en blanco: el motivo de la
-     realidad (la foto vacía) se cuela en el feed.
-   - "Put down" deja el celular y muestra el resto del mundo imaginado.
+   CELULAR → REELS (Social comparison)
+   Fluye como TikTok / Instagram, con los reproductores OFICIALES de cada
+   plataforma (el video original, enlazado a su autor):
+   - Orden: el primero al azar; luego una lista BARAJADA de todos los links
+     de media-links.js, sin repetir ninguno hasta agotarlos. Al agotarlos se
+     vuelve a barajar (y el último nunca queda primero).
+   - Deslizar arriba/abajo (capa de gestos sobre el video), rueda, flechas,
+     PageUp/PageDown y botones ▲ ▼. Se puede volver a los anteriores.
+   - Autoplay y sonido por las vías oficiales: YouTube (API de iframe por
+     postMessage: playVideo / unMute) y TikTok (/player/v1 + postMessage:
+     play / unMute). Instagram y Facebook: lo que admiten sus embeds.
+     Si el navegador bloquea el sonido: "tap for sound" y el primer toque o
+     tecla lo enciende; luego se mantiene en los siguientes videos.
+   - El que sale se pausa y se descarga; el siguiente se precarga.
+   - Cada 5 videos, la tarjeta vacía (el residuo: la foto en blanco).
    ========================================================================= */
 
 (function () {
@@ -18,192 +24,359 @@
   var reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var VELOCIDAD_TIEMPO = 40;   // 1 s real = 40 s "de scroll"
-  var CADA_VACIO = 5;          // cada 5 videos, la tarjeta en blanco
-  var PAUSA_RUEDA = 900;       // ms entre cambios con la rueda
+  var CADA_VACIO = 5;          // cada 5 pasos, la tarjeta en blanco
+  var PAUSA_GESTO = 650;       // ms mínimos entre cambios (rueda / gestos)
+  var UMBRAL_SWIPE = 50;       // px para contar un deslizamiento
 
   /* =======================================================================
-     Reconocer cada link y convertirlo en un reproductor incrustado
+     Reconocer cada link → reproductor incrustado oficial
      ======================================================================= */
-  function youtube(id) {
-    return {
-      platform: 'Shorts',
-      embed: 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id +
-        '&playsinline=1&rel=0&modestbranding=1',
-      original: 'https://www.youtube.com/shorts/' + id
-    };
+
+  /** URL del reproductor; autoplay=false se usa para PRECARGAR sin sonar. */
+  function urlEmbed(item, autoplay) {
+    var a = autoplay ? 1 : 0;
+    if (item.platform === 'Shorts') {
+      return 'https://www.youtube.com/embed/' + item.id + '?enablejsapi=1&autoplay=' + a +
+        '&mute=1&loop=1&playlist=' + item.id + '&playsinline=1&rel=0&modestbranding=1&controls=1&origin=' +
+        encodeURIComponent(location.origin === 'null' ? '*' : location.origin);
+    }
+    if (item.platform === 'TikTok') {
+      // Reproductor oficial (el mismo que entrega el oEmbed de TikTok)
+      return 'https://www.tiktok.com/player/v1/' + item.id + '?embed_from=oembed&autoplay=' + a +
+        '&muted=1&loop=1&music_info=1&description=1&rel=0&controls=1&progress_bar=1&play_button=1&volume_control=1';
+    }
+    if (item.platform === 'Instagram') return 'https://www.instagram.com/reel/' + item.id + '/embed/';
+    if (item.platform === 'Facebook') {
+      return 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(item.original) +
+        '&show_text=false&autoplay=' + (autoplay ? 'true' : 'false') + '&mute=0&width=360';
+    }
+    return '';
   }
 
   /**
-   * Devuelve { platform, embed, original } si se puede reproducir aquí,
-   * { platform, link } si solo se puede abrir fuera, o null si no sirve.
+   * { platform, id, original } si se reproduce aquí,
+   * { platform, link } si solo se puede abrir fuera, o null si no es un video.
    */
   function parse(texto) {
     if (typeof texto !== 'string') return null;
     var u;
     try { u = new URL(texto.trim()); } catch (e) { return null; }
     if (u.protocol !== 'https:' && u.protocol !== 'http:') return null;
-
     var host = u.hostname.toLowerCase().replace(/^(www|m|web)\./, '');
     var m;
 
     if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
       m = u.pathname.match(/^\/(?:shorts|embed|live)\/([\w-]{6,})/);
       var v = m ? m[1] : u.searchParams.get('v');
-      return v && /^[\w-]{6,}$/.test(v) ? youtube(v) : null;
+      return v && /^[\w-]{6,}$/.test(v) ? { platform: 'Shorts', id: v, original: 'https://www.youtube.com/shorts/' + v } : null;
     }
     if (host === 'youtu.be') {
       m = u.pathname.match(/^\/([\w-]{6,})/);
-      return m ? youtube(m[1]) : null;
+      return m ? { platform: 'Shorts', id: m[1], original: 'https://www.youtube.com/shorts/' + m[1] } : null;
     }
-
     if (host === 'tiktok.com') {
       m = u.pathname.match(/\/video\/(\d{8,})/) || u.pathname.match(/^\/(?:embed\/v2|player\/v1)\/(\d{8,})/);
-      if (!m) return null; // portada u otra página que no es un video
-      return {
-        platform: 'TikTok',
-        // Mismo reproductor que da el oEmbed oficial de TikTok (silenciado para que el autoplay funcione)
-        embed: 'https://www.tiktok.com/player/v1/' + m[1] + '?embed_from=oembed&autoplay=1&muted=1&loop=1&music_info=1&description=1&rel=0',
-        original: 'https://www.tiktok.com/video/' + m[1]
-      };
+      return m ? { platform: 'TikTok', id: m[1], original: 'https://www.tiktok.com/video/' + m[1] } : null;
     }
     if (host === 'vt.tiktok.com' || host === 'vm.tiktok.com') return { platform: 'TikTok', link: u.href };
-
     if (host === 'instagram.com') {
       m = u.pathname.match(/^\/(?:reel|reels|p|tv)\/([\w-]+)/);
-      if (!m) return null;
-      return {
-        platform: 'Instagram',
-        embed: 'https://www.instagram.com/reel/' + m[1] + '/embed/',
-        original: 'https://www.instagram.com/reel/' + m[1] + '/'
-      };
+      return m ? { platform: 'Instagram', id: m[1], original: 'https://www.instagram.com/reel/' + m[1] + '/' } : null;
     }
-
     if (host === 'facebook.com') {
       if (!/^\/(?:reel\/\d+|watch\/?$|[^/]+\/videos\/\d+)/.test(u.pathname)) return null;
       var limpio = 'https://www.facebook.com' + u.pathname + (u.pathname.indexOf('/watch') === 0 ? u.search : '');
-      return {
-        platform: 'Facebook',
-        embed: 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(limpio) +
-          '&show_text=false&autoplay=true&mute=true&width=360',
-        original: limpio
-      };
+      return { platform: 'Facebook', id: limpio, original: limpio };
     }
     if (host === 'fb.watch') return { platform: 'Facebook', link: u.href };
-
     return null;
   }
 
   /* =======================================================================
-     Estado y DOM
+     Control de los reproductores (vías oficiales por postMessage)
+     ======================================================================= */
+  function enviar(reel, accion) {
+    var f = reel && reel.querySelector('iframe');
+    if (!f || !f.contentWindow) return;
+    var p = reel.dataset.platform;
+    try {
+      if (p === 'Shorts') {
+        var func = { play: 'playVideo', pause: 'pauseVideo', unMute: 'unMute', mute: 'mute' }[accion];
+        f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: [] }), '*');
+        if (accion === 'unMute') f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'setVolume', args: [100] }), '*');
+      } else if (p === 'TikTok') {
+        f.contentWindow.postMessage({ 'x-tiktok-player': true, type: accion, value: null }, '*');
+      }
+    } catch (e) { /* el reproductor aún no está listo */ }
+  }
+
+  /* =======================================================================
+     Estado
      ======================================================================= */
   var el = {};
-  var reproducibles = [];
-  var soloEnlace = [];
-  var ultimo = -1;
-  var vistos = 0;
-  var likes = 0;
-  var segundos = 0;
-  var abierto = false;
+  var reproducibles = [];   // links que se reproducen aquí
+  var soloEnlace = [];      // links que solo se abren fuera
+  var bolsa = [];           // lista barajada en curso
+  var historial = [];       // lo que ya se mostró: { tipo: 'video'|'card'|'blank'|'gen', item }
+  var pos = -1;             // posición actual en el historial
+  var pasos = 0;            // pasos hacia adelante (para la tarjeta vacía)
+  var actual = null;        // elemento .iw-reel en pantalla
+  var precargado = null;    // { entrada, nodo } del siguiente
+  var sonidoOk = false;     // el visitante ya hizo un gesto (sonido permitido)
+  var vistos = 0, likes = 0, segundos = 0;
+  var abierto = false, ultimoCambio = 0;
   var motivoSrc = null;
-  var ultimaRueda = 0;
 
+  function barajar(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /**
+   * Nueva vuelta de la lista. Los últimos que se vieron (hasta 3) van al
+   * FINAL de la nueva vuelta y en el mismo orden en que se vieron: así el
+   * último nunca queda primero y ningún video vuelve a los 2 o 3 pasos.
+   */
+  function rellenarBolsa() {
+    var todos = reproducibles.map(function (x) { return { tipo: 'video', item: x }; })
+      .concat(soloEnlace.map(function (x) { return { tipo: 'card', item: x }; }));
+    var recientes = [];
+    for (var i = historial.length - 1; i >= 0 && recientes.length < Math.min(3, todos.length - 1); i--) {
+      var it = historial[i].item;
+      if (it && recientes.indexOf(it) === -1) recientes.unshift(it);   // del más antiguo al más nuevo
+    }
+    var resto = barajar(todos.filter(function (e) { return recientes.indexOf(e.item) === -1; }));
+    var alFinal = recientes.map(function (it) {
+      return todos.filter(function (e) { return e.item === it; })[0];
+    }).filter(Boolean);
+    bolsa = resto.concat(alFinal);
+  }
+
+  /** La siguiente entrada (sin repetir hasta agotar la lista). */
+  function sacarSiguiente() {
+    pasos++;
+    if (motivoSrc && pasos > 1 && pasos % CADA_VACIO === 0) return { tipo: 'blank' };
+    if (!reproducibles.length && !soloEnlace.length) return { tipo: 'gen' };
+    if (!bolsa.length) rellenarBolsa();
+    return bolsa.shift();
+  }
+
+  /* =======================================================================
+     Construcción de cada reel
+     ======================================================================= */
   function formatearTiempo(s) {
     var min = Math.floor(s / 60);
     if (min < 60) return min + ' min';
-    var h = Math.floor(min / 60);
-    return h + ' h ' + String(min % 60).padStart(2, '0') + ' min';
+    return Math.floor(min / 60) + ' h ' + String(min % 60).padStart(2, '0') + ' min';
   }
 
   function actualizarContador() {
     el.meter.textContent = vistos + (vistos === 1 ? ' video' : ' videos') + ' · ' + formatearTiempo(segundos);
   }
 
-  /** Elige un índice al azar distinto del anterior. */
-  function azar(lista) {
-    if (lista.length === 1) return 0;
-    var i;
-    do { i = Math.floor(Math.random() * lista.length); } while (i === ultimo);
-    ultimo = i;
-    return i;
+  /** Capa de gestos: sobre todo el video (YouTube/TikTok) o solo en franjas (IG/FB). */
+  function capaGestos(completa) {
+    if (completa) return '<div class="iw-reel-gesture" aria-hidden="true"><span class="iw-reel-gesture__icon"></span></div>';
+    return '<div class="iw-reel-gesture iw-reel-gesture--side iw-reel-gesture--left" aria-hidden="true"></div>' +
+           '<div class="iw-reel-gesture iw-reel-gesture--side iw-reel-gesture--right" aria-hidden="true"></div>';
   }
 
-  /* ---------- Construcción de cada "reel" ---------- */
-  function reelVideo(item) {
+  function nodoDe(entrada, autoplay) {
     var r = document.createElement('div');
     r.className = 'iw-reel';
-    var iframe = document.createElement('iframe');
-    iframe.src = item.embed;
-    iframe.title = 'Short video from ' + item.platform;
-    iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write');
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-    iframe.addEventListener('load', function () { r.classList.add('iw-reel--loaded'); });
-    r.innerHTML = '<span class="iw-reel__loading" aria-hidden="true"></span>' +
-      '<span class="iw-reel__chip" aria-hidden="true">' + item.platform + '</span>';
-    r.insertBefore(iframe, r.firstChild);
-    return r;
-  }
 
-  function reelEnlace(item) {
-    var r = document.createElement('div');
-    r.className = 'iw-reel iw-reel--card';
-    r.innerHTML =
-      '<p class="iw-reel__platform">' + item.platform + '</p>' +
-      '<p class="iw-reel__note">This one only plays on ' + item.platform + '.</p>';
-    var a = document.createElement('a');
-    a.className = 'iw-reel__open';
-    a.href = item.link;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.textContent = 'Open ↗';
-    r.appendChild(a);
-    return r;
-  }
+    if (entrada.tipo === 'video') {
+      var it = entrada.item;
+      var controlable = it.platform === 'Shorts' || it.platform === 'TikTok';
+      r.dataset.platform = it.platform;
+      var f = document.createElement('iframe');
+      f.src = urlEmbed(it, autoplay);
+      f.title = 'Short video from ' + it.platform;
+      f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write');
+      f.setAttribute('allowfullscreen', '');
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      f.addEventListener('load', function () {
+        r.classList.add('iw-reel--loaded');
+        // YouTube solo envía eventos después de este saludo de su API
+        if (it.platform === 'Shorts') {
+          try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*'); } catch (e) { /* nada */ }
+        }
+        // Si ya es el actual cuando termina de cargar: a sonar
+        if (r === actual) arrancar(r);
+      });
+      r.innerHTML = '<span class="iw-reel__loading" aria-hidden="true"></span>' +
+        capaGestos(controlable) +
+        '<a class="iw-reel__chip" href="' + it.original + '" target="_blank" rel="noopener noreferrer">' + it.platform + ' ↗</a>';
+      r.insertBefore(f, r.firstChild);
+      return r;
+    }
 
-  /** El residuo: una tarjeta vacía en medio del feed. */
-  function reelVacio() {
-    var r = document.createElement('div');
-    r.className = 'iw-reel iw-reel--blank';
-    r.innerHTML = (motivoSrc ? '<img src="' + motivoSrc + '" alt="">' : '') +
-      '<p>Nothing here.</p><p class="iw-reel__sub">Keep scrolling.</p>';
-    return r;
-  }
+    if (entrada.tipo === 'card') {
+      r.classList.add('iw-reel--card');
+      r.innerHTML = '<p class="iw-reel__platform">' + entrada.item.platform + '</p>' +
+        '<p class="iw-reel__note">This one only plays on ' + entrada.item.platform + '.</p>' +
+        '<a class="iw-reel__open" href="' + entrada.item.link + '" target="_blank" rel="noopener noreferrer">Open ↗</a>' +
+        capaGestos(false);
+      return r;
+    }
 
-  /** Sin links válidos: un feed generativo para que la experiencia no se rompa. */
-  function reelGenerado() {
-    var r = document.createElement('div');
-    r.className = 'iw-reel iw-reel--gen';
+    if (entrada.tipo === 'blank') {
+      r.classList.add('iw-reel--blank');
+      r.innerHTML = (motivoSrc ? '<img src="' + motivoSrc + '" alt="">' : '') +
+        '<p>Nothing here.</p><p class="iw-reel__sub">Keep scrolling.</p>' + capaGestos(true);
+      return r;
+    }
+
+    r.classList.add('iw-reel--gen');
     r.style.setProperty('--h', Math.floor(Math.random() * 360));
     r.innerHTML = '<span class="iw-reel__blob"></span><span class="iw-reel__blob iw-reel__blob--2"></span>' +
-      '<p class="iw-reel__sub">Add your links in js/media-links.js</p>';
+      '<p class="iw-reel__sub">Add your links in js/media-links.js</p>' + capaGestos(true);
     return r;
   }
 
-  function siguienteReel() {
-    vistos++;
-    if (motivoSrc && vistos > 1 && vistos % CADA_VACIO === 0) return reelVacio();
-    if (reproducibles.length) return reelVideo(reproducibles[azar(reproducibles)]);
-    if (soloEnlace.length) return reelEnlace(soloEnlace[azar(soloEnlace)]);
-    return reelGenerado();
+  /** El actual empieza a sonar (si el visitante ya dio un gesto y no silenció). */
+  function arrancar(r) {
+    enviar(r, 'play');
+    if (sonidoOk && !IW.audio.isMuted()) enviar(r, 'unMute');
+    else enviar(r, 'mute');
+    // Algunos reproductores tardan en aceptar órdenes: se repite un par de veces
+    [400, 1200].forEach(function (ms) {
+      setTimeout(function () {
+        if (r !== actual) return;
+        enviar(r, 'play');
+        if (sonidoOk && !IW.audio.isMuted()) enviar(r, 'unMute');
+      }, ms);
+    });
   }
 
-  /** Cambia al siguiente reel con un deslizamiento hacia arriba. */
-  function next() {
-    var viejo = el.screen.querySelector('.iw-reel:not(.iw-reel--out)');
-    var nuevo = siguienteReel();
-    if (!reducido) nuevo.classList.add('iw-reel--in');
-    el.screen.appendChild(nuevo);
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { nuevo.classList.remove('iw-reel--in'); });
-    });
+  /* =======================================================================
+     Avanzar y retroceder
+     ======================================================================= */
+  function precargar() {
+    if (precargado || pos !== historial.length - 1) return;
+    var entrada = sacarSiguiente();
+    // Precarga sin autoplay (no suena hasta que llegue a pantalla)
+    var nodo = nodoDe(entrada, false);
+    nodo.classList.add('iw-reel--next');
+    nodo.setAttribute('aria-hidden', 'true');
+    el.screen.appendChild(nodo);
+    precargado = { entrada: entrada, nodo: nodo };
+  }
+
+  function mostrar(nodo, direccion) {
+    var viejo = actual;
+    actual = nodo;
+    nodo.classList.remove('iw-reel--next');
+    nodo.removeAttribute('aria-hidden');
+    if (!nodo.parentNode) el.screen.appendChild(nodo);
+    if (!reducido) {
+      nodo.classList.add(direccion > 0 ? 'iw-reel--in' : 'iw-reel--in-up');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { nodo.classList.remove('iw-reel--in', 'iw-reel--in-up'); });
+      });
+    }
+    if (nodo.classList.contains('iw-reel--loaded')) arrancar(nodo);
+
     if (viejo) {
-      viejo.classList.add('iw-reel--out');
+      // El que sale: pausa y se descarga
+      enviar(viejo, 'pause');
+      viejo.classList.add(direccion > 0 ? 'iw-reel--out' : 'iw-reel--out-down');
       setTimeout(function () { viejo.remove(); }, reducido ? 0 : 700);
     }
+    vistos++;
     actualizarContador();
+    setTimeout(precargar, 900);
   }
 
-  /* ---------- Me gusta: corazones que suben ---------- */
+  function next() {
+    var ahora = Date.now();
+    if (ahora - ultimoCambio < PAUSA_GESTO) return;
+    ultimoCambio = ahora;
+
+    if (pos < historial.length - 1) {
+      // Se había vuelto atrás: avanzar por el historial
+      pos++;
+      mostrar(nodoDe(historial[pos], true), 1);
+      return;
+    }
+    var entrada, nodo;
+    if (precargado) {
+      entrada = precargado.entrada;
+      nodo = precargado.nodo;
+      precargado = null;
+    } else {
+      entrada = sacarSiguiente();
+      nodo = nodoDe(entrada, true);
+    }
+    historial.push(entrada);
+    pos = historial.length - 1;
+    mostrar(nodo, 1);
+  }
+
+  function prev() {
+    var ahora = Date.now();
+    if (ahora - ultimoCambio < PAUSA_GESTO || pos <= 0) return;
+    ultimoCambio = ahora;
+    pos--;
+    mostrar(nodoDe(historial[pos], true), -1);
+  }
+
+  /* =======================================================================
+     Gestos: capa transparente sobre el video (los iframes se los "comen")
+     ======================================================================= */
+  var gesto = null;
+
+  function alBajar(e) {
+    if (!e.target.closest('.iw-reel-gesture')) return;
+    gesto = { y: e.clientY, x: e.clientX, t: Date.now() };
+    e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId);
+  }
+
+  function alSubir(e) {
+    if (!gesto) return;
+    var dy = gesto.y - e.clientY;
+    var dx = gesto.x - e.clientX;
+    var corto = Date.now() - gesto.t < 300;
+    gesto = null;
+    if (Math.abs(dy) > UMBRAL_SWIPE && Math.abs(dy) > Math.abs(dx)) {
+      if (dy > 0) next(); else prev();
+    } else if (corto && Math.abs(dy) < 10 && e.target.closest('.iw-reel-gesture:not(.iw-reel-gesture--side)')) {
+      alternarReproduccion();
+    }
+  }
+
+  /** Toque sobre el video (YouTube/TikTok): pausa / sigue. */
+  function alternarReproduccion() {
+    if (!actual) return;
+    var pausado = actual.classList.toggle('iw-reel--paused');
+    enviar(actual, pausado ? 'pause' : 'play');
+    if (!pausado && sonidoOk && !IW.audio.isMuted()) enviar(actual, 'unMute');
+  }
+
+  function alRueda(e) {
+    if (!abierto) return;
+    e.preventDefault();
+    if (Math.abs(e.deltaY) < 20) return;
+    if (e.deltaY > 0) next(); else prev();
+  }
+
+  function alTeclado(e) {
+    if (!abierto || (e.target && e.target.tagName === 'INPUT')) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'j') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'k') { e.preventDefault(); prev(); }
+  }
+
+  /** El primer gesto del visitante en esta página permite el sonido. */
+  function permitirSonido() {
+    if (sonidoOk) return;
+    sonidoOk = true;
+    if (actual && !IW.audio.isMuted()) { enviar(actual, 'play'); enviar(actual, 'unMute'); }
+  }
+
+  /* ---------- Me gusta ---------- */
   function like() {
     likes++;
     el.likes.textContent = likes;
@@ -219,45 +392,8 @@
     }
   }
 
-  /* ---------- El feed se abre al llegar (no hay "dejar el celular":
-                solo se sale por el portal a la realidad) ---------- */
-  function abrir() {
-    if (abierto) return;
-    abierto = true;
-    el.box.hidden = false;
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { el.box.classList.add('iw-reels--on'); });
-    });
-    if (!el.screen.querySelector('.iw-reel')) next();
-    el.next.focus({ preventScroll: true });
-  }
-
-  /* ---------- Gestos ---------- */
-  function alRueda(e) {
-    if (!abierto) return;
-    e.preventDefault();
-    var ahora = Date.now();
-    if (Math.abs(e.deltaY) < 30 || ahora - ultimaRueda < PAUSA_RUEDA) return;
-    ultimaRueda = ahora;
-    if (e.deltaY > 0) next();
-  }
-
-  var toqueY = null;
-  function alTocar(e) { toqueY = e.touches[0].clientY; }
-  function alSoltar(e) {
-    if (toqueY === null) return;
-    var dy = toqueY - e.changedTouches[0].clientY;
-    toqueY = null;
-    if (dy > 60) next();
-  }
-
-  function alTeclado(e) {
-    if (!abierto) return;
-    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'j') { e.preventDefault(); next(); }
-  }
-
   /* =======================================================================
-     Inicio (solo si se entró con el celular)
+     Inicio
      ======================================================================= */
   function init(scene, motifId) {
     el.box = document.getElementById('iw-reels');
@@ -267,39 +403,75 @@
     el.like = document.getElementById('iw-reels-like');
     el.likes = document.getElementById('iw-reels-likes');
     el.next = document.getElementById('iw-reels-next');
+    el.prev = document.getElementById('iw-reels-prev');
 
-    // Clasificar los links: los que se reproducen aquí y los que solo se abren fuera
-    var vistosEmbed = {};
+    var vistosId = {};
     (IW.mediaLinks || []).forEach(function (link) {
       var item = parse(link);
       if (!item) return;
-      if (item.embed && !vistosEmbed[item.embed]) { vistosEmbed[item.embed] = true; reproducibles.push(item); }
-      else if (item.link) soloEnlace.push(item);
+      var clave = item.id ? item.platform + ':' + item.id : item.link;
+      if (vistosId[clave]) return;
+      vistosId[clave] = true;
+      if (item.id) reproducibles.push(item); else soloEnlace.push(item);
     });
 
     if (motifId && /^[a-z0-9-]+$/.test(motifId)) motivoSrc = IW.data.MOTIF_PATH + motifId + '.svg';
 
     el.next.addEventListener('click', next);
+    if (el.prev) el.prev.addEventListener('click', prev);
     el.like.addEventListener('click', like);
     el.box.addEventListener('wheel', alRueda, { passive: false });
-    el.box.addEventListener('touchstart', alTocar, { passive: true });
-    el.box.addEventListener('touchend', alSoltar, { passive: true });
+    el.screen.addEventListener('pointerdown', alBajar);
+    el.screen.addEventListener('pointerup', alSubir);
+    el.screen.addEventListener('pointercancel', function () { gesto = null; });
     document.addEventListener('keydown', alTeclado);
+    ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) {
+      window.addEventListener(ev, permitirSonido, { capture: true, once: true });
+    });
 
-    // El tiempo "de scroll" corre más rápido que el real
+    // El botón de sonido general también manda en los videos
+    var boton = document.getElementById('iw-mute');
+    if (boton) boton.addEventListener('click', function () {
+      setTimeout(function () {
+        if (!actual) return;
+        if (IW.audio.isMuted()) enviar(actual, 'mute');
+        else { sonidoOk = true; enviar(actual, 'unMute'); }
+      }, 0);
+    });
+
+    // Los reproductores avisan cuando están listos: si es el actual, a sonar
+    window.addEventListener('message', function (e) {
+      if (!actual || !/tiktok\.com|youtube\.com/.test(e.origin)) return;
+      var f = actual.querySelector('iframe');
+      if (!f || e.source !== f.contentWindow) return;
+      var d = e.data;
+      if (typeof d === 'string') { try { d = JSON.parse(d); } catch (x) { return; } }
+      if (d && (d.type === 'onPlayerReady' || d.event === 'onReady' || d.event === 'initialDelivery')) arrancar(actual);
+    });
+
     setInterval(function () {
       if (!abierto || document.hidden) return;
       segundos += VELOCIDAD_TIEMPO;
       actualizarContador();
     }, 1000);
 
-    // Al terminar la transición, el celular ya está en la mano
-    setTimeout(abrir, reducido ? 0 : 900);
+    // "tap for sound" si el navegador bloquea el audio (convención del proyecto)
+    IW.audio.start();
+
+    // Abre con el primer video ya en la mano
+    abierto = true;
+    el.box.hidden = false;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { el.box.classList.add('iw-reels--on'); });
+    });
+    rellenarBolsa(null);
+    ultimoCambio = 0;
+    next();
+    el.next.focus({ preventScroll: true });
   }
 
-  IW.reels = { init: init, parse: parse, open: abrir };
+  IW.reels = { init: init, parse: parse, next: next, prev: prev };
 
-  // El celular: su experiencia es el feed
   IW.experiences = IW.experiences || {};
   IW.experiences.feed = function (c) { init(c.scene, c.motifId); };
 })();

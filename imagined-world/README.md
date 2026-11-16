@@ -18,7 +18,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 
 | Aparato (Muted World) | Situación | Experiencia | Archivo |
 |---|---|---|---|
-| 📱 Celular | Social comparison | **Reels**: videos verticales al azar de tus links, Next / deslizar, ♥, contador de tiempo acelerado | `js/reels.js` |
+| 📱 Celular | Social comparison | **Reels** con los reproductores oficiales: el primero al azar y luego una lista barajada sin repetir hasta agotar todos los links (ningún video vuelve antes de 4 pasos). Deslizar arriba/abajo (capa de gestos), rueda, flechas, PageUp/PageDown y botones ▲ ▼. Autoplay y sonido por las APIs oficiales de YouTube y TikTok; el siguiente se precarga y el anterior se descarga. ♥ y contador de tiempo acelerado | `js/reels.js` |
 | 🎮 Mando | Loneliness | **Juego en línea**: disparas a sombras junto a 3 amigos que pelean contigo y te escriben; combos, rondas, la música se acelera, no hay game over | `js/exp-online.js` |
 | 🎧 Audífonos | Emotional overload | **Reproductor de música**: la pantalla llena de portadas de éxitos (pop, latino, hip-hop, K-pop, R&B, rock, electrónica, afrobeats, indie), filtros por género y abajo anterior · pausa · siguiente, progreso y volumen. Vistas previas oficiales de 30 s (Apple Music); al terminar una, empieza la siguiente. En pausa, todo se vuelve gris y vuelven las voces de la realidad | `js/exp-music.js` + `js/music-tracks.js` |
 | 💻 Portátil | Academic pressure | **Series**: capítulos cinematográficos con subtítulos y música que crece. *Next episode in 5…* arranca solo | `js/exp-video.js` |
