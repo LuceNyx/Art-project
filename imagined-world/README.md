@@ -41,7 +41,7 @@ Tocar el motivo muestra una frase (*"Still no reply."*, *"It still says seven."*
 
 ### Común a todas
 - **Sin pantallas de inicio:** cada experiencia arranca sola al terminar la transición (la frase del goce se ve en la transición). Si el navegador bloquea el sonido, el botón dice *tap for sound* y el primer toque o tecla lo enciende.
-- **Portal a la realidad** (arriba a la izquierda): una rendija gris que parpadea, muestra mensajes del cuarto y a los 20 y 50 s insiste más. Al hacer clic se vuelve al Muted World con `?return=<scene>`.
+- **Portal a la realidad** (arriba a la izquierda): una ventana en gris a la escena de la que vino el visitante, con su aparato de escape (carga `../muted-world/index.html?preview=<scene>` en miniatura, inerte y sin sonido). Da *chispazos*: destellos suaves, glitch leve en los bordes y la luz de la escena que titila; a los 20 y 50 s insiste más. Muestra los mensajes del cuarto. Al pasar el cursor o enfocarla, la ventana se agranda. Con `prefers-reduced-motion`, solo un brillo quieto. Al hacer clic se vuelve **directo al cuarto** con `?return=<scene>` (sin la pantalla de entrada).
 - **Sonido** (abajo a la derecha): todo se genera en código con Web Audio. La preferencia de silencio se guarda.
 - Teclado: el juego y la VR usan WASD o flechas; las decisiones, 1/2/3; construir, flechas + Espacio y 1-9; los reels, ↓; la música, el control de volumen.
 
@@ -49,10 +49,10 @@ Tocar el motivo muestra una frase (*"Still no reply."*, *"It still says seven."*
 
 | Archivo | Función |
 |---|---|
-| `index.html` | Escenario, tarjeta de inicio, reels, portal, sonido y scripts |
-| `css/imagined.css` | Base, tarjeta, avisos, portal y reels |
+| `index.html` | Escenario, reels, portal, sonido y scripts |
+| `css/imagined.css` | Base, avisos, portal (ventana y chispazos) y reels |
 | `css/experiences.css` | Diseño de cada experiencia (una sección por aparato) |
-| `js/imagined.js` | Lee `?from=&motif=`, elige la experiencia del aparato y la monta. Portal y tarjeta de inicio |
+| `js/imagined.js` | Lee `?from=&motif=`, elige la experiencia del aparato y la monta. Portal con la ventana al cuarto |
 | `js/scene-data.js` | Por situación: aparato (`medium`), goce, mensajes de la realidad y frase del residuo |
 | `js/audio.js` | Motor de sonido compartido (notas, ruido, bombo, secuenciador) |
 | `js/residual-motif.js` | Carga el SVG original del motivo desde `../muted-world/assets/motifs/` |

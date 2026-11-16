@@ -53,10 +53,16 @@
 
   <p class="iw-toast" id="iw-toast" aria-live="polite"></p>
 
-  <!-- PORTAL a la realidad: gris, parpadea y llama la atención cada vez más -->
-  <a class="iw-portal" id="iw-portal" href="../muted-world/index.html" aria-label="A crack back to your room. Return to the real world">
+  <!-- PORTAL a la realidad: una ventana en gris a la escena de la que viniste.
+       Da "chispazos" y llama la atención cada vez más (imagined.js) -->
+  <a class="iw-portal" id="iw-portal" href="../muted-world/index.html" aria-label="A window back to your room. Return to the real world">
     <span class="iw-portal__ring" aria-hidden="true"></span>
-    <span class="iw-portal__door" aria-hidden="true"><span class="iw-portal__crack"></span></span>
+    <span class="iw-portal__door" aria-hidden="true">
+      <span class="iw-portal__view" id="iw-portal-view"></span>
+      <span class="iw-portal__light"></span>
+      <span class="iw-portal__glitch"></span>
+      <span class="iw-portal__crack"></span>
+    </span>
     <span class="iw-portal__msg" id="iw-portal-msg" aria-hidden="true"></span>
   </a>
 

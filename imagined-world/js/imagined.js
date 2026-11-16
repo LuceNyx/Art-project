@@ -49,10 +49,45 @@
   var INSISTE_MAS = 20000;
   var INSISTE_MUCHO = 50000;
 
-  function iniciarPortal(scene, url) {
+  // Tamaño "real" de la miniatura del cuarto antes de escalarla a la ventana
+  var PREVIA_W = 360;
+  var PREVIA_H = 540;
+
+  /**
+   * Ventana del portal: carga el Muted World en modo ?preview=<scene>
+   * (el primer plano de la situación con su aparato, en B/N, sin sonido)
+   * y lo escala al tamaño de la ventana. Es inerte: no recibe clics ni foco.
+   */
+  function ventanaPortal(portal, sceneId) {
+    var vista = document.getElementById('iw-portal-view');
+    if (!vista || !sceneId) return;
+    var marco = document.createElement('iframe');
+    marco.title = 'Your room';
+    marco.tabIndex = -1;
+    marco.setAttribute('aria-hidden', 'true');
+    marco.setAttribute('inert', '');
+    marco.width = PREVIA_W;
+    marco.height = PREVIA_H;
+    function escalar() {
+      var k = Math.max(vista.clientWidth / PREVIA_W, vista.clientHeight / PREVIA_H);
+      marco.style.transform = 'scale(' + k.toFixed(4) + ')';
+    }
+    marco.addEventListener('load', function () {
+      escalar();
+      portal.classList.add('iw-portal--live');
+    });
+    window.addEventListener('resize', escalar);
+    marco.src = IW.data.RETURN_URL + '?preview=' + encodeURIComponent(sceneId);
+    vista.appendChild(marco);
+    escalar();
+  }
+
+  function iniciarPortal(scene, url, sceneId) {
     var portal = document.getElementById('iw-portal');
     var msg = document.getElementById('iw-portal-msg');
     portal.href = url;
+    // La ventana se abre un poco después, para no competir con el arranque
+    setTimeout(function () { ventanaPortal(portal, sceneId); }, 1200);
     var mensajes = scene.reality && scene.reality.length ? scene.reality : ['Your room is still there.'];
     var i = 0;
     function siguiente() {
@@ -81,7 +116,7 @@
 
     var urlRegreso = IW.data.RETURN_URL + (elegida.id ? '?return=' + encodeURIComponent(elegida.id) : '');
     IW.audio.init();
-    iniciarPortal(scene, urlRegreso);
+    iniciarPortal(scene, urlRegreso, elegida.id);
 
     // El aparato define la experiencia
     var experiencia = IW.experiences[scene.medium] || IW.experiences.feed;

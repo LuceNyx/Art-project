@@ -61,7 +61,17 @@ Los SVG están en `muted-world/assets/motifs/<motif>.svg`. Desde `transition/` o
 ../muted-world/index.html?return=<scene>
 ```
 
-La habitación muestra esa situación como visitada (más oscura, con un detalle cambiado) y una **luz nueva** que antes no estaba: el regreso no es igual a la partida. La pantalla de entrada dice *"Click to return to your room"*. Los ids no válidos se ignoran.
+Se vuelve **directo a la habitación**, sin la pantalla de entrada: la luz se abre sobre el objeto de esa situación, que recibe el foco del teclado (en pantallas estrechas, la habitación se desplaza hasta él). La situación queda como visitada (más oscura, con un detalle cambiado) y aparece una **luz nueva** que antes no estaba: el regreso no es igual a la partida. Los ids no válidos se ignoran y se muestra la entrada normal.
+
+Sonido: sin el clic de *Click to enter*, el navegador puede dejar el audio bloqueado. En ese caso el botón de sonido dice *"tap for sound"* y el primer toque, clic o tecla lo enciende (tocar el mismo botón lo enciende, no lo silencia).
+
+### Miniatura para el portal: `?preview=<scene>`
+
+```
+../muted-world/index.html?preview=<scene>
+```
+
+Muestra solo el primer plano de la situación (con su aparato de escape), sin sonido, sin textos, sin controles y sin robar el foco. **No cuenta como visita.** El portal del mundo imaginado la carga en un `<iframe>` inerte y escalado como ventana al cuarto.
 
 ## La puerta no lleva al mundo imaginado
 

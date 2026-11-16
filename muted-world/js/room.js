@@ -462,6 +462,7 @@
      API usada por scenes.js
      ======================================================================= */
   function markVisited(id) {
+    if (document.body.classList.contains('mw-body--preview')) return; // la miniatura no cuenta
     agregar(visitadas, cfg.STORAGE.visited, id);
     actualizarHuella(id);
   }
@@ -482,14 +483,61 @@
   function leerRegreso() {
     var params = new URLSearchParams(window.location.search);
     var id = params.get(cfg.RETURN_PARAM);
-    if (!id || !cfg.getScene(id)) return false;
+    if (!id || !cfg.getScene(id)) return null;
 
     agregar(visitadas, cfg.STORAGE.visited, id);
     agregar(regresos, cfg.STORAGE.returned, id);
 
     // Limpia la URL para que recargar no repita el regreso
     try { history.replaceState(null, '', window.location.pathname); } catch (e) { /* file:// */ }
-    return true;
+    return id;
+  }
+
+  /**
+   * Regreso directo (sin pantalla de entrada): la habitación se abre con la
+   * luz sobre el objeto de esa situación, ya marcado como visitado.
+   * Si el navegador bloquea el sonido sin un clic, audio.js muestra
+   * "tap for sound" y el primer gesto lo enciende.
+   */
+  function volverDirecto(id) {
+    el.intro.classList.add('mw-intro--gone', 'mw-intro--quick');
+    el.viewport.inert = false;
+    MW.audio.start();
+    arrancarBucle();
+
+    var obj = objetos[id];
+    if (!obj) return;
+    var r = obj.scene.roomObject.rect;
+    // En pantallas estrechas, desplaza la habitación hasta el objeto
+    var vista = el.viewport;
+    vista.scrollLeft = ((r.x + r.w / 2) / 100) * vista.scrollWidth - vista.clientWidth / 2;
+    cursor.x = cursor.tx = obj.scene.roomObject.light.x;
+    cursor.y = cursor.ty = obj.scene.roomObject.light.y;
+    obj.el.focus({ preventScroll: true });
+  }
+
+  /* =======================================================================
+     Vista previa (?preview=<scene>): la ventana del portal en el mundo
+     imaginado carga esta página en miniatura. Muestra el primer plano de
+     la situación, sin sonido, sin textos ni controles.
+     ======================================================================= */
+  function leerVistaPrevia() {
+    var id = new URLSearchParams(window.location.search).get('preview');
+    var scene = id && cfg.getScene(id);
+    return scene && scene.ready ? id : null;
+  }
+
+  function iniciarVistaPrevia(id) {
+    document.body.classList.add('mw-body--preview');
+    // La miniatura nunca debe robar el foco (ni el teclado) a la página que la contiene
+    window.HTMLElement.prototype.focus = function () {};
+    el.intro.hidden = true;
+    MW.scenes.init();
+    MW.images.load(document.getElementById('mw-room-bg'), 'room.jpg', 'room');
+    construirObjetos();
+    redimensionar();
+    dibujar(0);
+    MW.scenes.open(id, null);
   }
 
   /* =======================================================================
@@ -516,15 +564,15 @@
     el.intro = document.getElementById('mw-intro');
     ctx = el.light.getContext('2d');
 
+    var previa = leerVistaPrevia();
+    if (previa) { iniciarVistaPrevia(previa); return; }
+
     MW.grain.init();
     MW.audio.init();
     MW.scenes.init();
     MW.routine.init();
 
     var volvio = leerRegreso();
-    if (volvio) {
-      el.intro.querySelector('.mw-intro__enter').textContent = 'Click to return to your room';
-    }
 
     MW.images.load(document.getElementById('mw-room-bg'), 'room.jpg', 'room');
     construirObjetos();
@@ -532,7 +580,7 @@
 
     var botonEntrar = el.intro.querySelector('.mw-intro__enter');
     botonEntrar.addEventListener('click', entrar);
-    botonEntrar.focus({ preventScroll: true });
+    if (!volvio) botonEntrar.focus({ preventScroll: true });
     el.viewport.addEventListener('pointermove', alMoverPuntero, { passive: true });
     el.viewport.addEventListener('pointerdown', alMoverPuntero, { passive: true });
     el.viewport.addEventListener('wheel', alRueda, { passive: false });
@@ -542,6 +590,7 @@
     redimensionar();
     centrar();
     dibujar(0);
+    if (volvio) volverDirecto(volvio);
   }
 
   MW.room = {

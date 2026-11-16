@@ -1631,3 +1631,30 @@ button.mw-object:focus-visible {
     transition-delay: 0s !important;
   }
 }
+
+/* =========================================================================
+   REGRESO DIRECTO Y SONIDO BLOQUEADO
+   ========================================================================= */
+/* Sin pantalla de entrada: la oscuridad se abre más rápido y no bloquea clics */
+.mw-intro--gone { pointer-events: none; }
+.mw-intro--quick { transition-duration: 1.2s; }
+
+/* "tap for sound": el navegador bloqueó el sonido hasta el primer gesto */
+.mw-mute--hint {
+  color: var(--mw-white);
+  background: rgba(255, 255, 255, .08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25);
+}
+
+/* =========================================================================
+   VISTA PREVIA (?preview=<scene>): miniatura dentro del portal del mundo
+   imaginado. Solo la imagen de la situación, sin textos ni controles.
+   ========================================================================= */
+.mw-body--preview .mw-lines,
+.mw-body--preview .mw-back,
+.mw-body--preview .mw-mute,
+.mw-body--preview .mw-intro,
+.mw-body--preview .mw-grain { display: none !important; }
+.mw-body--preview { pointer-events: none; overflow: hidden; }
+/* La miniatura es vertical: el primer plano llena el alto (centrado) */
+.mw-body--preview .mw-scene__stage { width: calc(var(--mw-vh) * 16 / 9) !important; }
