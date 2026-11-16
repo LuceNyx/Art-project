@@ -1,7 +1,10 @@
 /* =========================================================================
    IMAGINED WORLD · exp-video.js
    PORTÁTIL → SERIES (Academic pressure)
-   Estás dentro de una serie: capítulos cortos y cinematográficos (escenas
+   Primero, un catálogo: 8 plataformas (el nombre en texto con un estilo
+   propio, no los logos oficiales) y, en cada una, sus series más
+   populares como tarjetas con afiches abstractos generados en código.
+   Al elegir una, estás dentro: capítulos cortos y cinematográficos (escenas
    originales dibujadas en canvas), subtítulos con emoción y música que
    crece. Al terminar, "Next episode in 5…" arranca solo: parar cuesta
    más que seguir. El contador de horas vistas no deja de subir.
@@ -32,6 +35,57 @@
   // Acordes de la banda sonora: Re – Si menor – Sol – La
   var BANDA = [[146.83, 185, 220], [123.47, 146.83, 185], [196, 246.94, 293.66], [220, 277.18, 329.63]];
 
+  // Plataformas: el nombre se escribe en texto con un estilo propio (no son
+  // los logos oficiales). Cada serie: [título, géneros].
+  var PLATAFORMAS = [
+    { id: 'netflix', name: 'Netflix', mark: 'NETFLIX', series: [
+      ['Stranger Things', 'Sci-fi · Mystery'], ['Wednesday', 'Mystery · Comedy'], ['Squid Game', 'Thriller · Drama'],
+      ['Bridgerton', 'Romance · Period'], ['Money Heist', 'Heist · Thriller'], ['Dark', 'Sci-fi · Mystery'],
+      ['Black Mirror', 'Sci-fi · Anthology'], ['The Crown', 'Drama · History']] },
+    { id: 'prime', name: 'Prime Video', mark: 'prime video', series: [
+      ['The Boys', 'Action · Satire'], ['The Rings of Power', 'Fantasy · Epic'], ['Reacher', 'Action · Crime'],
+      ['Fallout', 'Sci-fi · Adventure'], ['Invincible', 'Animation · Action']] },
+    { id: 'hbo', name: 'HBO Max', mark: 'HBO max', series: [
+      ['The Last of Us', 'Drama · Survival'], ['House of the Dragon', 'Fantasy · Drama'], ['Succession', 'Drama · Satire'],
+      ['Euphoria', 'Drama · Youth'], ['The White Lotus', 'Comedy · Drama'], ['Game of Thrones', 'Fantasy · Epic']] },
+    { id: 'disney', name: 'Disney+', mark: 'Disney+', series: [
+      ['The Mandalorian', 'Sci-fi · Western'], ['Loki', 'Sci-fi · Adventure'], ['Andor', 'Sci-fi · Thriller'],
+      ['WandaVision', 'Fantasy · Mystery']] },
+    { id: 'apple', name: 'Apple TV+', mark: 'tv+', series: [
+      ['Severance', 'Thriller · Mystery'], ['Ted Lasso', 'Comedy · Sports'], ['The Morning Show', 'Drama'],
+      ['Slow Horses', 'Spy · Thriller'], ['Silo', 'Sci-fi · Mystery']] },
+    { id: 'hulu', name: 'Hulu', mark: 'hulu', series: [
+      ['The Bear', 'Drama · Comedy'], ['Only Murders in the Building', 'Mystery · Comedy'], ['Shōgun', 'Drama · History'],
+      ["The Handmaid's Tale", 'Drama · Dystopia']] },
+    { id: 'paramount', name: 'Paramount+', mark: 'Paramount+', series: [
+      ['Yellowstone', 'Drama · Western'], ['1923', 'Drama · Western'], ['Star Trek: Strange New Worlds', 'Sci-fi · Adventure'],
+      ['Halo', 'Sci-fi · Action']] },
+    { id: 'crunchyroll', name: 'Crunchyroll', mark: 'crunchyroll', series: [
+      ['Solo Leveling', 'Anime · Action'], ['Jujutsu Kaisen', 'Anime · Action'], ['Demon Slayer', 'Anime · Adventure'],
+      ['Frieren', 'Anime · Fantasy'], ['Spy x Family', 'Anime · Comedy'], ['One Piece', 'Anime · Adventure']] }
+  ];
+
+  // Número estable a partir de un texto (para colores y formas de los afiches)
+  function hash(txt) {
+    var h = 2166136261;
+    for (var i = 0; i < txt.length; i++) { h ^= txt.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+
+  function escapar(txt) {
+    return String(txt).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  // Afiche abstracto generado en código: dos tonos, una forma y el título
+  function afiche(titulo) {
+    var h = hash(titulo);
+    var a = h % 360, b = (a + 40 + (h >> 9) % 140) % 360;
+    var forma = (h >> 3) % 4;
+    return 'style="--a:' + a + ';--b:' + b + ';--x:' + (20 + (h >> 5) % 60) + '%;--y:' + (15 + (h >> 11) % 45) + '%" data-forma="' + forma + '"';
+  }
+
   IW.experiences.video = function (c) {
     var reducido = c.reducido;
     c.root.innerHTML =
@@ -39,8 +93,9 @@
         '<canvas class="iw-video__canvas" aria-hidden="true"></canvas>' +
         '<div class="iw-video__bars" aria-hidden="true"></div>' +
         '<div class="iw-video__top">' +
-          '<p class="iw-video__show">Continue watching</p>' +
-          '<p class="iw-video__ep" id="iw-v-ep">S1 · E4</p>' +
+          '<button class="iw-video__back" id="iw-v-back" type="button">← Browse</button>' +
+          '<p class="iw-video__show" id="iw-v-show">Now watching</p>' +
+          '<p class="iw-video__ep" id="iw-v-ep">S1 · E1</p>' +
         '</div>' +
         '<p class="iw-video__sub" id="iw-v-sub" aria-live="polite"></p>' +
         '<button class="iw-video__skip" id="iw-v-skip" type="button" hidden>Skip intro</button>' +
@@ -56,6 +111,19 @@
           '<button class="iw-video__now" id="iw-v-now" type="button">Watch now</button>' +
           '<p class="iw-video__watched" id="iw-v-watched"></p>' +
         '</div>' +
+        // Catálogo: plataformas → series
+        '<section class="iw-tv" id="iw-tv">' +
+          '<div class="iw-tv__hub" id="iw-tv-hub">' +
+            '<h2 class="iw-tv__ask">What do you want to watch?</h2>' +
+            '<div class="iw-tv__grid">' +
+              PLATAFORMAS.map(function (p, i) {
+                return '<button class="iw-tv__tile" type="button" data-p="' + i + '" data-id="' + p.id + '" aria-label="' + escapar(p.name) + '">' +
+                  '<span class="iw-tv__mark iw-tv__mark--' + p.id + '">' + escapar(p.mark) + '</span></button>';
+              }).join('') +
+            '</div>' +
+          '</div>' +
+          '<div class="iw-tv__page" id="iw-tv-page" hidden></div>' +
+        '</section>' +
       '</div>';
 
     var root = c.root.querySelector('.iw-video');
@@ -65,7 +133,9 @@
       ep: root.querySelector('#iw-v-ep'), sub: root.querySelector('#iw-v-sub'), skip: root.querySelector('#iw-v-skip'),
       title: root.querySelector('#iw-v-title'), bar: root.querySelector('#iw-v-bar'), time: root.querySelector('#iw-v-time'),
       next: root.querySelector('#iw-v-next'), count: root.querySelector('#iw-v-count'), nextTitle: root.querySelector('#iw-v-next-title'),
-      now: root.querySelector('#iw-v-now'), watched: root.querySelector('#iw-v-watched'), refl: root.querySelector('#iw-v-refl')
+      now: root.querySelector('#iw-v-now'), watched: root.querySelector('#iw-v-watched'), refl: root.querySelector('#iw-v-refl'),
+      show: root.querySelector('#iw-v-show'), back: root.querySelector('#iw-v-back'),
+      tv: root.querySelector('#iw-tv'), hub: root.querySelector('#iw-tv-hub'), page: root.querySelector('#iw-tv-page')
     };
 
     // Residuo: la pila de hojas reflejada en la pantalla oscura
@@ -84,8 +154,10 @@
     window.addEventListener('resize', medir);
     medir();
 
-    var numero = 4;        // empieza "a mitad de temporada"
+    var numero = 1;
     var vistos = 0;
+    var serie = null;      // [título, géneros] elegida en el catálogo
+    var plataforma = null;
     var cap = CAPITULOS[0];
     var inicioCap = 0;
     var reproduciendo = false;
@@ -125,7 +197,7 @@
 
     /* ---------- Capítulos ---------- */
     function empezarCapitulo() {
-      cap = CAPITULOS[(numero - 4) % CAPITULOS.length];
+      cap = CAPITULOS[(numero - 1 + (serie ? hash(serie[0]) : 0)) % CAPITULOS.length];
       inicioCap = performance.now();
       reproduciendo = true;
       enCuenta = false;
@@ -144,7 +216,7 @@
       vistos++;
       el.sub.textContent = '';
       el.skip.hidden = true;
-      var siguiente = CAPITULOS[(numero + 1 - 4) % CAPITULOS.length];
+      var siguiente = CAPITULOS[(numero + (serie ? hash(serie[0]) : 0)) % CAPITULOS.length];
       el.nextTitle.textContent = 'E' + (numero + 1) + ' · ' + siguiente.title;
       el.watched.textContent = "You've been watching for " + horas(vistos * MIN_POR_CAP + 132);
       el.next.hidden = false;
@@ -293,7 +365,9 @@
     }
 
     function dibujar(t) {
-      var p = reproduciendo ? Math.min(1, (performance.now() - inicioCap) / 1000 / DURACION) : 0;
+      // En el catálogo la escena queda detrás de una capa opaca: no se dibuja
+      if (!el.tv.hidden) { requestAnimationFrame(dibujar); return; }
+      var p =reproduciendo ? Math.min(1, (performance.now() - inicioCap) / 1000 / DURACION) : 0;
       g.save();
       // Cámara: un acercamiento lento durante el capítulo
       var z = reducido ? 1 : 1 + p * 0.08;
@@ -322,14 +396,94 @@
     }
     requestAnimationFrame(dibujar);
 
-    IW.ui.startCard({
-      kicker: 'Continue watching · S1 · E4',
-      title: CAPITULOS[0].title,
-      sub: c.scene.pleasure,
-      button: 'Play'
-    }).then(function () {
-      iniciarMusica();
+    /* ---------- Catálogo: plataformas → series → capítulos ---------- */
+    function clic(f) { IW.audio.tone({ f: f || 520, dur: 0.09, type: 'sine', vol: 0.05 }); }
+
+    function detener() {
+      reproduciendo = false;
+      enCuenta = false;
+      clearInterval(terminarCapitulo.id);
+      el.next.hidden = true;
+      el.skip.hidden = true;
+      el.sub.textContent = '';
+    }
+
+    function verHub() {
+      detener();
+      plataforma = null;
+      el.tv.hidden = false;
+      el.page.hidden = true;
+      el.hub.hidden = false;
+      root.dataset.view = 'hub';
+      var primero = el.hub.querySelector('.iw-tv__tile');
+      if (primero) primero.focus({ preventScroll: true });
+    }
+
+    function tarjeta(s, k) {
+      return '<button class="iw-tv__card" type="button" data-s="' + k + '">' +
+        '<span class="iw-tv__poster" ' + afiche(s[0]) + '>' +
+          '<span class="iw-tv__rank" aria-hidden="true">' + (k + 1) + '</span>' +
+          '<span class="iw-tv__ptitle">' + escapar(s[0]) + '</span>' +
+        '</span>' +
+        '<span class="iw-tv__genre">' + escapar(s[1]) + '</span>' +
+      '</button>';
+    }
+
+    function verPlataforma(i) {
+      detener();
+      plataforma = i;
+      var p = PLATAFORMAS[i];
+      var top = p.series[0];
+      el.page.dataset.id = p.id;
+      el.page.innerHTML =
+        '<header class="iw-tv__bar">' +
+          '<button class="iw-tv__back" type="button" data-act="hub">← All platforms</button>' +
+          '<span class="iw-tv__mark iw-tv__mark--' + p.id + '" aria-label="' + escapar(p.name) + '">' + escapar(p.mark) + '</span>' +
+        '</header>' +
+        '<div class="iw-tv__hero" ' + afiche(top[0]) + '>' +
+          '<p class="iw-tv__kicker">#1 on ' + escapar(p.name) + ' today</p>' +
+          '<h2 class="iw-tv__htitle">' + escapar(top[0]) + '</h2>' +
+          '<p class="iw-tv__hgenre">' + escapar(top[1]) + '</p>' +
+          '<button class="iw-tv__play" type="button" data-s="0">▶ Play</button>' +
+        '</div>' +
+        '<h3 class="iw-tv__row">Most popular</h3>' +
+        '<div class="iw-tv__cards">' + p.series.map(tarjeta).join('') + '</div>';
+      el.hub.hidden = true;
+      el.page.hidden = false;
+      el.tv.hidden = false;
+      el.page.scrollTop = 0;
+      root.dataset.view = 'platform';
+      el.page.querySelector('.iw-tv__play').focus({ preventScroll: true });
+    }
+
+    function elegirSerie(k) {
+      serie = PLATAFORMAS[plataforma].series[k];
+      numero = 1;
+      el.show.textContent = serie[0];
+      el.tv.hidden = true;
+      root.dataset.view = 'player';
+      if (!musica) iniciarMusica();
       empezarCapitulo();
+      el.back.focus({ preventScroll: true });
+    }
+
+    el.hub.addEventListener('click', function (e) {
+      var b = e.target.closest('.iw-tv__tile');
+      if (!b) return;
+      clic(440 + Number(b.dataset.p) * 40);
+      verPlataforma(Number(b.dataset.p));
     });
+    el.page.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.act === 'hub') { clic(330); verHub(); return; }
+      if (b.dataset.s != null) { clic(660); elegirSerie(Number(b.dataset.s)); }
+    });
+    el.back.addEventListener('click', function () {
+      clic(330);
+      if (plataforma == null) verHub(); else verPlataforma(plataforma);
+    });
+
+    IW.ui.startCard().then(verHub);
   };
 })();
