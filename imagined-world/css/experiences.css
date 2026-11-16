@@ -584,95 +584,152 @@
 .iw-video__residue { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* =========================================================================
-   COMPUTADORA · JUEGO DE DECISIONES
+   COMPUTADORA · CREAR PERSONAJE Y MUNDO (vóxel)
    ========================================================================= */
-.iw-choice { font-family: var(--iw-ui); }
-
-.iw-choice__hud {
+.iw-cr {
   position: absolute;
-  top: clamp(.9rem, 3vw, 1.6rem);
-  right: clamp(.9rem, 3vw, 1.6rem);
+  inset: 0;
   display: grid;
-  justify-items: end;
-  gap: .2rem;
-  text-align: right;
-}
-
-.iw-choice__name { margin: 0; font-size: .7rem; letter-spacing: .25em; text-transform: uppercase; opacity: .75; }
-.iw-choice__turn { margin: 0; font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; text-shadow: 0 2px 14px rgba(0, 0, 0, .5); }
-
-/* El reloj detenido, junto al contador que sí avanza */
-.iw-choice__residue {
-  position: relative;
-  width: clamp(3rem, 6vw, 4.4rem);
-  aspect-ratio: 1;
-  margin-top: .4rem;
-  opacity: .85;
-}
-
-.iw-choice__panel {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(3rem, 8vh, 4.6rem);
-  display: grid;
-  justify-items: center;
+  grid-template-rows: auto 1fr;
   gap: .8rem;
-  width: min(54rem, 94vw);
-  translate: -50% 0;
+  padding: clamp(5.4rem, 12vh, 6.2rem) clamp(.8rem, 3vw, 2rem) clamp(3.4rem, 8vh, 4rem);
+  overflow: hidden;
+  font-family: var(--iw-ui);
+  background: radial-gradient(ellipse at 50% 0%, #3a2a7a, #120c2a 70%);
 }
 
-.iw-choice__ask {
-  margin: 0;
-  font-family: var(--iw-font);
-  font-style: italic;
-  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
-  text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
-}
+/* El título deja sitio al portal (arriba a la izquierda) */
+.iw-cr__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-left: clamp(4.6rem, 8vw, 6.4rem); }
+.iw-cr__step { margin: 0; font-size: clamp(.9rem, 1.6vw, 1.1rem); font-weight: 700; }
 
-.iw-choice__options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: .7rem;
-  width: 100%;
-}
-
-.iw-choice__options--in .iw-choice__opt { animation: iw-chat .45s var(--iw-ease) both; }
-.iw-choice__options--in .iw-choice__opt:nth-child(2) { animation-delay: .08s; }
-.iw-choice__options--in .iw-choice__opt:nth-child(3) { animation-delay: .16s; }
-
-.iw-choice__opt {
+/* Contador de cambios con el reloj detenido al lado */
+.iw-cr__count {
   display: flex;
   align-items: center;
-  gap: .7rem;
-  min-height: 3.6rem;
-  padding: .8rem 1rem;
-  border: 1px solid rgba(255, 255, 255, .35);
+  gap: .6rem;
+  margin: 0;
+  padding: .3rem .4rem .3rem .9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  font-size: .9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.iw-cr__residue { position: relative; width: 2.4rem; height: 2.4rem; }
+
+.iw-cr__pane { min-height: 0; display: grid; gap: 1rem; }
+.iw-cr__pane--char { grid-template-columns: minmax(170px, 230px) 1fr minmax(260px, 340px); }
+.iw-cr__pane--world { grid-template-columns: 1fr minmax(260px, 340px); }
+
+/* La ficha del yo real: en gris, como el cuarto */
+.iw-cr__id {
+  align-self: start;
+  margin: 0;
+  padding: .8rem;
   border-radius: .8rem;
-  background: rgba(16, 10, 40, .55);
-  backdrop-filter: blur(8px);
-  font-size: clamp(.9rem, 1.6vw, 1.05rem);
-  font-weight: 600;
-  text-align: left;
-  transition: background-color .2s, translate .2s, border-color .2s;
+  background: #e4e4e4;
+  color: #2a2a2a;
+  filter: grayscale(1);
+  box-shadow: 0 20px 40px -20px #000;
+  font-family: "EB Garamond", Georgia, serif;
 }
 
-.iw-body .iw-choice__opt:hover { background: rgba(255, 143, 196, .3); border-color: #ff8fc4; translate: 0 -3px; }
+.iw-cr__id-head { display: flex; justify-content: space-between; margin: 0 0 .5rem; font-size: .8rem; font-weight: 600; letter-spacing: .08em; }
+.iw-cr__id-head span { font-weight: 400; font-style: italic; opacity: .7; letter-spacing: 0; }
+.iw-cr__id-photo { display: block; width: 100%; height: auto; border-radius: .3rem; }
 
-.iw-choice__opt kbd {
+.iw-cr__id-data {
   display: grid;
-  place-items: center;
-  flex: none;
-  width: 1.7rem;
-  height: 1.7rem;
-  border-radius: .4rem;
-  background: rgba(255, 255, 255, .15);
-  font: inherit;
-  font-size: .8rem;
+  grid-template-columns: auto 1fr;
+  gap: .15rem .7rem;
+  margin: .6rem 0 0;
+  font-size: .85rem;
 }
 
-@media (max-width: 40rem) {
-  .iw-choice__options { grid-template-columns: 1fr; }
+.iw-cr__id-data dt { opacity: .6; }
+.iw-cr__id-data dd { margin: 0; }
+
+.iw-cr__stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 30px 60px -30px #000;
 }
+
+.iw-cr__stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.iw-cr__panel {
+  display: grid;
+  align-content: start;
+  gap: .5rem;
+  min-height: 0;
+  overflow-y: auto;
+  padding: .8rem;
+  border-radius: 1rem;
+  background: rgba(16, 10, 40, .6);
+  scrollbar-width: thin;
+}
+
+.iw-cr__presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+
+.iw-cr__preset {
+  padding: .6rem;
+  border-radius: .6rem;
+  background: linear-gradient(135deg, #ff8fc4, #b38cff);
+  color: #1a1030;
+  font-weight: 800;
+}
+
+.iw-cr__range { display: grid; gap: .2rem; font-size: .8rem; font-weight: 600; }
+.iw-cr__range input { width: 100%; accent-color: #ff8fc4; }
+
+.iw-cr__label { margin: .3rem 0 0; font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; opacity: .7; }
+.iw-cr__row { display: flex; flex-wrap: wrap; gap: .35rem; }
+
+.iw-cr__opt {
+  padding: .4rem .7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.iw-cr__opt[aria-pressed="true"] { background: #fff; color: #120c24; }
+
+.iw-cr__swatch {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: .4rem;
+  background: var(--c);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .2);
+}
+
+.iw-cr__swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff, inset 0 -3px 0 rgba(0, 0, 0, .2); }
+
+.iw-cr__next {
+  margin-top: .6rem;
+  padding: .8rem;
+  border-radius: .7rem;
+  background: #fff;
+  color: #120c24;
+  font-weight: 800;
+}
+
+.iw-cr__next--back { background: rgba(255, 255, 255, .15); color: #fff; }
+
+/* Celular: la ficha y el avatar lado a lado arriba; los controles debajo */
+@media (max-width: 48rem) {
+  .iw-cr { padding-top: 5.6rem; overflow-y: auto; grid-template-rows: auto auto; }
+  .iw-cr__pane--char { grid-template-columns: 38% 1fr; grid-template-rows: auto auto; }
+  .iw-cr__pane--char .iw-cr__stage { min-height: 15rem; }
+  .iw-cr__pane--char .iw-cr__panel { grid-column: 1 / -1; overflow: visible; }
+  .iw-cr__id { padding: .5rem; }
+  .iw-cr__id-data { font-size: .72rem; }
+  .iw-cr__pane--world { grid-template-columns: 1fr; grid-template-rows: 18rem auto; }
+  .iw-cr__pane--world .iw-cr__panel { overflow: visible; }
+}
+
 
 /* =========================================================================
    LENTES VR · UN PLANETA QUE NO EXISTE

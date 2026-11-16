@@ -22,7 +22,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 | 🎮 Mando | Loneliness | **Juego en línea**: disparas a sombras junto a 3 amigos que pelean contigo y te escriben; combos, rondas, la música se acelera, no hay game over | `js/exp-online.js` |
 | 🎧 Audífonos | Emotional overload | **Reproductor de música**: la pantalla llena de portadas de éxitos (pop, latino, hip-hop, K-pop, R&B, rock, electrónica, afrobeats, indie), filtros por género y abajo anterior · pausa · siguiente, progreso y volumen. Vistas previas oficiales de 30 s (Apple Music); al terminar una, empieza la siguiente. En pausa, todo se vuelve gris y vuelven las voces de la realidad | `js/exp-music.js` + `js/music-tracks.js` |
 | 💻 Portátil | Academic pressure | **Series**: capítulos cinematográficos con subtítulos y música que crece. *Next episode in 5…* arranca solo | `js/exp-video.js` |
-| 🖥️ Computadora | Lack of control | **Juego de decisiones**: tres opciones por turno y cada una cambia el mundo al instante | `js/exp-choice.js` |
+| 🖥️ Computadora | Lack of control | **Creador de personaje y mundo** en vóxeles (estética propia). Paso 1: a la izquierda la ficha del yo real (en gris); a la derecha el avatar con tamaño, musculatura, complexión, pelo, piel, ojos, ropa y poderes (vuelo, fuerza, fuego, rayo, invisible), y ajustes rápidos *Titan* / *Idol* / *Random* para llegar a los extremos. Paso 2: terreno, cielo, bloques y objetos (árboles, castillo, cascada, portal, una estatua del avatar), con el avatar dentro | `js/exp-choice.js` |
 | 🥽 Lentes VR | Uncertain future | **Un planeta que no existe**, visto a través de un visor: dos soles, un planeta gigante con anillos, cordilleras en capas con niebla y cristales, montañas flotantes con cascadas, suelo luminoso que avanza, una ballena del cielo, un caminante gigante y medusas de luz. Mirar con el mouse, el dedo o las flechas. Lentes con viñeta y aberración cromática, HUD tenue. Canvas 2D sin librerías | `js/exp-vr.js` |
 | 🕹️ Consola portátil | Family expectations | **Mini plataformero**: personaje pixel art original (gorra y overoles rojos), corre y salta entre plataformas y bloques ✦ con cámara lateral. Sin puntaje ni game over: si cae, reaparece en la última zona segura; la bandera reinicia el nivel. Teclado (flechas/A D + Espacio) y botones táctiles | `js/exp-sandbox.js` |
 
@@ -33,7 +33,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 | Juego | La burbuja sin respuesta flota y las balas la atraviesan. En el chat llega un mensaje de fuera que nadie abre |
 | Música | Una portada gris entre todas: la nota clavada. Y al pausar, la realidad vuelve |
 | Series | Entre capítulos, en la pantalla oscura, se refleja la pila de hojas |
-| Decisiones | El reloj detenido en las 7:00, junto al contador de turnos que sí avanza |
+| Creador | El reloj detenido en las 7:00, junto al contador de cambios que sí avanza |
 | VR | La ventana encendida en el horizonte, que nunca se acerca |
 | Plataformero | Bloques grises con el marco boca abajo: un muro que hay que saltar y una plataforma; no se rompen ni se tapan |
 
