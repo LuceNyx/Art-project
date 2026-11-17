@@ -1,7 +1,7 @@
 /* =========================================================================
    IMAGINED WORLD · media-links.js
    ╔══════════════════════════════════════════════════════════════════╗
-   ║  PEGA AQUÍ TUS 10 LINKS (TikTok, Instagram Reels, Facebook Reels  ║
+   ║  PEGA AQUÍ TUS LINKS (TikTok, Instagram Reels, Facebook Reels     ║
    ║  o YouTube Shorts). Al entrar al mundo imaginado con el CELULAR   ║
    ║  se elige uno al azar; "Next" o deslizar elige otro.              ║
    ╚══════════════════════════════════════════════════════════════════╝
@@ -15,8 +15,9 @@
    ⚠ Los links CORTOS (vt.tiktok.com, vm.tiktok.com, fb.watch) no se
      pueden incrustar: ábrelos en el navegador y copia la dirección
      completa. Si se dejan, se ignoran (el feed no saca de la página).
-   ➕ Además de estos, el feed usa el banco de videos populares de
-     media-pool.js, así que nunca se queda corto.
+   ➕ El banco de videos populares (media-pool.js) está APAGADO: el feed
+     usa solo esta lista. Para volver a mezclarlo, descomenta su <script>
+     en imagined-world/index.html.
    ⚠ Los textos de ejemplo ("LINK_7"…) y las páginas que no son un
      video (p. ej. https://www.tiktok.com/es/) se ignoran solos.
    ========================================================================= */
@@ -26,17 +27,16 @@
 
   // ======================= TUS LINKS (editar aquí) =======================
   const mediaLinks = [
-    // Original: https://vt.tiktok.com/ZSp92HKA4/ (link corto → dirección completa)
-    "https://www.tiktok.com/@aldoxiito.exe/video/7706683463226674454",
-    "https://www.tiktok.com/@aldoxiito.exe/video/7706683463226674454",
+    "https://www.tiktok.com/@tiggien/video/7688467046278941974",
+    "https://www.tiktok.com/@laika_012345/video/7706669227968679190",
+    "https://www.tiktok.com/@una.frase.para.ti7/video/7707825517726027030",
+    "https://www.tiktok.com/@lenguaaprista/video/7690045836427791636",
+    "https://www.tiktok.com/@nkolsx855/video/7687947613483715854",
+    "https://www.tiktok.com/@user4586906149617/video/7689124742393122078",
+    "https://www.tiktok.com/@michilovies/video/7707459652312681746",
+    "https://www.tiktok.com/@subwaysurfers/video/7608242750542335254",
     "https://www.instagram.com/reels/DfiRwgnPwQe/",
-    "https://web.facebook.com/reel/1150944893945530",
-    "https://www.tiktok.com/es/",
-    "https://www.tiktok.com/@thefrutinovela/video/7705128262665571617?q=fruta%20novelas&t=1794495569486",
-    "LINK_7",
-    "LINK_8",
-    "LINK_9",
-    "LINK_10"
+    "https://web.facebook.com/reel/1150944893945530"
   ];
   // =======================================================================
 
