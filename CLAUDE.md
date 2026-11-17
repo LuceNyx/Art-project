@@ -32,7 +32,7 @@ MUTED WORLD ──clic en un APARATO──► TRANSICIÓN ──► IMAGINED WOR
 | `loneliness` | Celular en la cama | Mando | Juego en línea | **Juego en línea** con 3 amigos que pelean y escriben, combos, rondas, sin game over (`exp-online.js`) | `unanswered-bubble`, flota y las balas la atraviesan |
 | `emotional-overload` | Corcho | Audífonos | Música | **Reproductor**: pared de portadas de éxitos, filtros por género, anterior/pausa/siguiente; en pausa vuelve la realidad (`exp-music.js`) | `pinned-note`, una portada gris |
 | `lack-of-control` | Reloj | Computadora | Decisiones (transición) | **Creador de personaje y mundo** vóxel: ficha del yo real (gris) frente al avatar personalizable hasta los extremos; luego su mundo (`exp-choice.js`) | `stopped-clock`, junto al contador de cambios |
-| `social-comparison` | Espejo con fotos | Celular | Reels | **Reels** con reproductores oficiales, lista barajada sin repeticiones, gestos y autoplay/sonido por API (`reels.js`) | `blank-polaroid`, tarjeta vacía cada 5 videos |
+| `social-comparison` | Espejo con fotos | Celular | Reels | **Reels** tipo feed *For you* sin cuenta: tus links + un banco de 25 TikToks populares verificados (`media-pool.js`), barajados sin repeticiones, todo dentro de la página, autor y texto encima, gestos y autoplay/sonido por API (`reels.js`) | `blank-polaroid`, tarjeta vacía cada 5 videos |
 | `uncertain-future` | Ventana | Lentes VR | VR | **Planeta alienígena inmersivo** (dos soles, anillos, montañas flotantes, criaturas), sin objetivos (`exp-vr.js`) | `lit-window`, en el horizonte, nunca se acerca |
 | `family-expectations` | Foto en el estante | Consola portátil | Construir (transición) | **Mini plataformero** con personaje propio de rojo, sin puntaje ni game over (`exp-sandbox.js`) | `facedown-frame`, bloques grises del camino que no se rompen |
 
@@ -46,7 +46,8 @@ MUTED WORLD ──clic en un APARATO──► TRANSICIÓN ──► IMAGINED WOR
 
 ## Archivos que edita el usuario
 
-- `imagined-world/js/media-links.js` → lista `mediaLinks` de los **reels**: TikTok, Instagram, Facebook o YouTube Shorts. Deben ser direcciones completas; los links cortos (`vt.tiktok.com`) se muestran como tarjeta *Open ↗* y los placeholders se ignoran.
+- `imagined-world/js/media-links.js` → lista `mediaLinks` de los **reels**: TikTok, Instagram, Facebook o YouTube Shorts. Deben ser direcciones completas; los links cortos (`vt.tiktok.com`) y los placeholders se ignoran.
+- `imagined-world/js/media-pool.js` → `IW.mediaPool`: banco de TikToks populares `{ url, author, caption }` que se mezcla con los links. **No existe una API pública para pedir videos al azar** de TikTok, Instagram o Facebook desde una página estática: por eso es una lista, verificada con `https://www.tiktok.com/player/api/v1/items?item_ids=<id>` (si devuelve `nil_core_data`, el video ya no existe). Instagram y Facebook no permiten autoplay en reproductores incrustados.
 - `imagined-world/js/music-tracks.js` → lista `IW.musicTracks` de las **canciones** (título, artista, género, portada, vista previa, enlace). Se resolvieron con la API pública de búsqueda de iTunes. Dentro del archivo se explica cómo agregar más.
 
 ## Estructura

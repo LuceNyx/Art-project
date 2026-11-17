@@ -41,9 +41,14 @@
         encodeURIComponent(location.origin === 'null' ? '*' : location.origin);
     }
     if (item.platform === 'TikTok') {
-      // Reproductor oficial (el mismo que entrega el oEmbed de TikTok)
-      return 'https://www.tiktok.com/player/v1/' + item.id + '?embed_from=oembed&autoplay=' + a +
-        '&muted=1&loop=1&music_info=1&description=1&rel=0&controls=1&progress_bar=1&play_button=1&volume_control=1';
+      // Reproductor oficial (el mismo que entrega el oEmbed de TikTok).
+      // SIEMPRE con autoplay=1: si se precarga pausado, TikTok no siempre
+      // obedece la orden "play" después y queda la portada que abre su web.
+      // Sin descripción ni música propias (son enlaces que sacan de la
+      // página): el autor y el texto los dibuja el feed encima.
+      return 'https://www.tiktok.com/player/v1/' + item.id + '?embed_from=oembed&autoplay=1' +
+        '&muted=1&loop=1&music_info=0&description=0&rel=0&controls=1&progress_bar=1&play_button=1' +
+        '&volume_control=0&fullscreen_button=0&timestamp=0&closed_caption=0';
     }
     if (item.platform === 'Instagram') return 'https://www.instagram.com/reel/' + item.id + '/embed/';
     if (item.platform === 'Facebook') {
@@ -141,8 +146,11 @@
    * último nunca queda primero y ningún video vuelve a los 2 o 3 pasos.
    */
   function rellenarBolsa() {
-    var todos = reproducibles.map(function (x) { return { tipo: 'video', item: x }; })
-      .concat(soloEnlace.map(function (x) { return { tipo: 'card', item: x }; }));
+    // Solo lo que se reproduce aquí: el feed nunca manda fuera de la página.
+    // (Los links cortos se muestran como tarjeta solo si no hay nada más.)
+    var todos = reproducibles.length
+      ? reproducibles.map(function (x) { return { tipo: 'video', item: x }; })
+      : soloEnlace.map(function (x) { return { tipo: 'card', item: x }; });
     var recientes = [];
     for (var i = historial.length - 1; i >= 0 && recientes.length < Math.min(3, todos.length - 1); i--) {
       var it = historial[i].item;
@@ -184,6 +192,12 @@
            '<div class="iw-reel-gesture iw-reel-gesture--side iw-reel-gesture--right" aria-hidden="true"></div>';
   }
 
+  function texto(t) {
+    return String(t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
   function nodoDe(entrada, autoplay) {
     var r = document.createElement('div');
     r.className = 'iw-reel';
@@ -207,9 +221,18 @@
         // Si ya es el actual cuando termina de cargar: a sonar
         if (r === actual) arrancar(r);
       });
+      // Todo pasa en esta página: la plataforma es una etiqueta, no un enlace.
+      // Autor y texto (si se conocen) abajo, como en el feed de la app.
+      var pie = '';
+      if (it.author || it.caption) {
+        pie = '<div class="iw-reel__info" aria-hidden="true">' +
+          (it.author ? '<p class="iw-reel__author">@' + texto(it.author) + '</p>' : '') +
+          (it.caption ? '<p class="iw-reel__caption">' + texto(it.caption) + '</p>' : '') +
+        '</div>';
+      }
       r.innerHTML = '<span class="iw-reel__loading" aria-hidden="true"></span>' +
         capaGestos(controlable) +
-        '<a class="iw-reel__chip" href="' + it.original + '" target="_blank" rel="noopener noreferrer">' + it.platform + ' ↗</a>';
+        '<span class="iw-reel__chip">' + it.platform + '</span>' + pie;
       r.insertBefore(f, r.firstChild);
       return r;
     }
@@ -405,10 +428,13 @@
     el.next = document.getElementById('iw-reels-next');
     el.prev = document.getElementById('iw-reels-prev');
 
+    // Tus links (media-links.js) + el banco de videos populares (media-pool.js)
     var vistosId = {};
-    (IW.mediaLinks || []).forEach(function (link) {
-      var item = parse(link);
+    (IW.mediaLinks || []).concat(IW.mediaPool || []).forEach(function (link) {
+      var meta = link && typeof link === 'object' ? link : null;
+      var item = parse(meta ? meta.url : link);
       if (!item) return;
+      if (meta) { item.author = meta.author || ''; item.caption = meta.caption || ''; }
       var clave = item.id ? item.platform + ':' + item.id : item.link;
       if (vistosId[clave]) return;
       vistosId[clave] = true;
@@ -440,13 +466,17 @@
     });
 
     // Los reproductores avisan cuando están listos: si es el actual, a sonar
+    // El precargado (TikTok arranca solo) se pausa y silencia hasta que llegue.
     window.addEventListener('message', function (e) {
-      if (!actual || !/tiktok\.com|youtube\.com/.test(e.origin)) return;
-      var f = actual.querySelector('iframe');
-      if (!f || e.source !== f.contentWindow) return;
+      if (!/tiktok\.com|youtube\.com/.test(e.origin)) return;
       var d = e.data;
       if (typeof d === 'string') { try { d = JSON.parse(d); } catch (x) { return; } }
-      if (d && (d.type === 'onPlayerReady' || d.event === 'onReady' || d.event === 'initialDelivery')) arrancar(actual);
+      if (!d || !(d.type === 'onPlayerReady' || d.event === 'onReady' || d.event === 'initialDelivery')) return;
+      var fa = actual && actual.querySelector('iframe');
+      if (fa && e.source === fa.contentWindow) { arrancar(actual); return; }
+      var np = precargado && precargado.nodo;
+      var fp = np && np.querySelector('iframe');
+      if (fp && e.source === fp.contentWindow) { enviar(np, 'mute'); enviar(np, 'pause'); }
     });
 
     setInterval(function () {
