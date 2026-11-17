@@ -41,19 +41,17 @@
         encodeURIComponent(location.origin === 'null' ? '*' : location.origin);
     }
     if (item.platform === 'TikTok') {
-      // Reproductor oficial (el mismo que entrega el oEmbed de TikTok).
-      // SIEMPRE con autoplay=1: si se precarga pausado, TikTok no siempre
-      // obedece la orden "play" después y queda la portada que abre su web.
-      // Sin descripción ni música propias (son enlaces que sacan de la
-      // página): el autor y el texto los dibuja el feed encima.
-      return 'https://www.tiktok.com/player/v1/' + item.id + '?embed_from=oembed&autoplay=1' +
-        '&muted=1&loop=1&music_info=0&description=0&rel=0&controls=1&progress_bar=1&play_button=1' +
-        '&volume_control=0&fullscreen_button=0&timestamp=0&closed_caption=0';
+      // MODO DIRECTO (como con los primeros links, que sí se veían en
+      // laptops): exactamente el reproductor del oEmbed oficial, silenciado
+      // para que el autoplay funcione, y sin nada encima: el visitante toca
+      // el propio reproductor de TikTok (play, sonido) como en su web.
+      return 'https://www.tiktok.com/player/v1/' + item.id +
+        '?embed_from=oembed&autoplay=1&muted=1&loop=1&music_info=1&description=1&rel=0';
     }
     if (item.platform === 'Instagram') return 'https://www.instagram.com/reel/' + item.id + '/embed/';
     if (item.platform === 'Facebook') {
       return 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(item.original) +
-        '&show_text=false&autoplay=' + (autoplay ? 'true' : 'false') + '&mute=0&width=360';
+        '&show_text=false&autoplay=true&mute=true&width=360';
     }
     return '';
   }
@@ -204,14 +202,11 @@
 
     if (entrada.tipo === 'video') {
       var it = entrada.item;
-      var controlable = it.platform === 'Shorts' || it.platform === 'TikTok';
+      // Capa de gestos completa solo en YouTube; en TikTok, IG y FB, franjas
+      // laterales para deslizar y el centro libre para su propio reproductor.
+      var controlable = it.platform === 'Shorts';
       r.dataset.platform = it.platform;
       var f = document.createElement('iframe');
-      // TikTok sin las cookies del visitante (como alguien sin cuenta): con
-      // una sesión de TikTok abierta en el navegador, muchos videos dan
-      // "Player authentication failed". Chrome/Edge lo respetan; el resto
-      // lo ignora. Debe ponerse ANTES de la dirección.
-      if (it.platform === 'TikTok') f.setAttribute('credentialless', '');
       f.src = urlEmbed(it, autoplay);
       f.title = 'Short video from ' + it.platform;
       f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write');
@@ -285,7 +280,9 @@
   function precargar() {
     if (precargado || pos !== historial.length - 1) return;
     var entrada = sacarSiguiente();
-    // Precarga sin autoplay (no suena hasta que llegue a pantalla)
+    // Un solo reproductor a la vez (como la primera versión): los videos se
+    // eligen antes, pero el iframe se crea recién al llegar a pantalla.
+    if (entrada.tipo === 'video') { precargado = { entrada: entrada, nodo: null }; return; }
     var nodo = nodoDe(entrada, false);
     nodo.classList.add('iw-reel--next');
     nodo.setAttribute('aria-hidden', 'true');
@@ -332,7 +329,7 @@
     var entrada, nodo;
     if (precargado) {
       entrada = precargado.entrada;
-      nodo = precargado.nodo;
+      nodo = precargado.nodo || nodoDe(entrada, true);
       precargado = null;
     } else {
       entrada = sacarSiguiente();
@@ -409,6 +406,7 @@
      vuelve a fallar, el video sale de la lista y se pasa al siguiente.
      Si fallan demasiados seguidos se deja de saltar (evita un bucle). */
   var fallosSeguidos = 0;
+  var MODO_DIRECTO = true;   // TikTok sin recargas ni saltos automáticos
 
   function reelDeFuente(fuente) {
     var candidatos = [actual, precargado && precargado.nodo];
@@ -445,6 +443,10 @@
     var f = r.querySelector('iframe');
     if (navigator.onLine === false) { r.dataset.fallo = 'red'; esperarConexion(); return; }
     if (r.dataset.fallo === 'red') delete r.dataset.fallo;
+    // Modo directo: no se recarga ni se salta nada (como la primera versión);
+    // el reproductor de TikTok muestra su propio aviso y el visitante sigue.
+    if (window.console) console.info('[reels] TikTok avisó un error:', valor);
+    if (MODO_DIRECTO) return;
     if (!r.dataset.fallo) {
       r.dataset.fallo = '1';
       setTimeout(function () { recargar(f); }, 1200);
