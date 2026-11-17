@@ -236,6 +236,13 @@
    * usa el placeholder. kind = 'room' o el id de la situación.
    */
   function load(img, file, kind) {
+    // Si la ilustración aún no existe, el placeholder va directo (sin 404)
+    var reales = MW.config.REAL_IMAGES || [];
+    if (reales.indexOf(file) === -1) {
+      img.dataset.placeholder = 'true';
+      img.src = placeholder(kind, file);
+      return;
+    }
     img.onerror = function () {
       img.onerror = null;
       img.dataset.placeholder = 'true';

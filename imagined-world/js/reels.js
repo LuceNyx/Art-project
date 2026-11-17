@@ -15,6 +15,8 @@
      tecla lo enciende; luego se mantiene en los siguientes videos.
    - El que sale se pausa y se descarga; el siguiente se precarga.
    - Cada 5 videos, la tarjeta vacía (el residuo: la foto en blanco).
+   - ANTES de mostrar nada, content-filter.js revisa cada video (lista
+     negra, palabras bloqueadas y, en modo presentación, solo revisados).
    ========================================================================= */
 
 (function () {
@@ -260,7 +262,7 @@
     r.classList.add('iw-reel--gen');
     r.style.setProperty('--h', Math.floor(Math.random() * 360));
     r.innerHTML = '<span class="iw-reel__blob"></span><span class="iw-reel__blob iw-reel__blob--2"></span>' +
-      '<p class="iw-reel__sub">Add your links in js/media-links.js</p>' + capaGestos(true);
+      '<p class="iw-reel__sub">Nothing to watch right now. Keep scrolling.</p>' + capaGestos(true);
     return r;
   }
 
@@ -497,11 +499,15 @@
 
     // Tus links (media-links.js) + el banco de videos populares (media-pool.js)
     var vistosId = {};
-    (IW.mediaLinks || []).concat(IW.mediaPool || []).forEach(function (link) {
+    // Los del banco ya están curados (revisados) salvo que digan revisado: false;
+    // los links sueltos de media-links.js solo si dicen revisado: true.
+    var banco = IW.mediaPool || [];
+    (IW.mediaLinks || []).concat(banco).forEach(function (link) {
       var meta = link && typeof link === 'object' ? link : null;
       var item = parse(meta ? meta.url : link);
       if (!item) return;
       if (meta) { item.author = meta.author || ''; item.caption = meta.caption || ''; }
+      item.revisado = banco.indexOf(link) !== -1 ? !(meta && meta.revisado === false) : !!(meta && meta.revisado === true);
       var clave = item.id ? item.platform + ':' + item.id : item.link;
       if (vistosId[clave]) return;
       vistosId[clave] = true;
@@ -563,6 +569,12 @@
     requestAnimationFrame(function () {
       requestAnimationFrame(function () { el.box.classList.add('iw-reels--on'); });
     });
+    // El filtro decide qué videos entran, ANTES de mostrar el primero
+    if (IW.contentFilter) {
+      reproducibles = IW.contentFilter.filtrar(reproducibles);
+      soloEnlace = IW.contentFilter.filtrar(soloEnlace);
+    }
+
     rellenarBolsa(null);
     ultimoCambio = 0;
     next();

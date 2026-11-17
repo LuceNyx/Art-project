@@ -17,6 +17,11 @@
      completa. Si se dejan, se ignoran (el feed no saca de la página).
    ➕ Además de estos, el feed usa el banco de videos populares de
      media-pool.js, así que nunca se queda corto.
+   🛡 FILTRO (content-filter.js, modo presentación activado): un link
+     suelto NO se muestra hasta que alguien lo vea y lo apruebe. Para
+     aprobarlo, escríbelo así:
+       { url: "https://www.tiktok.com/@usuario/video/123...", revisado: true },
+     (opcional: author: "usuario", caption: "texto" para verlo encima).
    ⚠ Los textos de ejemplo ("LINK_7"…) y las páginas que no son un
      video (p. ej. https://www.tiktok.com/es/) se ignoran solos.
    ========================================================================= */

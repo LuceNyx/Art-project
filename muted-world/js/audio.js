@@ -14,6 +14,10 @@
 
   var MW = (window.MutedWorld = window.MutedWorld || {});
   var AUDIO_PATH = 'assets/audio/';
+  // Grabaciones reales que YA están en assets/audio/ (p. ej. 'rain.mp3').
+  // Solo estas se piden al servidor; las demás capas se generan en código
+  // directamente (sin errores 404 en la consola).
+  var AUDIO_REALES = [];
 
   // Capas: archivo opcional + volumen base (muy bajo)
   var CAPAS = {
@@ -214,7 +218,8 @@
     var url = AUDIO_PATH + CAPAS[nombre].file;
     var respaldo = function () { sintetizar(nombre, g); };
 
-    if (location.protocol === 'file:' || !window.fetch) { respaldo(); return; }
+    if (location.protocol === 'file:' || !window.fetch ||
+        AUDIO_REALES.indexOf(CAPAS[nombre].file) === -1) { respaldo(); return; }
 
     fetch(url)
       .then(function (r) { if (!r.ok) throw new Error('sin archivo'); return r.arrayBuffer(); })

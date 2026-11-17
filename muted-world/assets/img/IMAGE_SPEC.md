@@ -1,6 +1,6 @@
 # Especificación de imágenes: Muted World
 
-Mientras una imagen no exista, el código dibuja un **placeholder** gris con su nombre y sus medidas (`js/images.js`). Para poner la ilustración real, guárdala aquí con el **nombre exacto** de la tabla. No hace falta tocar el código.
+Mientras una imagen no exista, el código dibuja un **placeholder** gris con su nombre y sus medidas (`js/images.js`). Para poner la ilustración real, guárdala aquí con el **nombre exacto** de la tabla y **agrega ese nombre a `REAL_IMAGES`** en `js/config.js` (p. ej. `REAL_IMAGES: ['room.jpg']`). Las que no estén en esa lista no se piden al servidor, así no aparecen errores 404 en la consola.
 
 ## Reglas para todas las imágenes
 
