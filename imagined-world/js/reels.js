@@ -207,6 +207,11 @@
       var controlable = it.platform === 'Shorts' || it.platform === 'TikTok';
       r.dataset.platform = it.platform;
       var f = document.createElement('iframe');
+      // TikTok sin las cookies del visitante (como alguien sin cuenta): con
+      // una sesión de TikTok abierta en el navegador, muchos videos dan
+      // "Player authentication failed". Chrome/Edge lo respetan; el resto
+      // lo ignora. Debe ponerse ANTES de la dirección.
+      if (it.platform === 'TikTok') f.setAttribute('credentialless', '');
       f.src = urlEmbed(it, autoplay);
       f.title = 'Short video from ' + it.platform;
       f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write');
