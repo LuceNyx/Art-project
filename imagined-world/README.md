@@ -18,7 +18,7 @@ Normalmente se llega desde `transition/`. Sin parámetros se abre el celular (re
 
 | Aparato (Muted World) | Situación | Experiencia | Archivo |
 |---|---|---|---|
-| 📱 Celular | Social comparison | **Reels** con los reproductores oficiales: el primero al azar y luego una lista barajada sin repetir hasta agotar todos los links (ningún video vuelve antes de 4 pasos). Deslizar arriba/abajo (capa de gestos), rueda, flechas, PageUp/PageDown y botones ▲ ▼. Autoplay y sonido por las APIs oficiales de YouTube y TikTok; el siguiente se precarga y el anterior se descarga. ♥ y contador de tiempo acelerado | `js/reels.js` |
+| 📱 Celular | Social comparison | **Reels** como el feed *For you* de TikTok sin cuenta: tus links (`js/media-links.js`) + un banco de 25 TikToks populares (`js/media-pool.js`), todo dentro de la página (sin enlaces hacia fuera), con autor y texto encima. Los reproductores oficiales: el primero al azar y luego una lista barajada sin repetir hasta agotar todos los links (ningún video vuelve antes de 4 pasos). Deslizar arriba/abajo (capa de gestos), rueda, flechas, PageUp/PageDown y botones ▲ ▼. Autoplay y sonido por las APIs oficiales de YouTube y TikTok; el siguiente se precarga y el anterior se descarga. ♥ y contador de tiempo acelerado | `js/reels.js` |
 | 🎮 Mando | Loneliness | **Juego en línea**: disparas a sombras junto a 3 amigos que pelean contigo y te escriben; combos, rondas, la música se acelera, no hay game over | `js/exp-online.js` |
 | 🎧 Audífonos | Emotional overload | **Reproductor de música**: la pantalla llena de portadas de éxitos (pop, latino, hip-hop, K-pop, R&B, rock, electrónica, afrobeats, indie), filtros por género y abajo anterior · pausa · siguiente, progreso y volumen. Vistas previas oficiales de 30 s (Apple Music); al terminar una, empieza la siguiente. En pausa, todo se vuelve gris y vuelven las voces de la realidad | `js/exp-music.js` + `js/music-tracks.js` |
 | 💻 Portátil | Academic pressure | **Series**: primero un catálogo de 8 plataformas (Netflix, Prime Video, HBO Max, Disney+, Apple TV+, Hulu, Paramount+, Crunchyroll; el nombre en texto con estilo propio, no los logos) y, en cada una, sus series más populares como tarjetas con afiches abstractos generados en código. Al elegir una: capítulos cinematográficos con subtítulos y música que crece; *Next episode in 5…* arranca solo. *← Browse* vuelve al catálogo | `js/exp-video.js` |
@@ -74,8 +74,18 @@ Edita solo la lista `mediaLinks` de `js/media-links.js`:
 | Facebook | `https://www.facebook.com/reel/1234567890` (también `web.facebook.com`) |
 | YouTube Shorts | `https://www.youtube.com/shorts/ID` (o `youtu.be/ID`) |
 
-- Los **links cortos** (`vt.tiktok.com`, `vm.tiktok.com`, `fb.watch`) no se pueden incrustar. Copia la dirección completa. Si se dejan, se muestran como tarjeta *Open ↗*.
+- Los **links cortos** (`vt.tiktok.com`, `vm.tiktok.com`, `fb.watch`) no se pueden incrustar. Copia la dirección completa. Si se dejan, se ignoran: el feed nunca manda fuera de la página.
 - Lo que no es un video (`LINK_7`, `tiktok.com/es/`…) se ignora solo.
+
+### El banco de videos populares (`js/media-pool.js`)
+
+No hay una API pública que entregue videos "al azar" de TikTok, Instagram o Facebook a una página estática (sin servidor ni cuenta). Por eso el feed usa, además de tus links, un banco de **25 TikToks populares** (de las listas de los más vistos y con más likes de 2025), cada uno con su autor y su texto. Se verificaron con la API del reproductor oficial:
+
+```
+https://www.tiktok.com/player/api/v1/items?item_ids=<id>
+```
+
+Si responde `nil_core_data`, el video ya no existe y conviene quitarlo. Instagram y Facebook no tienen una verificación así sin clave, y sus reproductores incrustados **no arrancan solos** (hay que tocar ▶ dentro del video). Por eso el banco es solo de TikTok.
 
 ## Integración
 

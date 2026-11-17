@@ -14,7 +14,9 @@
 
    ⚠ Los links CORTOS (vt.tiktok.com, vm.tiktok.com, fb.watch) no se
      pueden incrustar: ábrelos en el navegador y copia la dirección
-     completa. Si se dejan, se muestran como una tarjeta "Open ↗".
+     completa. Si se dejan, se ignoran (el feed no saca de la página).
+   ➕ Además de estos, el feed usa el banco de videos populares de
+     media-pool.js, así que nunca se queda corto.
    ⚠ Los textos de ejemplo ("LINK_7"…) y las páginas que no son un
      video (p. ej. https://www.tiktok.com/es/) se ignoran solos.
    ========================================================================= */
@@ -26,7 +28,7 @@
   const mediaLinks = [
     // Original: https://vt.tiktok.com/ZSp92HKA4/ (link corto → dirección completa)
     "https://www.tiktok.com/@aldoxiito.exe/video/7706683463226674454",
-    "https://vt.tiktok.com/ZSp92HKA4/",
+    "https://www.tiktok.com/@aldoxiito.exe/video/7706683463226674454",
     "https://www.instagram.com/reels/DfiRwgnPwQe/",
     "https://web.facebook.com/reel/1150944893945530",
     "https://www.tiktok.com/es/",
