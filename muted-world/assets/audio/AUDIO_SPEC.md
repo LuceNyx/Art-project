@@ -1,6 +1,6 @@
 # Especificación de audio: Muted World
 
-Ahora mismo **todo el sonido se genera en código** con la Web Audio API (`js/audio.js`). Si guardas aquí un archivo con el **nombre exacto** de la tabla, se usa ese archivo en lugar del sonido generado, sin tocar el código.
+Ahora mismo **todo el sonido se genera en código** con la Web Audio API (`js/audio.js`). Si guardas aquí un archivo con el **nombre exacto** de la tabla y **agregas ese nombre a `AUDIO_REALES`** al inicio de `js/audio.js`, se usa ese archivo en lugar del sonido generado. Los que no estén en esa lista no se piden al servidor (sin errores 404).
 
 **Reglas**
 - **MP3** (o cambia la extensión en `CAPAS`, dentro de `js/audio.js`), mono o estéreo, de 20 a 60 s.

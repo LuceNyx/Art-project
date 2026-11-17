@@ -234,6 +234,10 @@
     ESCAPE_EVENT: 'muted:escape',
     RETURN_PARAM: 'return',
     IMG_PATH: 'assets/img/',
+    // Ilustraciones reales que YA están en assets/img/ (p. ej. 'room.jpg').
+    // Solo estas se piden al servidor; las demás se dibujan como placeholder
+    // en código, sin generar errores 404 en la consola.
+    REAL_IMAGES: [],
     STAGE: { width: 1920, height: 1080 },
     STORAGE: { muted: 'mw:muted', visited: 'mw:visited', returned: 'mw:returned' },
     MUTED_SCENES: MUTED_SCENES,

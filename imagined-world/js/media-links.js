@@ -18,6 +18,12 @@
    ➕ El banco de videos populares (media-pool.js) está APAGADO: el feed
      usa solo esta lista. Para volver a mezclarlo, descomenta su <script>
      en imagined-world/index.html.
+   🛡 FILTRO (content-filter.js, modo presentación activado): solo se
+     muestran los links marcados revisado: true, después de que alguien
+     los vea enteros. Un link suelto ("https://...") NO sale. Formato:
+       { url: "https://www.tiktok.com/@usuario/video/123...", revisado: true },
+     (opcional: author: "usuario", caption: "texto"; el filtro también
+     revisa esas palabras).
    ⚠ Los textos de ejemplo ("LINK_7"…) y las páginas que no son un
      video (p. ej. https://www.tiktok.com/es/) se ignoran solos.
    ========================================================================= */
@@ -27,16 +33,16 @@
 
   // ======================= TUS LINKS (editar aquí) =======================
   const mediaLinks = [
-    "https://www.tiktok.com/@tiggien/video/7688467046278941974",
-    "https://www.tiktok.com/@laika_012345/video/7706669227968679190",
-    "https://www.tiktok.com/@una.frase.para.ti7/video/7707825517726027030",
-    "https://www.tiktok.com/@lenguaaprista/video/7690045836427791636",
-    "https://www.tiktok.com/@nkolsx855/video/7687947613483715854",
-    "https://www.tiktok.com/@user4586906149617/video/7689124742393122078",
-    "https://www.tiktok.com/@michilovies/video/7707459652312681746",
-    "https://www.tiktok.com/@subwaysurfers/video/7608242750542335254",
-    "https://www.instagram.com/reels/DfiRwgnPwQe/",
-    "https://web.facebook.com/reel/1150944893945530"
+    { url: "https://www.tiktok.com/@tiggien/video/7688467046278941974", revisado: true },
+    { url: "https://www.tiktok.com/@laika_012345/video/7706669227968679190", revisado: true },
+    { url: "https://www.tiktok.com/@una.frase.para.ti7/video/7707825517726027030", revisado: true },
+    { url: "https://www.tiktok.com/@lenguaaprista/video/7690045836427791636", revisado: true },
+    { url: "https://www.tiktok.com/@nkolsx855/video/7687947613483715854", revisado: true },
+    { url: "https://www.tiktok.com/@user4586906149617/video/7689124742393122078", revisado: true },
+    { url: "https://www.tiktok.com/@michilovies/video/7707459652312681746", revisado: true },
+    { url: "https://www.tiktok.com/@subwaysurfers/video/7608242750542335254", revisado: true },
+    { url: "https://www.instagram.com/reels/DfiRwgnPwQe/", revisado: true },
+    { url: "https://web.facebook.com/reel/1150944893945530", revisado: true }
   ];
   // =======================================================================
 
