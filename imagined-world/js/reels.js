@@ -399,6 +399,44 @@
     if (actual && !IW.audio.isMuted()) { enviar(actual, 'play'); enviar(actual, 'unMute'); }
   }
 
+  /* ---------- Videos que fallan (borrados, enlace vencido…) ----------
+     TikTok avisa con onPlayerError. Primero se recarga una vez (pide un
+     enlace nuevo: "Player authentication failed" suele ser eso); si
+     vuelve a fallar, el video sale de la lista y se pasa al siguiente.
+     Si fallan demasiados seguidos se deja de saltar (evita un bucle). */
+  var fallosSeguidos = 0;
+
+  function reelDeFuente(fuente) {
+    var candidatos = [actual, precargado && precargado.nodo];
+    for (var i = 0; i < candidatos.length; i++) {
+      var f = candidatos[i] && candidatos[i].querySelector('iframe');
+      if (f && f.contentWindow === fuente) return candidatos[i];
+    }
+    return null;
+  }
+
+  function alFallar(fuente, valor) {
+    var r = reelDeFuente(fuente);
+    if (!r || r.dataset.fallo === 'fin') return;
+    var f = r.querySelector('iframe');
+    if (!r.dataset.fallo) {
+      r.dataset.fallo = '1';
+      setTimeout(function () { f.src = f.src.replace(/&_r=\d+/, '') + '&_r=' + Date.now(); }, 1200);
+      return;
+    }
+    r.dataset.fallo = 'fin';
+    var id = f.src.match(/player\/v1\/(\d+)/);
+    if (id) {
+      reproducibles = reproducibles.filter(function (x) { return x.id !== id[1]; });
+      bolsa = bolsa.filter(function (e) { return !e.item || e.item.id !== id[1]; });
+    }
+    if (window.console) console.info('[reels] TikTok no se pudo reproducir:', id && id[1], valor);
+    fallosSeguidos++;
+    if (fallosSeguidos > 4 || !reproducibles.length) return;
+    if (r === actual) { ultimoCambio = 0; next(); }
+    else if (precargado && r === precargado.nodo) { r.remove(); precargado = null; setTimeout(precargar, 300); }
+  }
+
   /* ---------- Me gusta ---------- */
   function like() {
     likes++;
@@ -471,6 +509,8 @@
       if (!/tiktok\.com|youtube\.com/.test(e.origin)) return;
       var d = e.data;
       if (typeof d === 'string') { try { d = JSON.parse(d); } catch (x) { return; } }
+      if (d && d.type === 'onPlayerError') { alFallar(e.source, d.value); return; }
+      if (d && d.type === 'onStateChange' && d.value === 1) fallosSeguidos = 0;   // 1 = reproduciendo
       if (!d || !(d.type === 'onPlayerReady' || d.event === 'onReady' || d.event === 'initialDelivery')) return;
       var fa = actual && actual.querySelector('iframe');
       if (fa && e.source === fa.contentWindow) { arrancar(actual); return; }
