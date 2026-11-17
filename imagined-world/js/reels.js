@@ -215,7 +215,6 @@
       f.src = urlEmbed(it, autoplay);
       f.title = 'Short video from ' + it.platform;
       f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write');
-      f.setAttribute('allowfullscreen', '');
       f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
       f.addEventListener('load', function () {
         r.classList.add('iw-reel--loaded');
@@ -420,18 +419,43 @@
     return null;
   }
 
+  function recargar(f) { f.src = f.src.replace(/&_r=\d+/, '') + '&_r=' + Date.now(); }
+
+  /* Sin internet no es culpa del video: se espera a que vuelva la conexión
+     y se recarga el que está en pantalla (no se saca de la lista). */
+  var esperandoRed = false;
+  function esperarConexion() {
+    if (esperandoRed) return;
+    esperandoRed = true;
+    if (IW.ui && IW.ui.toast) IW.ui.toast('No connection. The feed will wait.', 3500);
+    window.addEventListener('online', function vuelve() {
+      window.removeEventListener('online', vuelve);
+      esperandoRed = false;
+      fallosSeguidos = 0;
+      [actual, precargado && precargado.nodo].forEach(function (n) {
+        var fr = n && n.querySelector('iframe');
+        if (fr && n.dataset.fallo) { delete n.dataset.fallo; recargar(fr); }
+      });
+    });
+  }
+
   function alFallar(fuente, valor) {
     var r = reelDeFuente(fuente);
     if (!r || r.dataset.fallo === 'fin') return;
     var f = r.querySelector('iframe');
+    if (navigator.onLine === false) { r.dataset.fallo = 'red'; esperarConexion(); return; }
+    if (r.dataset.fallo === 'red') delete r.dataset.fallo;
     if (!r.dataset.fallo) {
       r.dataset.fallo = '1';
-      setTimeout(function () { f.src = f.src.replace(/&_r=\d+/, '') + '&_r=' + Date.now(); }, 1200);
+      setTimeout(function () { recargar(f); }, 1200);
       return;
     }
     r.dataset.fallo = 'fin';
     var id = f.src.match(/player\/v1\/(\d+)/);
-    if (id) {
+    // Solo se quita de la lista si TikTok dice que el video no sirve; un
+    // error de reproducción (red lenta, corte) puede salir bien más tarde.
+    var deFondo = !(valor && valor.errorType === 'PLAYBACK_ERROR');
+    if (id && deFondo) {
       reproducibles = reproducibles.filter(function (x) { return x.id !== id[1]; });
       bolsa = bolsa.filter(function (e) { return !e.item || e.item.id !== id[1]; });
     }

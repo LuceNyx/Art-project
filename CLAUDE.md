@@ -103,7 +103,7 @@ python3 -m http.server 8000   # abrir http://localhost:8000
 
 - Para revisar en un navegador real se usa **Playwright** (Chromium), instalado en la carpeta temporal de la sesión, fuera del proyecto. Las librerías del sistema ya están en el Codespace.
 - **Limitaciones conocidas del Chromium de pruebas:** no reproduce **AAC**, que es el formato de las vistas previas de Apple; para probar la música se sustituye el audio por un WAV. Tampoco decodifica el video de TikTok: su reproductor carga, pero muestra *Player error* (`onPlayerError` 3001). En Chrome, Edge o Safari reales ambos funcionan.
-- **Videos de TikTok que fallan:** el reproductor avisa con `onPlayerError`. El feed lo recarga una vez (enlace nuevo) y, si vuelve a fallar, lo saca de la lista y pasa al siguiente; tras 5 fallos seguidos deja de saltar. Los iframes de TikTok llevan `credentialless` (sin las cookies del visitante): con una sesión de TikTok abierta en Chrome/Edge de PC, muchos videos daban *Player authentication failed*.
+- **Videos de TikTok que fallan:** el reproductor avisa con `onPlayerError`. El feed lo recarga una vez (enlace nuevo) y, si vuelve a fallar, lo saca de la lista y pasa al siguiente; tras 5 fallos seguidos deja de saltar. Solo se quita de la lista si el error no es `PLAYBACK_ERROR` (un corte o red lenta puede salir bien después). **Sin internet** (`navigator.onLine` falso) no descarta nada: muestra *No connection. The feed will wait.* y, al volver la conexión, recarga el actual y el precargado. Los iframes de TikTok llevan `credentialless` (sin las cookies del visitante): con una sesión de TikTok abierta en Chrome/Edge de PC, muchos videos daban *Player authentication failed*.
 
 ## Pendiente
 
